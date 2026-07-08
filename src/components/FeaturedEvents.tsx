@@ -1,0 +1,125 @@
+import Image from "next/image";
+
+export default function FeaturedEvents() {
+  const events = [
+    {
+      id: 1,
+      image: "https://lh3.googleusercontent.com/aida/AP1WRLsM4r_jaW7lQPgpgG3ivsQUumbeHJdVF1rfkMmbpwGBkbW2InqnleBtNIAdELpnzDtAZkXTow9qN8N8ixjJ2D8zPPBOTVsV_4nyDacVwfRWgQLu-8QUe4g4w54khcpJ3ZfzIkXnXHCxzss-mW1vpJKvJRfJGJ59fQpWvndizAbAVmah3D3ynBaXHXThcP7AsRH9YVJFG_JRg4DwnZUt-39JHkeeG9mkol-q55Z7kCnpFaCYdi96OqRYxomY",
+      month: "Jun",
+      day: "28",
+      category: "Inter-Uni Sports",
+      title: "University Basketball Cup Finals",
+      location: "Multi-Sport Indoor Arena",
+      time: "18:00 PM - 21:00 PM",
+      price: "$12.50",
+    },
+    {
+      id: 2,
+      image: "https://lh3.googleusercontent.com/aida/AP1WRLtW3caMfd_05I9KWZExov2ccAndk0pgNPtzdG4xKQzKWBOd5uwraesd4W4ZUHDaamTc-GqWby-CF0i9m6CJv0saCciPPQAfuYWENnncKw77VlZq3jGWZ6_sQ614zvkfVRp0L9wB1I1tXtnHI46rMO51Q9I4Er_G3TskQmLximILNyCVoYOWt1n4MI2hf2ySK184M-etauvBb_0AzniNkrxe_qDKaF-rlRz3tlv-ViYyATQikSUu8us0YPA",
+      month: "Jul",
+      day: "05",
+      category: "Campus Festivals",
+      title: "Summer Vibes: Faculty of Arts Gala",
+      location: "West Wing Gardens",
+      time: "20:00 PM - Late",
+      price: "$25.00",
+    },
+    {
+      id: 3,
+      image: "https://lh3.googleusercontent.com/aida/AP1WRLu4Ey3tEeslXcOOKIHghqJZ80LR43D2Wkov97HeANnlu3IRDXD5SRs3bqrPtb0RzqBV7LkPGjji0AazjglvOVEpm58Y1puAFOqxkzKw82_gkzx3gA0H4Rc3i2oUVe592yPokan0ykLDmWCztJQ_HdnzVwnsLia15-hpEzBuTZ_xXuw9rH5deFmkPgECU8EdeJ0bi-K4RnklZXR6KXg5vjvbdBy7IyGzlKw-qXcRgOjOsdmnSfyDt-y-hGQJ",
+      month: "Jul",
+      day: "12",
+      category: "Academic Conferences",
+      title: "AI & The Future of Higher Ed",
+      location: "Great Auditorium Hall",
+      time: "09:00 AM - 16:00 PM",
+      price: "FREE",
+      isFree: true,
+    },
+  ];
+
+  return (
+    <section className="py-20">
+      <div className="max-w-container-max mx-auto px-margin-desktop">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <h2 className="font-headline-lg text-headline-lg text-university-blue mb-4">
+              Featured Campus Events
+            </h2>
+            <p className="font-body-md text-body-md text-on-surface-variant max-w-lg">
+              Hand-picked experiences across all departments and universities.
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <button className="px-6 py-2 rounded-full border border-university-blue text-university-blue font-semibold hover:bg-university-blue hover:text-white transition-all">
+              Today
+            </button>
+            <button className="px-6 py-2 rounded-full bg-university-blue text-white font-semibold shadow-md">
+              This Weekend
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {events.map((evt) => (
+            <article
+              key={evt.id}
+              className="event-card-hover bg-surface-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant group"
+            >
+              <div className="relative h-64 overflow-hidden">
+                <Image
+                  fill
+                  className="object-cover"
+                  src={evt.image}
+                  alt={evt.title}
+                />
+                <div className="absolute top-4 left-4 bg-surface-white rounded-xl p-2 text-center shadow-md border border-outline-variant min-w-[50px]">
+                  <span className="block text-university-blue font-bold text-label-sm leading-tight uppercase">
+                    {evt.month}
+                  </span>
+                  <span className="block text-university-blue font-black text-headline-sm leading-none">
+                    {evt.day}
+                  </span>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <span className="bg-innovation-purple text-white px-3 py-1 rounded-full text-label-sm font-bold shadow-lg">
+                    {evt.category}
+                  </span>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="font-title-lg text-title-lg text-university-blue mb-3 group-hover:text-innovation-purple transition-colors">
+                  {evt.title}
+                </h3>
+                <div className="space-y-2 mb-6">
+                  <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
+                    <span className="material-symbols-outlined text-sm">location_on</span>
+                    {evt.location}
+                  </p>
+                  <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
+                    <span className="material-symbols-outlined text-sm">schedule</span>
+                    {evt.time}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`font-extrabold text-headline-sm ${
+                      evt.isFree ? "text-green-600" : "text-university-blue"
+                    }`}
+                  >
+                    {evt.price}
+                  </span>
+                  <button className="bg-university-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">
+                    {evt.isFree ? "Register" : "Buy Ticket"}
+                    <span className="material-symbols-outlined text-sm">
+                      {evt.isFree ? "app_registration" : "shopping_cart"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

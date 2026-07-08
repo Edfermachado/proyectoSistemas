@@ -1,7 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-// Importaremos el esquema en el Paso 3
-// import * as schema from './schema';
+import * as schema from './schema';
 
 const connectionString = process.env.DATABASE_URI;
 
@@ -11,4 +10,4 @@ if (!connectionString) {
 
 // Inicialización del cliente Postgres
 const client = postgres(connectionString, { max: 10 }); // max: 10 conexiones simultáneas
-export const db = drizzle(client); // Añadiremos { schema } en el Paso 3
+export const db = drizzle(client, { schema });
