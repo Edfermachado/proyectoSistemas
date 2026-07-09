@@ -15,7 +15,7 @@ export class TenantsService {
     });
   }
 
-  static async createTenant(data: { name: string; description?: string }) {
+  static async createTenant(data: { name: string; description?: string; universityId?: string }) {
     const [newTenant] = await db.insert(tenants).values(data).returning();
     return newTenant;
   }

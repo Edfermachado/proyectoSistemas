@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
 export default function NewTenantPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [universities, setUniversities] = useState<{id: string, name: string}[]>([]);
+
+  useEffect(() => {
+    fetch('/api/universities').then(r => r.json()).then(setUniversities);
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -16,6 +21,7 @@ export default function NewTenantPage() {
     const data = {
       name: formData.get("name"),
       description: formData.get("description"),
+      universityId: formData.get("universityId") || null,
     };
 
     try {
@@ -51,6 +57,13 @@ export default function NewTenantPage() {
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Descripción (Opcional)</label>
             <textarea name="description" rows={4} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Descripción breve..." />
+          </div>
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Universidad</label>
+            <select name="universityId" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+              <option value="">-- Sin Universidad / Independiente --</option>
+              {universities.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+            </select>
           </div>
           <div className="flex justify-end gap-4 pt-4 border-t border-outline-variant/50">
             <Button type="button" variant="ghost" onClick={() => router.back()}>Cancelar</Button>

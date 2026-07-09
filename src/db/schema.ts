@@ -1,10 +1,18 @@
 import { pgTable, uuid, varchar, text, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+export const universities = pgTable('universities', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull().unique(),
   description: text('description'),
+  universityId: uuid('university_id').references(() => universities.id),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -44,8 +52,16 @@ export const attendees = pgTable('attendees', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Configuración de Relaciones (Drizzle Relations) para hacer queries anidados fácilmente
-export const tenantsRelations = relations(tenants, ({ many }) => ({
+// Configuración de Relaciones (Drizzle Relations)
+export const universitiesRelations = relations(universities, ({ many }) => ({
+  tenants: many(tenants),
+}));
+
+export const tenantsRelations = relations(tenants, ({ one, many }) => ({
+  university: one(universities, {
+    fields: [tenants.universityId],
+    references: [universities.id],
+  }),
   users: many(users),
   spaces: many(spaces),
   events: many(events),
@@ -59,6 +75,14 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   attendances: many(attendees),
 }));
 
+export const spacesRelations = relations(spaces, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [spaces.tenantId],
+    references: [tenants.id],
+  }),
+  events: many(events),
+}));
+
 export const eventsRelations = relations(events, ({ one, many }) => ({
   tenant: one(tenants, {
     fields: [events.tenantId],
@@ -69,4 +93,15 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     references: [spaces.id],
   }),
   attendees: many(attendees),
+}));
+
+export const attendeesRelations = relations(attendees, ({ one }) => ({
+  user: one(users, {
+    fields: [attendees.userId],
+    references: [users.id],
+  }),
+  event: one(events, {
+    fields: [attendees.eventId],
+    references: [events.id],
+  }),
 }));
