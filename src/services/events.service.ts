@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { events, spaces } from "@/db/schema";
+import { events } from "@/db/schema";
 import { eq, and, lte, gte } from "drizzle-orm";
 
 /**
@@ -21,22 +21,45 @@ export class EventsService {
   }
 
   /**
-   * Lógica de Negocio: Validar colisiones de horarios antes de crear un evento.
+   * Obtiene un evento por su ID.
    */
-  static async checkSpaceConflict(spaceId: string, eventDate: Date): Promise<boolean> {
-    // Definimos una ventana de tiempo (ej. 3 horas)
-    const startTime = new Date(eventDate);
-    const endTime = new Date(eventDate.getTime() + 3 * 60 * 60 * 1000);
+  static async getEventById(id: string) {
+    return await db.query.events.findFirst({
+      where: eq(events.id, id),
+      with: {
+        space: true,
+      },
+    });
+  }
 
-    // TODO: Implementar lógica de conflicto real usando los operadores de Drizzle
-    // Por ahora retornamos falso asumiendo que no hay conflicto
-    return false;
+  /**
+   * Lógica de Negocio: Validar colisiones de horarios antes de crear o actualizar un evento.
+   */
+  static async checkSpaceConflict(spaceId: string, eventDate: Date, excludeEventId?: string): Promise<boolean> {
+    // Definimos una ventana de tiempo (ej. 3 horas)
+    const threeHours = 3 * 60 * 60 * 1000;
+    const lowerBound = new Date(eventDate.getTime() - threeHours);
+    const upperBound = new Date(eventDate.getTime() + threeHours);
+
+    const overlappingEvents = await db.query.events.findMany({
+      where: and(
+        eq(events.spaceId, spaceId),
+        gte(events.date, lowerBound),
+        lte(events.date, upperBound)
+      ),
+    });
+
+    if (excludeEventId) {
+      return overlappingEvents.some(event => event.id !== excludeEventId);
+    }
+
+    return overlappingEvents.length > 0;
   }
 
   /**
    * Crea un evento validando las reglas de negocio.
    */
-  static async createEvent(data: { title: string; date: Date; tenantId: string; spaceId: string; description?: string }) {
+  static async createEvent(data: { title: string; date: Date; price?: string; tenantId: string; spaceId: string; description?: string }) {
     const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date);
     
     if (hasConflict) {
@@ -45,5 +68,40 @@ export class EventsService {
 
     const [newEvent] = await db.insert(events).values(data).returning();
     return newEvent;
+  }
+
+  /**
+   * Actualiza un evento validando las reglas de negocio.
+   */
+  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; price: string; spaceId: string; description: string }>) {
+    if (data.spaceId || data.date) {
+      const currentEvent = await this.getEventById(id);
+      if (!currentEvent) throw new Error("Event not found");
+
+      const spaceId = data.spaceId || currentEvent.spaceId;
+      const eventDate = data.date || currentEvent.date;
+
+      const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, id);
+      
+      if (hasConflict) {
+        throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
+      }
+    }
+
+    const [updatedEvent] = await db.update(events)
+      .set(data)
+      .where(eq(events.id, id))
+      .returning();
+    return updatedEvent;
+  }
+
+  /**
+   * Elimina un evento.
+   */
+  static async deleteEvent(id: string) {
+    const [deletedEvent] = await db.delete(events)
+      .where(eq(events.id, id))
+      .returning();
+    return deletedEvent;
   }
 }

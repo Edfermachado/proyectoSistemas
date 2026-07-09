@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import { db } from '@/db';
+import { tenants, users, events, spaces } from '@/db/schema';
+import { count } from 'drizzle-orm';
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  // Fetch real metrics from the database
+  const [tenantsCount] = await db.select({ value: count() }).from(tenants);
+  const [usersCount] = await db.select({ value: count() }).from(users);
+  const [eventsCount] = await db.select({ value: count() }).from(events);
+  const [spacesCount] = await db.select({ value: count() }).from(spaces);
+
   return (
     <div className="space-y-10 animate-fade-in">
       <div className="flex justify-between items-end">
@@ -18,10 +27,10 @@ export default function AdminDashboard() {
 
       {/* Métricas Globales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard title="Facultades" value="12" icon="account_balance" color="text-innovation-purple" bg="bg-innovation-purple/10" />
-        <MetricCard title="Usuarios" value="1,248" icon="group" color="text-university-blue" bg="bg-university-blue/10" />
-        <MetricCard title="Eventos Activos" value="84" icon="event" color="text-academic-gold" bg="bg-academic-gold/20" />
-        <MetricCard title="Espacios Físicos" value="36" icon="location_on" color="text-emerald-600" bg="bg-emerald-100" />
+        <MetricCard title="Facultades" value={tenantsCount.value.toString()} icon="account_balance" color="text-innovation-purple" bg="bg-innovation-purple/10" />
+        <MetricCard title="Usuarios" value={usersCount.value.toString()} icon="group" color="text-university-blue" bg="bg-university-blue/10" />
+        <MetricCard title="Eventos Activos" value={eventsCount.value.toString()} icon="event" color="text-academic-gold" bg="bg-academic-gold/20" />
+        <MetricCard title="Espacios Físicos" value={spacesCount.value.toString()} icon="location_on" color="text-emerald-600" bg="bg-emerald-100" />
       </div>
 
       {/* Accesos Rápidos (Quick Links) */}
