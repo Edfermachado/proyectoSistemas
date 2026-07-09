@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { DeleteButton } from "@/components/ui/DeleteButton";
 import { db } from "@/db";
 import Link from "next/link";
 
@@ -53,12 +54,10 @@ export default async function UsersPage() {
                     </td>
                     <td className="px-6 py-4 text-on-surface-variant">{u.tenant?.name || "Global"}</td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
+                      <Link href={`/admin/users/${u.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
                         <span className="material-symbols-outlined text-sm">edit</span>
-                      </button>
-                      <button className="text-error hover:text-error/80 p-2 ml-2 transition-colors">
-                        <span className="material-symbols-outlined text-sm">delete</span>
-                      </button>
+                      </Link>
+                      <DeleteButton endpoint="users" id={u.id} />
                     </td>
                   </tr>
                 ))}

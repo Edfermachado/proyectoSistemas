@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { DeleteButton } from "@/components/ui/DeleteButton";
 import { TenantsService } from "@/services/tenants.service";
 import Link from "next/link";
 
@@ -57,12 +58,10 @@ export default async function TenantsPage() {
                     <td className="px-6 py-4 text-on-surface-variant max-w-xs truncate">{t.description || "-"}</td>
                     <td className="px-6 py-4 text-on-surface-variant">{t.createdAt?.toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
+                      <Link href={`/admin/tenants/${t.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
                         <span className="material-symbols-outlined text-sm">edit</span>
-                      </button>
-                      <button className="text-error hover:text-error/80 p-2 ml-2 transition-colors">
-                        <span className="material-symbols-outlined text-sm">delete</span>
-                      </button>
+                      </Link>
+                      <DeleteButton endpoint="tenants" id={t.id} />
                     </td>
                   </tr>
                 ))}
