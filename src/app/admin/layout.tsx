@@ -17,6 +17,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
           </Link>
+          <Link href="/admin/universities" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">domain</span>
+            Universidades
+          </Link>
           <Link href="/admin/tenants" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">account_balance</span>
             Facultades

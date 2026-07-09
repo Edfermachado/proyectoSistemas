@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { db } from '@/db';
-import { tenants, users, events, spaces } from '@/db/schema';
+import { universities, tenants, users, events, spaces } from '@/db/schema';
 import { count } from 'drizzle-orm';
 
 export default async function AdminDashboard() {
   // Fetch real metrics from the database
+  const [universitiesCount] = await db.select({ value: count() }).from(universities);
   const [tenantsCount] = await db.select({ value: count() }).from(tenants);
   const [usersCount] = await db.select({ value: count() }).from(users);
   const [eventsCount] = await db.select({ value: count() }).from(events);
@@ -26,7 +27,8 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Métricas Globales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <MetricCard title="Universidades" value={universitiesCount.value.toString()} icon="domain" color="text-indigo-600" bg="bg-indigo-100" />
         <MetricCard title="Facultades" value={tenantsCount.value.toString()} icon="account_balance" color="text-innovation-purple" bg="bg-innovation-purple/10" />
         <MetricCard title="Usuarios" value={usersCount.value.toString()} icon="group" color="text-university-blue" bg="bg-university-blue/10" />
         <MetricCard title="Eventos Activos" value={eventsCount.value.toString()} icon="event" color="text-academic-gold" bg="bg-academic-gold/20" />
@@ -39,7 +41,17 @@ export default async function AdminDashboard() {
           <span className="material-symbols-outlined text-academic-gold">bolt</span>
           Accesos Rápidos
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link href="/admin/universities" className="event-card-hover bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex items-center justify-between group shadow-sm">
+            <div>
+              <h3 className="font-title-lg text-university-blue group-hover:text-innovation-purple transition-colors">Universidades</h3>
+              <p className="text-label-sm text-on-surface-variant mt-2">Gestionar instituciones base</p>
+            </div>
+            <div className="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-innovation-purple/10 transition-colors">
+              <span className="material-symbols-outlined text-university-blue group-hover:text-innovation-purple">arrow_forward</span>
+            </div>
+          </Link>
+
           <Link href="/admin/tenants" className="event-card-hover bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex items-center justify-between group shadow-sm">
             <div>
               <h3 className="font-title-lg text-university-blue group-hover:text-innovation-purple transition-colors">Gestionar Facultades</h3>
