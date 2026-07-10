@@ -29,7 +29,7 @@ export default function Header() {
             <Link href="#" className="font-body-md text-label-md text-academic-gold font-bold border-b-2 border-academic-gold pb-1">
               Explore
             </Link>
-            <Link href="#" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
+            <Link href="/universities" className="font-body-md text-label-md text-surface-variant hover:text-academic-gold transition-colors">
               Universities
             </Link>
             <Link href="#" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
