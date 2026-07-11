@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { db } from "@/db";
 import { eq, ilike, and, or } from "drizzle-orm";
-import { events as eventsSchema, tenants } from "@/db/schema";
+import { events as eventsSchema, tenants, spaces, universities } from "@/db/schema";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -29,18 +29,42 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
 
   let whereClause = undefined;
   if (resolvedFacultyId && query) {
-    whereClause = and(eq(eventsSchema.tenantId, resolvedFacultyId), ilike(eventsSchema.title, `%${query}%`));
+    whereClause = and(
+      eq(eventsSchema.tenantId, resolvedFacultyId),
+      or(
+        ilike(eventsSchema.title, `%${query}%`),
+        ilike(eventsSchema.description, `%${query}%`)
+      )
+    );
   } else if (resolvedFacultyId) {
     whereClause = eq(eventsSchema.tenantId, resolvedFacultyId);
   } else if (query) {
-    whereClause = ilike(eventsSchema.title, `%${query}%`);
+    whereClause = or(
+      ilike(eventsSchema.title, `%${query}%`),
+      ilike(eventsSchema.description, `%${query}%`),
+      ilike(tenants.name, `%${query}%`),
+      ilike(universities.name, `%${query}%`)
+    );
   }
 
-  const events = await db.query.events.findMany({
-    where: whereClause,
-    with: { space: true, tenant: true },
-    orderBy: (events, { asc }) => [asc(events.date)],
-  });
+  const rows = await db
+    .select({
+      event: eventsSchema,
+      tenant: tenants,
+      space: spaces,
+    })
+    .from(eventsSchema)
+    .leftJoin(tenants, eq(eventsSchema.tenantId, tenants.id))
+    .leftJoin(spaces, eq(eventsSchema.spaceId, spaces.id))
+    .leftJoin(universities, eq(tenants.universityId, universities.id))
+    .where(whereClause)
+    .orderBy(eventsSchema.date);
+
+  const events = rows.map((row) => ({
+    ...row.event,
+    tenant: row.tenant,
+    space: row.space,
+  }));
 
   return (
     <main className="bg-surface">

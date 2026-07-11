@@ -18,20 +18,21 @@ export default function Hero() {
           <p className="font-body-lg text-body-lg text-on-primary-container/80 max-w-xl">
             Desde campeonatos importantes hasta galas nocturnas de la facultad, encuentra cada boleto para los momentos que definen tu vida estudiantil.
           </p>
-          <div className="bg-surface-white p-2 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-outline-variant">
+          <form action="/events" method="GET" className="bg-surface-white p-2 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-outline-variant">
             <div className="flex-1 flex items-center px-4 border-r border-outline-variant/50">
               <span className="material-symbols-outlined text-university-blue mr-3">school</span>
               <input
                 type="text"
-                placeholder="Buscar por Facultad o Universidad"
+                name="q"
+                placeholder="Buscar por Evento, Facultad o Universidad"
                 className="w-full border-none focus:ring-0 text-body-md py-3 text-university-blue focus:outline-none"
               />
             </div>
-            <button className="bg-university-blue text-surface-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-innovation-purple transition-all duration-300">
+            <button type="submit" className="bg-university-blue text-surface-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-innovation-purple transition-all duration-300">
               <span className="material-symbols-outlined">search</span>
               Buscar Eventos
             </button>
-          </div>
+          </form>
           <div className="flex items-center gap-4 pt-4">
             <div className="flex -space-x-4">
               <div className="w-10 h-10 rounded-full border-2 border-university-blue bg-slate-500 overflow-hidden relative">
