@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,16 +28,40 @@ export default function Header() {
             UniEvents
           </Link>
           <nav className="hidden md:flex gap-6 items-center">
-            <Link href="#" className="font-body-md text-label-md text-academic-gold font-bold border-b-2 border-academic-gold pb-1">
+            <Link 
+              href="/events" 
+              className={`font-body-md text-label-md transition-colors ${
+                pathname === "/" || pathname?.startsWith("/events")
+                  ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
+                  : "text-surface-variant hover:text-surface-white"
+              }`}
+            >
               Explorar
             </Link>
-            <Link href="/universities" className="font-body-md text-label-md text-surface-variant hover:text-academic-gold transition-colors">
+            <Link 
+              href="/universities" 
+              className={`font-body-md text-label-md transition-colors ${
+                pathname?.startsWith("/universities")
+                  ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
+                  : "text-surface-variant hover:text-surface-white"
+              }`}
+            >
               Universidades
             </Link>
-            <Link href="/faculties" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
+            <Link 
+              href="/faculties" 
+              className={`font-body-md text-label-md transition-colors ${
+                pathname?.startsWith("/faculties")
+                  ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
+                  : "text-surface-variant hover:text-surface-white"
+              }`}
+            >
               Facultades
             </Link>
-            <Link href="#" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
+            <Link 
+              href="#" 
+              className={`font-body-md text-label-md transition-colors text-surface-variant hover:text-surface-white`}
+            >
               Ayuda
             </Link>
           </nav>
