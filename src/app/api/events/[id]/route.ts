@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
+import sharp from "sharp";
+import { join } from "path";
+import { mkdirSync } from "fs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,11 +18,64 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const body = await request.json();
     
-    // Parse date if present
-    if (body.date) {
-      body.date = new Date(body.date);
+    const contentType = request.headers.get("content-type") || "";
+    let body: any = {};
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      
+      body.title = formData.get("title");
+      body.description = formData.get("description");
+      if (formData.get("date")) body.date = new Date(formData.get("date") as string);
+      if (formData.get("duration")) body.duration = parseInt(formData.get("duration") as string);
+      body.price = formData.get("price");
+      body.tenantId = formData.get("tenantId");
+      body.spaceId = formData.get("spaceId");
+
+      const image = formData.get("image") as File | null;
+      if (image && image.size > 0) {
+        if (image.size > 5 * 1024 * 1024) {
+          return NextResponse.json({ error: "La imagen es demasiado grande (Máximo 5MB)" }, { status: 400 });
+        }
+        
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(image.type)) {
+          return NextResponse.json({ error: "Formato de imagen inválido. Solo JPG, PNG y WEBP están permitidos." }, { status: 400 });
+        }
+
+        const arrayBuffer = await image.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        const fileName = `event-${Date.now()}.webp`;
+        const uploadDir = join(process.cwd(), "public", "uploads");
+        
+        try {
+          mkdirSync(uploadDir, { recursive: true });
+        } catch (e) {}
+        
+        const filePath = join(uploadDir, fileName);
+        
+        await sharp(buffer)
+          .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toFile(filePath);
+          
+        body.imageUrl = `/uploads/${fileName}`;
+      }
+      
+      // Limpiar propiedades undefined o null que no fueron enviadas (excepto si el cliente quiere borrar algo, pero FormData devuelve string vacío o null si no se envió)
+      Object.keys(body).forEach(key => {
+        if (body[key] === null || body[key] === undefined) {
+          delete body[key];
+        }
+      });
+    } else {
+      // Soporte retrocompatible para JSON
+      body = await request.json();
+      if (body.date) {
+        body.date = new Date(body.date);
+      }
     }
     
     const updated = await EventsService.updateEvent(id, body);

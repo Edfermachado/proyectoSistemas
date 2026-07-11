@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const date = formData.get("date") as string;
+    const duration = parseInt(formData.get("duration") as string) || 60; // Default a 60 min
     const price = formData.get("price") as string;
     const tenantId = formData.get("tenantId") as string;
     const spaceId = formData.get("spaceId") as string;
@@ -75,6 +76,7 @@ export async function POST(request: Request) {
     const newEvent = await EventsService.createEvent({
       title,
       date: new Date(date),
+      duration,
       price: price || 'FREE',
       tenantId,
       spaceId,

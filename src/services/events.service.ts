@@ -33,13 +33,17 @@ export class EventsService {
   }
 
   /**
-   * Lógica de Negocio: Validar colisiones de horarios antes de crear o actualizar un evento.
+   * Lógica de Negocio: Validar colisiones de horarios considerando la duración.
    */
-  static async checkSpaceConflict(spaceId: string, eventDate: Date, excludeEventId?: string): Promise<boolean> {
-    // Definimos una ventana de tiempo (ej. 3 horas)
-    const threeHours = 3 * 60 * 60 * 1000;
-    const lowerBound = new Date(eventDate.getTime() - threeHours);
-    const upperBound = new Date(eventDate.getTime() + threeHours);
+  static async checkSpaceConflict(spaceId: string, eventDate: Date, durationMinutes: number, excludeEventId?: string): Promise<boolean> {
+    // Calculamos el inicio y fin del nuevo evento
+    const newStart = eventDate.getTime();
+    const newEnd = newStart + durationMinutes * 60 * 1000;
+
+    // Buscamos eventos en un rango de +/- 1 día para estar seguros (por temas de medianoche)
+    const oneDay = 24 * 60 * 60 * 1000;
+    const lowerBound = new Date(newStart - oneDay);
+    const upperBound = new Date(newEnd + oneDay);
 
     const overlappingEvents = await db.query.events.findMany({
       where: and(
@@ -49,18 +53,26 @@ export class EventsService {
       ),
     });
 
-    if (excludeEventId) {
-      return overlappingEvents.some(event => event.id !== excludeEventId);
+    for (const event of overlappingEvents) {
+      if (excludeEventId && event.id === excludeEventId) continue;
+
+      const eventStart = event.date.getTime();
+      const eventEnd = eventStart + event.duration * 60 * 1000;
+
+      // Hay colisión si startA < endB y startB < endA
+      if (newStart < eventEnd && eventStart < newEnd) {
+        return true;
+      }
     }
 
-    return overlappingEvents.length > 0;
+    return false;
   }
 
   /**
    * Crea un evento validando las reglas de negocio.
    */
-  static async createEvent(data: { title: string; date: Date; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null }) {
-    const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date);
+  static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null }) {
+    const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date, data.duration);
     
     if (hasConflict) {
       throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
@@ -73,15 +85,16 @@ export class EventsService {
   /**
    * Actualiza un evento validando las reglas de negocio.
    */
-  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; price: string; spaceId: string; description: string; imageUrl: string | null }>) {
-    if (data.spaceId || data.date) {
+  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; duration: number; price: string; spaceId: string; description: string; imageUrl: string | null }>) {
+    if (data.spaceId || data.date || data.duration) {
       const currentEvent = await this.getEventById(id);
       if (!currentEvent) throw new Error("Event not found");
 
       const spaceId = data.spaceId || currentEvent.spaceId;
       const eventDate = data.date || currentEvent.date;
+      const duration = data.duration || currentEvent.duration;
 
-      const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, id);
+      const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, duration, id);
       
       if (hasConflict) {
         throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");

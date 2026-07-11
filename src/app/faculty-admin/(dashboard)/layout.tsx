@@ -23,9 +23,13 @@ export default async function FacultyAdminLayout({ children }: { children: React
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
           </Link>
-          <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-university-blue bg-primary-fixed rounded-2xl shadow-sm border border-primary-fixed-dim font-bold transition-all hover:shadow-md">
+          <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">local_activity</span>
             Mis Eventos
+          </Link>
+          <Link href="/faculty-admin/calendar" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">calendar_month</span>
+            Calendario
           </Link>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">

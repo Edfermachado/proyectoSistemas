@@ -92,10 +92,14 @@ export default function FacultyNewEventPage() {
             <input name="title" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. Taller de Diseño" />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block font-title-sm text-university-blue mb-2">Fecha y Hora</label>
               <input name="date" required type="datetime-local" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Duración (min)</label>
+              <input name="duration" required type="number" min="15" step="15" defaultValue="60" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
             </div>
             <div>
               <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>

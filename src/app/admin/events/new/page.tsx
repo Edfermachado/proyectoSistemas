@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { EventTimePicker } from "@/components/EventTimePicker";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -38,20 +39,12 @@ export default function NewEventPage() {
     setErrorMsg("");
     
     const formData = new FormData(e.currentTarget);
-    const data = {
-      title: formData.get("title"),
-      description: formData.get("description"),
-      date: formData.get("date"),
-      price: formData.get("price") || "FREE",
-      tenantId: formData.get("tenantId"),
-      spaceId: formData.get("spaceId"),
-    };
+    if (!formData.get("price")) formData.set("price", "FREE");
 
     try {
       const res = await fetch("/api/events", {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
+        body: formData,
       });
       
       if (!res.ok) {
@@ -88,10 +81,8 @@ export default function NewEventPage() {
             <label className="block font-title-sm text-university-blue mb-2">Título del Evento</label>
             <input name="title" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. Taller de Robótica" />
           </div>
-          <div>
-            <label className="block font-title-sm text-university-blue mb-2">Fecha y Hora</label>
-            <input name="date" required type="datetime-local" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
-          </div>
+          
+          <EventTimePicker />
           
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -115,6 +106,13 @@ export default function NewEventPage() {
               </select>
             </div>
           </div>
+
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Foto / Banner (Opcional)</label>
+            <input name="image" type="file" accept="image/jpeg, image/png, image/webp" className="w-full px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-university-blue file:text-white hover:file:bg-innovation-purple cursor-pointer text-sm" />
+            <p className="text-xs text-on-surface-variant mt-1">Máximo 5MB (JPG, PNG, WEBP)</p>
+          </div>
+          
           
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Descripción (Opcional)</label>

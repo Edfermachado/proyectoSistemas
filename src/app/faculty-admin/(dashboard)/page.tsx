@@ -35,6 +35,18 @@ export default async function FacultyDashboardPage() {
             <p className="font-headline-lg text-university-blue">Gestionar</p>
           </div>
         </Link>
+        <Link 
+          href="/faculty-admin/calendar" 
+          className="bg-surface-white rounded-3xl p-6 border border-outline-variant shadow-sm flex items-center gap-4 hover:shadow-md hover:border-university-blue/30 transition-all cursor-pointer group"
+        >
+          <div className="w-16 h-16 bg-academic-gold/10 text-academic-gold rounded-2xl flex items-center justify-center group-hover:bg-academic-gold group-hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-3xl">calendar_month</span>
+          </div>
+          <div>
+            <p className="text-on-surface-variant font-label-md">Programación</p>
+            <p className="font-headline-lg text-university-blue">Calendario</p>
+          </div>
+        </Link>
       </div>
     </div>
   );
