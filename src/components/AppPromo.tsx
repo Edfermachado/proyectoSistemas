@@ -42,6 +42,7 @@ export default function AppPromo() {
               <div className="relative w-full h-full pt-8">
                 <Image
                   fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrdhlNNiTyxGBzRwAUdBsVdKKBSfXyl0IgJWag-RMu5LCsPR7HgYy-L1u-rch3ROqUHKY3fWx0XhxPVOafzIErAXU16hckQKRhrvWf9pdMtKc1ctS8YWYEDBxDNmleIuCjp28ww12NT1k_U-EH16HqjfSrmE6ABtBmELcP-MrwnLlBOhTqMIoxxMbKvAysRG-l1OlWCPjd-Wp-7VO0s_XJC5dzKFeEFNqjpxYZruid4fEi07jUOGPS3g5SA_UXnJ2igEA8vTbdBxwI"
                   alt="App Mockup"

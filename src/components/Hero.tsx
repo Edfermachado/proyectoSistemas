@@ -37,6 +37,7 @@ export default function Hero() {
               <div className="w-10 h-10 rounded-full border-2 border-university-blue bg-slate-500 overflow-hidden relative">
                 <Image
                   fill
+                  sizes="40px"
                   className="object-cover"
                   alt="Student 1"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDono8M6zN8lr0aqzEqWJmvmLIvXohTtVrXorEqeMpn6gjn5UqI0mGTj7i7jW2i64_xUjdt9OItKjbfjPGONLC5xBLAgrHluUFZoPwtHz9oHIz-T5LTBmD5dyKexdMHe0l1pq0pVedyw6qFhLNEMUzLlFT0ySjSry7IVh7C9HCAHrJl0xM8T1p0QREDSXb_QlKbTzxwuWucuqeG4EYGjfcnenfKxvaJD7reDwLsNgCDvGXMdgrXIC7ymre6orjpPDvYyerQxao_90WY"
@@ -45,6 +46,7 @@ export default function Hero() {
               <div className="w-10 h-10 rounded-full border-2 border-university-blue bg-slate-500 overflow-hidden relative">
                 <Image
                   fill
+                  sizes="40px"
                   className="object-cover"
                   alt="Student 2"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoclTX8cfYm9iuXp-7J2QroeNVSQJidV13UfabBG2nXBL8c7VbXp12IN3A3M2jrGpWtn7p_ju4KpiyfDAyedDZISwOYsv7BV76RFvDNnp7NgsfvabgqvtBke6LdpApmp9VHhnvweVCrFVUTmDgJArmgl5Yl3EFIfeV3d9tRXR-BXxNRvtQqAmfRIEo0KimjDFd5-XdAfcrNhN2HQKym6rY8ITPYTOqwFCBwPCFTohPhtPY51soLVyMbayemgz1luWlyIBJgxV3KwR6"
@@ -53,6 +55,7 @@ export default function Hero() {
               <div className="w-10 h-10 rounded-full border-2 border-university-blue bg-slate-500 overflow-hidden relative">
                 <Image
                   fill
+                  sizes="40px"
                   className="object-cover"
                   alt="Student 3"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2J7L-Twl-3etlhKNtRhe1CBmKwtgueDeLlW3GqmydirWYxDkJ3HkzC5rOBfjEdcYIdSvaDIW7_G9xir9FK0XnKsO3HoJeLpMzQat7-xeJ2OnLc0RKjwdYgnTLR9oJoWvIVAdPuM_mCdL8Rl4SpIr9iQHHZZLcIGGQso8RLI4jtDT0gMtrUPwaidl_C6wB-d379_r7TxXWusQ872y8WEz6jxZxqq9K4aGGEmgOkFLLbGSsHIrNS7SN4Ma0rBT91kvvtGpy9inWeIHZ"
@@ -67,9 +70,10 @@ export default function Hero() {
           <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/5] border-4 border-surface-white/10">
             <Image
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
               alt="Live Event"
-              src="https://lh3.googleusercontent.com/aida/AP1WRLtJRQD-GHfhea71C9S8RSBDXBh7MBu4e_xwfqbeCofCTGmxgZ0IjmwOaDOvyfur3pUaYdEws5vK1F7XhLJxFuUX4H8rpMkDW0q0BwhXKZND0SR4k-pLzgYCd2uJnswNqst4aACruAtvVRD6owGaIP7LTYFbVAhBdC9O0Xxlhf6W3Yx71ZS3kbMSDS-_TRl_Msp6t8beWgrCnlcJmmHkfC4ZOBhsRLVbOP6ZjoHdvSQY7OYd2ztcbQn5e_GL"
+              src="/images/hero_event_live.png"
             />
             <div className="absolute bottom-0 left-0 right-0 p-8 gradient-overlay flex flex-col justify-end">
               <div className="bg-innovation-purple text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest w-fit mb-3">

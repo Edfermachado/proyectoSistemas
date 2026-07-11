@@ -4,7 +4,7 @@ export default function FeaturedEvents() {
   const events = [
     {
       id: 1,
-      image: "https://lh3.googleusercontent.com/aida/AP1WRLsM4r_jaW7lQPgpgG3ivsQUumbeHJdVF1rfkMmbpwGBkbW2InqnleBtNIAdELpnzDtAZkXTow9qN8N8ixjJ2D8zPPBOTVsV_4nyDacVwfRWgQLu-8QUe4g4w54khcpJ3ZfzIkXnXHCxzss-mW1vpJKvJRfJGJ59fQpWvndizAbAVmah3D3ynBaXHXThcP7AsRH9YVJFG_JRg4DwnZUt-39JHkeeG9mkol-q55Z7kCnpFaCYdi96OqRYxomY",
+      image: "/images/event_basketball.png",
       month: "Jun",
       day: "28",
       category: "Inter-Uni Sports",
@@ -15,7 +15,7 @@ export default function FeaturedEvents() {
     },
     {
       id: 2,
-      image: "https://lh3.googleusercontent.com/aida/AP1WRLtW3caMfd_05I9KWZExov2ccAndk0pgNPtzdG4xKQzKWBOd5uwraesd4W4ZUHDaamTc-GqWby-CF0i9m6CJv0saCciPPQAfuYWENnncKw77VlZq3jGWZ6_sQ614zvkfVRp0L9wB1I1tXtnHI46rMO51Q9I4Er_G3TskQmLximILNyCVoYOWt1n4MI2hf2ySK184M-etauvBb_0AzniNkrxe_qDKaF-rlRz3tlv-ViYyATQikSUu8us0YPA",
+      image: "/images/event_gala.png",
       month: "Jul",
       day: "05",
       category: "Campus Festivals",
@@ -26,7 +26,7 @@ export default function FeaturedEvents() {
     },
     {
       id: 3,
-      image: "https://lh3.googleusercontent.com/aida/AP1WRLu4Ey3tEeslXcOOKIHghqJZ80LR43D2Wkov97HeANnlu3IRDXD5SRs3bqrPtb0RzqBV7LkPGjji0AazjglvOVEpm58Y1puAFOqxkzKw82_gkzx3gA0H4Rc3i2oUVe592yPokan0ykLDmWCztJQ_HdnzVwnsLia15-hpEzBuTZ_xXuw9rH5deFmkPgECU8EdeJ0bi-K4RnklZXR6KXg5vjvbdBy7IyGzlKw-qXcRgOjOsdmnSfyDt-y-hGQJ",
+      image: "/images/event_ai.png",
       month: "Jul",
       day: "12",
       category: "Academic Conferences",
@@ -68,6 +68,7 @@ export default function FeaturedEvents() {
               <div className="relative h-64 overflow-hidden">
                 <Image
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                   src={evt.image}
                   alt={evt.title}
