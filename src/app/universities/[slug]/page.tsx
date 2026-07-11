@@ -1,23 +1,27 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { db } from "@/db";
-import { eq } from "drizzle-orm";
-import { universities as universitiesSchema } from "@/db/schema";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { findUniversityBySlugOrId } from "@/lib/slug-helpers";
+import type { Metadata } from "next";
 
-export default async function UniversityFacultiesPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  
-  const university = await db.query.universities.findFirst({
-    where: eq(universitiesSchema.id, id),
-    with: {
-      tenants: {
-        orderBy: (tenants, { desc }) => [desc(tenants.createdAt)]
-      }
-    }
-  });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const university = await findUniversityBySlugOrId(slug);
+  if (!university) return { title: "Universidad no encontrada" };
+  return {
+    title: `${university.name} — UniEvents`,
+    description: university.description ?? `Explora las facultades y eventos de ${university.name} en UniEvents.`,
+    openGraph: {
+      title: `${university.name} — UniEvents`,
+      description: university.description ?? `Explora las facultades y eventos de ${university.name}.`,
+    },
+  };
+}
 
+export default async function UniversityFacultiesPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const university = await findUniversityBySlugOrId(slug);
   if (!university) notFound();
 
   return (
@@ -74,7 +78,7 @@ export default async function UniversityFacultiesPage({ params }: { params: Prom
                   {faculty.description || "Descubre los espacios, horarios y próximos eventos ofrecidos por esta facultad."}
                 </p>
                 
-                <Link href={`/events?faculty=${faculty.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
+                <Link href={`/events?faculty=${faculty.slug || faculty.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
                   Ver Eventos
                   <span className="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform">arrow_forward</span>
                 </Link>

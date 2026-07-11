@@ -51,7 +51,7 @@ export default async function UniversitiesPage() {
                   {uni.description || "Descubre las diversas facultades, espacios de primer nivel y próximos eventos ofrecidos por esta institución."}
                 </p>
                 
-                <Link href={`/universities/${uni.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
+                <Link href={`/universities/${uni.slug || uni.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
                   Ver Facultades
                   <span className="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform">arrow_forward</span>
                 </Link>

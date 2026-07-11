@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { tenants } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { generateUniqueSlug } from "@/lib/slug-helpers";
 
 export class TenantsService {
   static async getAllTenants() {
@@ -16,13 +17,15 @@ export class TenantsService {
   }
 
   static async createTenant(data: { name: string; description?: string; universityId?: string }) {
-    const [newTenant] = await db.insert(tenants).values(data).returning();
+    const slug = await generateUniqueSlug("tenants", data.name);
+    const [newTenant] = await db.insert(tenants).values({ ...data, slug }).returning();
     return newTenant;
   }
 
   static async updateTenant(id: string, data: Partial<{ name: string; description: string }>) {
+    const slugUpdate = data.name ? { slug: await generateUniqueSlug("tenants", data.name, id) } : {};
     const [updatedTenant] = await db.update(tenants)
-      .set(data)
+      .set({ ...data, ...slugUpdate })
       .where(eq(tenants.id, id))
       .returning();
     return updatedTenant;

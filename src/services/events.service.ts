@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { eq, and, lte, gte } from "drizzle-orm";
+import { generateUniqueSlug } from "@/lib/slug-helpers";
 
 /**
  * Service Layer (Clean Architecture)
@@ -78,7 +79,8 @@ export class EventsService {
       throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
     }
 
-    const [newEvent] = await db.insert(events).values(data).returning();
+    const slug = await generateUniqueSlug("events", data.title);
+    const [newEvent] = await db.insert(events).values({ ...data, slug }).returning();
     return newEvent;
   }
 
@@ -101,8 +103,11 @@ export class EventsService {
       }
     }
 
+    // Regenerate slug if title changed
+    const slugUpdate = data.title ? { slug: await generateUniqueSlug("events", data.title, id) } : {};
+
     const [updatedEvent] = await db.update(events)
-      .set(data)
+      .set({ ...data, ...slugUpdate })
       .where(eq(events.id, id))
       .returning();
     return updatedEvent;

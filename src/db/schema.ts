@@ -4,6 +4,7 @@ import { relations } from 'drizzle-orm';
 export const universities = pgTable('universities', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull().unique(),
+  slug: varchar('slug', { length: 300 }).unique(),
   description: text('description'),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -11,6 +12,7 @@ export const universities = pgTable('universities', {
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull().unique(),
+  slug: varchar('slug', { length: 300 }).unique(),
   description: text('description'),
   universityId: uuid('university_id').references(() => universities.id),
   createdAt: timestamp('created_at').defaultNow(),
@@ -36,11 +38,12 @@ export const spaces = pgTable('spaces', {
 export const events = pgTable('events', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 350 }).unique(),
   description: text('description'),
   date: timestamp('date').notNull(),
   price: varchar('price', { length: 50 }).default('FREE'),
   imageUrl: varchar('image_url', { length: 500 }),
-  duration: integer('duration').notNull().default(60), // Duración en minutos
+  duration: integer('duration').notNull().default(60),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
@@ -48,9 +51,11 @@ export const events = pgTable('events', {
 
 export const attendees = pgTable('attendees', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
   eventId: uuid('event_id').references(() => events.id).notNull(),
-  status: varchar('status', { length: 50 }).default('confirmed'),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  phone: varchar('phone', { length: 50 }).notNull(),
+  status: varchar('status', { length: 50 }).default('pending'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -74,7 +79,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.tenantId],
     references: [tenants.id],
   }),
-  attendances: many(attendees),
 }));
 
 export const spacesRelations = relations(spaces, ({ one, many }) => ({
@@ -98,10 +102,6 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
 }));
 
 export const attendeesRelations = relations(attendees, ({ one }) => ({
-  user: one(users, {
-    fields: [attendees.userId],
-    references: [users.id],
-  }),
   event: one(events, {
     fields: [attendees.eventId],
     references: [events.id],

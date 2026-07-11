@@ -57,6 +57,7 @@ export default async function FacultyEventsPage() {
                   <th className="px-6 py-4 font-title-sm text-university-blue">Fecha</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Espacio</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Precio</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Asistentes</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
               </thead>
@@ -64,9 +65,20 @@ export default async function FacultyEventsPage() {
                 {eventsList.map((e) => (
                   <tr key={e.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-university-blue">{e.title}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-6 py-4 text-on-surface-variant">{e.space?.name}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.price}</td>
+                    <td className="px-6 py-4 text-on-surface-variant">
+                      <span className={`font-bold ${ (e.price?.toUpperCase() === 'FREE' || e.price?.toUpperCase() === 'GRATIS') ? 'text-green-600' : 'text-university-blue' }`}>
+                        {e.price}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link href={`/faculty-admin/events/${e.id}/attendees`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-university-blue/10 text-university-blue rounded-lg text-xs font-bold hover:bg-university-blue hover:text-white transition-colors">
+                        <span className="material-symbols-outlined text-xs">group</span>
+                        Ver Asistentes
+                      </Link>
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <Link href={`/faculty-admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
                         <span className="material-symbols-outlined text-sm">edit</span>

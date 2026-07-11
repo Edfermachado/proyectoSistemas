@@ -58,7 +58,7 @@ export default async function FacultiesPage() {
                   {faculty.description || "Descubre los espacios, horarios y próximos eventos ofrecidos por esta facultad."}
                 </p>
                 
-                <Link href={`/events?faculty=${faculty.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
+                <Link href={`/events?faculty=${faculty.slug || faculty.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
                   Ver Eventos
                   <span className="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform">arrow_forward</span>
                 </Link>

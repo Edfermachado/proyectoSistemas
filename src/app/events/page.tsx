@@ -1,20 +1,37 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { db } from "@/db";
-import { eq, ilike, and } from "drizzle-orm";
+import { eq, ilike, and, or } from "drizzle-orm";
 import { events as eventsSchema, tenants } from "@/db/schema";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
+import { findTenantBySlugOrId } from "@/lib/slug-helpers";
+
+export const metadata: Metadata = {
+  title: "Explorar Eventos — UniEvents",
+  description: "Descubre conferencias, deportes, talleres y más eventos universitarios.",
+};
 
 export default async function EventsExplorePage({ searchParams }: { searchParams: Promise<{ faculty?: string, q?: string }> }) {
   const { faculty: facultyId, q: query } = await searchParams;
 
+  // Resolve faculty from slug or ID
+  let resolvedFacultyId: string | undefined;
+  let facultyName = "Todas las Facultades";
+  if (facultyId) {
+    const tenant = await findTenantBySlugOrId(facultyId);
+    if (tenant) {
+      resolvedFacultyId = tenant.id;
+      facultyName = tenant.name;
+    }
+  }
+
   let whereClause = undefined;
-  
-  if (facultyId && query) {
-    whereClause = and(eq(eventsSchema.tenantId, facultyId), ilike(eventsSchema.title, `%${query}%`));
-  } else if (facultyId) {
-    whereClause = eq(eventsSchema.tenantId, facultyId);
+  if (resolvedFacultyId && query) {
+    whereClause = and(eq(eventsSchema.tenantId, resolvedFacultyId), ilike(eventsSchema.title, `%${query}%`));
+  } else if (resolvedFacultyId) {
+    whereClause = eq(eventsSchema.tenantId, resolvedFacultyId);
   } else if (query) {
     whereClause = ilike(eventsSchema.title, `%${query}%`);
   }
@@ -22,18 +39,8 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
   const events = await db.query.events.findMany({
     where: whereClause,
     with: { space: true, tenant: true },
-    orderBy: (events, { asc }) => [asc(events.date)], // Mostrar los próximos eventos primero
+    orderBy: (events, { asc }) => [asc(events.date)],
   });
-
-  let facultyName = "Todas las Facultades";
-  if (facultyId) {
-    const tenant = await db.query.tenants.findFirst({
-      where: eq(tenants.id, facultyId)
-    });
-    if (tenant) {
-      facultyName = tenant.name;
-    }
-  }
 
   return (
     <main className="bg-surface">
@@ -158,7 +165,7 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
                       >
                         {isFree ? "GRATIS" : evt.price}
                       </span>
-                      <Link href={`/events/${evt.id}`}>
+                      <Link href={`/events/${evt.slug || evt.id}`}>
                         <button className="bg-university-blue text-white px-5 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">
                           Detalles
                           <span className="material-symbols-outlined text-sm">arrow_forward</span>
