@@ -45,20 +45,14 @@ export default function FacultyNewEventPage() {
     setErrorMsg("");
     
     const formData = new FormData(e.currentTarget);
-    const data = {
-      title: formData.get("title"),
-      description: formData.get("description"),
-      date: formData.get("date"),
-      price: formData.get("price") || "FREE",
-      tenantId: faculty.id, // Se asigna su respectiva facultad automáticamente
-      spaceId: formData.get("spaceId"),
-    };
+    formData.append("tenantId", faculty.id); // Agregamos la facultad asignada
+    if (!formData.get("price")) formData.set("price", "FREE");
 
     try {
       const res = await fetch("/api/events", {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
+        body: formData,
+        // No se establece "Content-Type", el navegador se encarga de enviarlo como multipart/form-data
       });
       
       if (!res.ok) {
@@ -109,12 +103,19 @@ export default function FacultyNewEventPage() {
             </div>
           </div>
           
-          <div>
-            <label className="block font-title-sm text-university-blue mb-2">Espacio Físico</label>
-            <select name="spaceId" required disabled={spaces.length === 0} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest disabled:opacity-50">
-              <option value="">{spaces.length === 0 ? "-- Sin Espacios --" : "-- Selecciona un Espacio --"}</option>
-              {spaces.map(s => <option key={s.id} value={s.id}>{s.name} (Capacidad: {s.capacity})</option>)}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Espacio Físico</label>
+              <select name="spaceId" required disabled={spaces.length === 0} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest disabled:opacity-50">
+                <option value="">{spaces.length === 0 ? "-- Sin Espacios --" : "-- Selecciona un Espacio --"}</option>
+                {spaces.map(s => <option key={s.id} value={s.id}>{s.name} (Capacidad: {s.capacity})</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Foto / Banner (Opcional)</label>
+              <input name="image" type="file" accept="image/jpeg, image/png, image/webp" className="w-full px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-university-blue file:text-white hover:file:bg-innovation-purple cursor-pointer text-sm" />
+              <p className="text-xs text-on-surface-variant mt-1">Máximo 5MB (JPG, PNG, WEBP)</p>
+            </div>
           </div>
           
           <div>

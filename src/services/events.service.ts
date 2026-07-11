@@ -59,7 +59,7 @@ export class EventsService {
   /**
    * Crea un evento validando las reglas de negocio.
    */
-  static async createEvent(data: { title: string; date: Date; price?: string; tenantId: string; spaceId: string; description?: string }) {
+  static async createEvent(data: { title: string; date: Date; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null }) {
     const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date);
     
     if (hasConflict) {
@@ -73,7 +73,7 @@ export class EventsService {
   /**
    * Actualiza un evento validando las reglas de negocio.
    */
-  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; price: string; spaceId: string; description: string }>) {
+  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; price: string; spaceId: string; description: string; imageUrl: string | null }>) {
     if (data.spaceId || data.date) {
       const currentEvent = await this.getEventById(id);
       if (!currentEvent) throw new Error("Event not found");

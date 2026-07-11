@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
+import sharp from "sharp";
+import { join } from "path";
+import { mkdirSync } from "fs";
 
-/**
- * API Route Handler
- * Su única responsabilidad es extraer datos de la Request HTTP, 
- * inyectarlos al Servicio, y formatear la Response HTTP.
- */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,7 +13,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing tenantId" }, { status: 400 });
     }
 
-    // Delegamos la búsqueda a la capa de servicio
     const data = await EventsService.getEventsByTenant(tenantId);
     
     return NextResponse.json(data);
@@ -27,18 +24,62 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Ya no usamos request.json() porque esperamos multipart/form-data
+    const formData = await request.formData();
     
-    // Aquí podríamos agregar una capa de validación Zod (ej. EventSchema.parse(body))
-    const { title, date, tenantId, spaceId, description } = body;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const date = formData.get("date") as string;
+    const price = formData.get("price") as string;
+    const tenantId = formData.get("tenantId") as string;
+    const spaceId = formData.get("spaceId") as string;
+    const image = formData.get("image") as File | null;
+
+    let imageUrl = null;
+
+    // Procesamiento de Imagen con compresión (sharp)
+    if (image && image.size > 0) {
+      // 1. Limite de tamaño: 5MB
+      if (image.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: "La imagen es demasiado grande (Máximo 5MB)" }, { status: 400 });
+      }
+      
+      // 2. Limite de formato
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(image.type)) {
+        return NextResponse.json({ error: "Formato de imagen inválido. Solo JPG, PNG y WEBP están permitidos." }, { status: 400 });
+      }
+
+      const arrayBuffer = await image.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      const fileName = `event-${Date.now()}.webp`; // Forzamos formato WebP
+      const uploadDir = join(process.cwd(), "public", "uploads");
+      
+      try {
+        mkdirSync(uploadDir, { recursive: true });
+      } catch (e) {}
+      
+      const filePath = join(uploadDir, fileName);
+      
+      // 3. Compresión con Sharp
+      await sharp(buffer)
+        .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(filePath);
+        
+      imageUrl = `/uploads/${fileName}`;
+    }
 
     // Delegamos la lógica de validación de colisiones e inserción al servicio
     const newEvent = await EventsService.createEvent({
       title,
       date: new Date(date),
+      price: price || 'FREE',
       tenantId,
       spaceId,
-      description
+      description,
+      imageUrl
     });
 
     return NextResponse.json(newEvent, { status: 201 });

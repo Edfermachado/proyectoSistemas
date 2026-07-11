@@ -39,6 +39,7 @@ export const events = pgTable('events', {
   description: text('description'),
   date: timestamp('date').notNull(),
   price: varchar('price', { length: 50 }).default('FREE'),
+  imageUrl: varchar('image_url', { length: 500 }),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
