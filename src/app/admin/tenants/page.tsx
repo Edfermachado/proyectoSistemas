@@ -2,9 +2,15 @@ import { Button } from "@/components/ui/Button";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { TenantsService } from "@/services/tenants.service";
 import Link from "next/link";
+import { SearchBar } from "@/components/ui/SearchBar";
 
-export default async function TenantsPage() {
-  const tenants = await TenantsService.getAllTenants();
+export default async function TenantsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q?.toLowerCase();
+  let tenants = await TenantsService.getAllTenants();
+
+  if (q) {
+    tenants = tenants.filter(t => t.name.toLowerCase().includes(q) || t.description?.toLowerCase().includes(q));
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -21,13 +27,7 @@ export default async function TenantsPage() {
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-outline-variant/50 bg-surface-container-lowest">
-          <input 
-            type="text" 
-            placeholder="Buscar por nombre..." 
-            className="w-full md:w-1/3 px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold text-label-md"
-          />
-        </div>
+        <SearchBar placeholder="Buscar por nombre o descripción..." />
         
         {tenants.length === 0 ? (
           <div className="p-12 flex flex-col items-center justify-center text-center">

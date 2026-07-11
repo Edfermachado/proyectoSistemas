@@ -2,12 +2,21 @@ import { Button } from "@/components/ui/Button";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { db } from "@/db";
 import Link from "next/link";
+import { SearchBar } from "@/components/ui/SearchBar";
 
-export default async function SpacesPage() {
-  const spaces = await db.query.spaces.findMany({
+export default async function SpacesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q?.toLowerCase();
+  let spaces = await db.query.spaces.findMany({
     with: { tenant: true },
     orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
   });
+
+  if (q) {
+    spaces = spaces.filter(s => 
+      s.name.toLowerCase().includes(q) || 
+      (s.tenant?.name || "").toLowerCase().includes(q)
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -24,6 +33,8 @@ export default async function SpacesPage() {
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
+        <SearchBar placeholder="Buscar por nombre o facultad..." />
+        
         {spaces.length === 0 ? (
           <div className="p-12 flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4">

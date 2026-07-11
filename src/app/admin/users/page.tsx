@@ -2,12 +2,22 @@ import { Button } from "@/components/ui/Button";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { db } from "@/db";
 import Link from "next/link";
+import { SearchBar } from "@/components/ui/SearchBar";
 
-export default async function UsersPage() {
-  const users = await db.query.users.findMany({
+export default async function UsersPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q?.toLowerCase();
+  let users = await db.query.users.findMany({
     with: { tenant: true },
     orderBy: (users, { desc }) => [desc(users.createdAt)],
   });
+
+  if (q) {
+    users = users.filter(u => 
+      u.email.toLowerCase().includes(q) || 
+      u.role.toLowerCase().includes(q) || 
+      (u.tenant?.name || "Global").toLowerCase().includes(q)
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -24,6 +34,8 @@ export default async function UsersPage() {
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
+        <SearchBar placeholder="Buscar por email, rol o facultad..." />
+        
         {users.length === 0 ? (
           <div className="p-12 flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4">
