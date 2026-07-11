@@ -44,11 +44,12 @@ export async function loginUser(prevState: any, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
-  // Find user (any role: user, tenant_admin, superadmin)
+  // Find user (role: user)
   const user = await db.query.users.findFirst({
     where: and(
       eq(users.email, email),
-      eq(users.passwordHash, password)
+      eq(users.passwordHash, password),
+      eq(users.role, "user")
     ),
   });
 
@@ -97,4 +98,39 @@ export async function registerUser(prevState: any, formData: FormData) {
   }
 
   redirect("/");
+}
+
+export async function loginSuperAdmin(prevState: any, formData: FormData) {
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+
+  if (!email || !password) {
+    return { error: "Faltan credenciales" };
+  }
+
+  // Find user (role: superadmin)
+  const user = await db.query.users.findFirst({
+    where: and(
+      eq(users.email, email),
+      eq(users.passwordHash, password),
+      eq(users.role, "superadmin")
+    ),
+  });
+
+  if (!user) {
+    return { error: "Credenciales de administrador del sistema incorrectas." };
+  }
+
+  await createSession(user.id, user.role, user.tenantId, user.email);
+  redirect("/admin");
+}
+
+export async function logoutAdmin() {
+  await deleteSession();
+  redirect("/admin/login");
+}
+
+export async function logoutUser() {
+  await deleteSession();
+  redirect("/login");
 }

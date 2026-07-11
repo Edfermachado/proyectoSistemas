@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 export default async function FacultyAdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  if (!session) redirect('/faculty-admin/login');
+  if (!session || session.role !== 'tenant_admin') redirect('/faculty-admin/login');
 
   return (
     <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden">

@@ -1,14 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { loginFacultyAdmin } from "@/app/actions/auth";
+import { loginSuperAdmin } from "@/app/actions/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function FacultyLoginPage() {
-  const [state, formAction, pending] = useActionState(loginFacultyAdmin, undefined);
+export default function AdminLoginPage() {
+  const [state, formAction, pending] = useActionState(loginSuperAdmin, undefined);
 
   return (
     <div className="bg-surface-bright text-on-surface font-body-md min-h-screen flex flex-col pt-16">
@@ -26,10 +26,10 @@ export default function FacultyLoginPage() {
                 <div className="h-1.5 w-24 bg-academic-gold rounded-full"></div>
               </div>
               <h1 className="font-headline-lg text-4xl mb-4 font-bold leading-tight">
-                Portal de Facultad y Productores
+                Consola de Administración Global
               </h1>
               <p className="font-body-lg text-base text-surface-variant opacity-90 max-w-sm leading-relaxed">
-                Crea, publica y gestiona las experiencias culturales, académicas y deportivas de tu facultad.
+                Portal de backoffice para gestionar las universidades, facultades, accesos de usuarios y parámetros globales del sistema.
               </p>
             </div>
             {/* Thematic Image */}
@@ -39,7 +39,7 @@ export default function FacultyLoginPage() {
                 priority
                 sizes="50vw"
                 className="object-cover"
-                alt="Faculty Administration"
+                alt="System Administration"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7r2edi3wa6T5TzjlZOvvBCh3K1B-7-fELFTo44IDGSlfGg5WO5Hd-ye0Jy7_nGSg480-ew2Pbv8ji3TxIQXGgWBOiTRuerj03O2OhJssCfG7ieRiTiFgELZRD5t7HHfGeNQz9mAdCPpHULjhADXcL-IY4X8KdkaiMHmqDNbGvuApY3JyAnRmCuQkNtjfeBM4yjzlPfplCiOrb7_Jvp1CcLHcFGwm35Yxg1zkqsAkmwjWujMhCt9SA-Q"
               />
             </div>
@@ -49,13 +49,13 @@ export default function FacultyLoginPage() {
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-white">
             <div className="mb-8 text-center md:text-left">
               <span className="inline-flex items-center gap-2 bg-academic-gold/20 text-academic-gold px-3.5 py-1 rounded-full border border-academic-gold/30 text-xs font-bold uppercase tracking-widest mb-4">
-                Administración de Facultad
+                Administrador del Sistema
               </span>
               <h2 className="font-headline-md text-3xl text-university-blue mb-2 font-bold">
-                Acceso al Portal
+                Backoffice Login
               </h2>
               <p className="font-body-md text-sm text-slate-500">
-                Ingresa con las credenciales de tu facultad
+                Ingresa con tu correo de administrador global
               </p>
             </div>
 
@@ -70,17 +70,17 @@ export default function FacultyLoginPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-on-surface-variant" htmlFor="email">
-                    Correo electrónico institucional
+                    Correo electrónico administrativo
                   </label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-                      mail
+                      admin_panel_settings
                     </span>
                     <input
                       required
                       name="email"
                       id="email"
-                      placeholder="admin@facultad.edu"
+                      placeholder="admin@unievents.com"
                       type="email"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-outline-variant focus:ring-2 focus:ring-university-blue focus:border-university-blue outline-none transition-all text-sm"
                     />
@@ -118,13 +118,13 @@ export default function FacultyLoginPage() {
                     <span className="material-symbols-outlined animate-spin">sync</span> Cargando...
                   </span>
                 ) : (
-                  "Entrar al Dashboard"
+                  "Entrar a la Consola"
                 )}
               </button>
 
               <div className="text-center pt-4 border-t border-outline-variant/40 mt-6">
-                <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                  ¿No tienes una cuenta de administrador de facultad? Contacta con el equipo de soporte de tu universidad.
+                <p className="text-xs text-error font-medium">
+                  Atención: El acceso a este panel es estrictamente restringido y monitoreado.
                 </p>
               </div>
             </form>

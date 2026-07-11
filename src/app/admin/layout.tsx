@@ -1,6 +1,11 @@
 import Link from 'next/link';
+import { getSession } from '@/lib/auth';
+import { logoutAdmin } from '@/app/actions/auth';
+import { redirect } from 'next/navigation';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  if (!session || session.role !== 'superadmin') redirect('/admin/login');
   return (
     <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden">
       {/* Sidebar */}
@@ -39,10 +44,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
-          <button className="flex items-center justify-center gap-3 px-4 py-3 w-full text-error bg-error-container hover:bg-error/90 hover:text-white rounded-xl transition-colors font-bold shadow-sm border border-error/20">
-            <span className="material-symbols-outlined">logout</span>
-            Cerrar Sesión
-          </button>
+          <form action={logoutAdmin}>
+            <button type="submit" className="flex items-center justify-center gap-3 px-4 py-3 w-full text-error bg-error-container hover:bg-error/90 hover:text-white rounded-xl transition-colors font-bold shadow-sm border border-error/20 cursor-pointer">
+              <span className="material-symbols-outlined">logout</span>
+              Cerrar Sesión
+            </button>
+          </form>
         </div>
       </aside>
       
@@ -60,11 +67,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="h-8 w-px bg-white/20"></div>
             <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity">
               <div className="text-right hidden md:block">
-                <p className="font-bold text-sm">admin@gmail.com</p>
+                <p className="font-bold text-sm">{String(session.email)}</p>
                 <p className="text-xs text-academic-gold font-bold uppercase tracking-widest">Superadmin</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-academic-gold flex items-center justify-center text-university-blue font-black border-2 border-white/20 text-lg shadow-inner">
-                AD
+              <div className="w-12 h-12 rounded-full bg-academic-gold flex items-center justify-center text-university-blue font-black border-2 border-white/20 text-lg shadow-inner uppercase">
+                {String(session.email).slice(0, 2)}
               </div>
             </div>
           </div>
