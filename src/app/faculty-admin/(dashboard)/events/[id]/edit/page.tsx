@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { EventTimePicker } from "@/components/EventTimePicker";
 
 export default function FacultyEditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -115,19 +116,11 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
             <input name="title" defaultValue={eventData.title} required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
           </div>
           
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block font-title-sm text-university-blue mb-2">Fecha y Hora</label>
-              <input name="date" defaultValue={formattedDate} required type="datetime-local" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
-            </div>
-            <div>
-              <label className="block font-title-sm text-university-blue mb-2">Duración (min)</label>
-              <input name="duration" defaultValue={eventData.duration || 60} required type="number" min="15" step="15" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
-            </div>
-            <div>
-              <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
-              <input name="price" defaultValue={eventData.price} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
-            </div>
+          <EventTimePicker initialDate={formattedDate} initialDuration={eventData.duration} />
+          
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
+            <input name="price" defaultValue={eventData.price} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
           </div>
           
           <div className="grid grid-cols-2 gap-4">

@@ -115,6 +115,7 @@ export function WeeklyGrid({ events }: { events: EventData[] }) {
                   {/* Eventos */}
                   {dayEvents.map(event => {
                     const eDate = new Date(event.date);
+                    const endDate = new Date(eDate.getTime() + event.duration * 60000);
                     const startMins = (eDate.getHours() * 60 + eDate.getMinutes()) - (startHour * 60);
                     
                     // Si el evento está fuera del rango visible, lo omitimos para no romper el layout
@@ -124,18 +125,23 @@ export function WeeklyGrid({ events }: { events: EventData[] }) {
                     const top = (startMins / 60) * 60; // px
                     const height = (event.duration / 60) * 60; // px
 
+                    const startTimeStr = `${eDate.getHours().toString().padStart(2, '0')}:${eDate.getMinutes().toString().padStart(2, '0')}`;
+                    const endTimeStr = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
+
                     return (
                       <div 
                         key={event.id} 
-                        className="absolute left-1 right-1 bg-university-blue/10 border-l-4 border-university-blue rounded p-2 overflow-hidden text-xs shadow-sm hover:shadow-md transition-all z-10 hover:z-20 group"
+                        className="absolute left-1 right-1 bg-university-blue/10 border-l-4 border-university-blue rounded p-2 overflow-hidden text-xs shadow-sm hover:shadow-md transition-all z-10 hover:z-20 group flex flex-col"
                         style={{ top: `${top}px`, height: `${height}px` }}
                       >
                         <p className="font-bold text-university-blue truncate">{event.title}</p>
-                        {event.space && <p className="truncate text-on-surface-variant">{event.space.name}</p>}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-surface-white/90 absolute inset-0 p-2 text-[10px]">
-                          <p className="font-bold">{event.title}</p>
-                          <p>{eDate.getHours().toString().padStart(2, '0')}:{eDate.getMinutes().toString().padStart(2, '0')} - {event.duration}m</p>
-                          {event.space && <p>{event.space.name}</p>}
+                        <p className="text-[10px] text-university-blue/80 font-medium truncate">{startTimeStr} - {endTimeStr}</p>
+                        {event.space && <p className="truncate text-on-surface-variant mt-auto">{event.space.name}</p>}
+                        
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-surface-white/95 absolute inset-0 p-2 text-[10px] flex flex-col justify-center">
+                          <p className="font-bold text-university-blue">{event.title}</p>
+                          <p className="font-medium">{startTimeStr} - {endTimeStr}</p>
+                          {event.space && <p className="text-on-surface-variant">{event.space.name}</p>}
                         </div>
                       </div>
                     );
