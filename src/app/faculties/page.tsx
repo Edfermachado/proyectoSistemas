@@ -3,9 +3,10 @@ import Footer from "@/components/Footer";
 import { db } from "@/db";
 import Link from "next/link";
 
-export default async function UniversitiesPage() {
-  const allUniversities = await db.query.universities.findMany({
-    orderBy: (universities, { desc }) => [desc(universities.createdAt)],
+export default async function FacultiesPage() {
+  const allFaculties = await db.query.tenants.findMany({
+    with: { university: true },
+    orderBy: (tenants, { desc }) => [desc(tenants.createdAt)],
   });
 
   return (
@@ -19,52 +20,58 @@ export default async function UniversitiesPage() {
         </div>
         <div className="max-w-container-max mx-auto px-margin-desktop relative z-10 text-center space-y-6">
           <h1 className="font-display-lg text-display-lg text-surface-white animate-fade-in">
-            Descubre Nuestras <span className="text-academic-gold">Universidades</span>
+            Explora Nuestras <span className="text-academic-gold">Facultades</span>
           </h1>
           <p className="text-white/80 font-body-lg max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "100ms" }}>
-            Explora los diferentes campus, facultades e instituciones que conforman nuestra diversa comunidad académica.
+            Descubre las organizaciones, departamentos y escuelas que ofrecen los mejores eventos en la comunidad universitaria.
           </p>
         </div>
       </section>
 
-      {/* Universities Grid */}
+      {/* Faculties Grid */}
       <section className="py-24 bg-surface-container-lowest">
         <div className="max-w-container-max mx-auto px-margin-desktop">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {allUniversities.map((uni, index) => (
+            {allFaculties.map((faculty, index) => (
               <div
-                key={uni.id}
+                key={faculty.id}
                 className="group bg-surface-white rounded-3xl p-8 border border-outline-variant shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-innovation-purple/5 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700"></div>
                 
-                <div className="w-16 h-16 bg-university-blue/5 text-university-blue rounded-2xl flex items-center justify-center mb-6 group-hover:bg-university-blue group-hover:text-surface-white transition-colors duration-300">
-                  <span className="material-symbols-outlined text-3xl">account_balance</span>
+                <div className="w-16 h-16 bg-academic-gold/10 text-academic-gold rounded-2xl flex items-center justify-center mb-6 group-hover:bg-academic-gold group-hover:text-surface-white transition-colors duration-300">
+                  <span className="material-symbols-outlined text-3xl">school</span>
                 </div>
                 
-                <h3 className="font-title-lg text-university-blue mb-3 group-hover:text-innovation-purple transition-colors">
-                  {uni.name}
+                <h3 className="font-title-lg text-university-blue mb-1 group-hover:text-innovation-purple transition-colors">
+                  {faculty.name}
                 </h3>
                 
+                {faculty.university && (
+                  <p className="text-academic-gold font-label-sm uppercase tracking-widest mb-3">
+                    {faculty.university.name}
+                  </p>
+                )}
+                
                 <p className="text-on-surface-variant font-body-md line-clamp-3 mb-8 min-h-[4.5rem]">
-                  {uni.description || "Descubre las diversas facultades, espacios de primer nivel y próximos eventos ofrecidos por esta institución."}
+                  {faculty.description || "Descubre los espacios, horarios y próximos eventos ofrecidos por esta facultad."}
                 </p>
                 
-                <Link href={`/universities/${uni.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
-                  Ver Facultades
+                <Link href={`/events?faculty=${faculty.id}`} className="inline-flex items-center gap-2 text-university-blue font-bold group-hover:text-innovation-purple transition-colors">
+                  Ver Eventos
                   <span className="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform">arrow_forward</span>
                 </Link>
               </div>
             ))}
             
-            {allUniversities.length === 0 && (
+            {allFaculties.length === 0 && (
               <div className="col-span-full py-20 text-center">
                 <div className="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="material-symbols-outlined text-outline text-4xl">domain_disabled</span>
                 </div>
-                <h3 className="font-title-lg text-university-blue mb-2">No Se Encontraron Universidades</h3>
-                <p className="text-on-surface-variant">Actualmente no hay universidades registradas en el sistema.</p>
+                <h3 className="font-title-lg text-university-blue mb-2">No Se Encontraron Facultades</h3>
+                <p className="text-on-surface-variant">Actualmente no hay facultades registradas en el sistema.</p>
               </div>
             )}
           </div>

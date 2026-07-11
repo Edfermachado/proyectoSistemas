@@ -8,17 +8,17 @@ export default function AppPromo() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-academic-gold/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
           <div className="flex-1 space-y-8 relative z-10 text-center lg:text-left">
             <h2 className="font-display-lg text-display-lg text-white">
-              Your Campus in <span className="text-academic-gold">Your Pocket</span>.
+              Tu Campus en <span className="text-academic-gold">Tu Bolsillo</span>.
             </h2>
             <p className="text-white/80 font-body-lg text-body-lg max-w-lg">
-              Get real-time notifications for faculty events, fast-pass entry with QR codes, and exclusive student-only discounts.
+              Recibe notificaciones en tiempo real para eventos de la facultad, entrada rápida con códigos QR y descuentos exclusivos para estudiantes.
             </p>
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
               <button className="bg-black text-white px-8 py-4 rounded-2xl flex items-center gap-4 hover:scale-105 transition-all shadow-xl">
                 <span className="material-symbols-outlined text-3xl">smartphone</span>
                 <div className="text-left">
                   <p className="text-[10px] uppercase font-bold text-white/60 leading-none">
-                    Download on the
+                    Consíguelo en el
                   </p>
                   <p className="text-lg font-bold leading-none">App Store</p>
                 </div>
@@ -27,7 +27,7 @@ export default function AppPromo() {
                 <span className="material-symbols-outlined text-3xl">play_books</span>
                 <div className="text-left">
                   <p className="text-[10px] uppercase font-bold text-white/60 leading-none">
-                    Get it on
+                    Disponible en
                   </p>
                   <p className="text-lg font-bold leading-none">Google Play</p>
                 </div>

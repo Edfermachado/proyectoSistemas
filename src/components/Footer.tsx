@@ -9,9 +9,7 @@ export default function Footer() {
             UniEvents
           </h3>
           <p className="text-surface-variant text-label-sm max-w-xs">
-            The premier event ticketing platform built exclusively for the
-            university community. Empowering student connection through
-            experiences.
+            La plataforma principal de venta de entradas para eventos construida exclusivamente para la comunidad universitaria. Empoderando la conexión estudiantil a través de experiencias.
           </p>
           <div className="flex gap-4">
             <Link
@@ -35,85 +33,85 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h4 className="text-white font-bold mb-6 font-title-lg">Platform</h4>
+          <h4 className="text-white font-bold mb-6 font-title-lg">Plataforma</h4>
           <ul className="space-y-4 font-label-sm text-label-sm">
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Explore Events
+                Explorar Eventos
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                University Partners
+                Universidades Asociadas
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Ticket Verification
+                Verificación de Entradas
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Faculty Dashboard
+              <Link href="/faculty-admin/login" className="text-surface-variant hover:text-academic-gold transition-all">
+                Panel de Facultad
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="text-white font-bold mb-6 font-title-lg">Resources</h4>
+          <h4 className="text-white font-bold mb-6 font-title-lg">Recursos</h4>
           <ul className="space-y-4 font-label-sm text-label-sm">
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Help Center
+                Centro de Ayuda
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Event Guidelines
+                Reglas de Eventos
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Privacy Policy
+                Política de Privacidad
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Terms of Service
+                Términos de Servicio
               </Link>
             </li>
             <li>
               <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Contact Us
+                Contáctanos
               </Link>
             </li>
           </ul>
         </div>
         <div className="space-y-6">
-          <h4 className="text-white font-bold mb-6 font-title-lg">Stay Updated</h4>
+          <h4 className="text-white font-bold mb-6 font-title-lg">Mantente Informado</h4>
           <p className="text-surface-variant text-label-sm">
-            Get the weekly campus digest delivered to your inbox.
+            Recibe el resumen semanal del campus en tu correo.
           </p>
           <form className="flex flex-col gap-3">
             <input
               type="email"
-              placeholder="student@university.edu"
+              placeholder="estudiante@universidad.edu"
               className="bg-white/10 border-white/20 rounded-xl px-4 py-3 text-white focus:ring-academic-gold focus:border-academic-gold focus:outline-none"
             />
             <button className="bg-academic-gold text-university-blue font-bold py-3 rounded-xl hover:opacity-90 transition-opacity">
-              Subscribe
+              Suscribirse
             </button>
           </form>
         </div>
       </div>
       <div className="border-t border-primary-container max-w-container-max mx-auto px-margin-desktop py-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-surface-variant text-label-sm opacity-80">
-          © 2024 UniEvents Ticketing. All rights reserved.
+          © 2024 UniEvents Ticketing. Todos los derechos reservados.
         </p>
         <div className="flex gap-8 text-surface-variant text-label-sm font-semibold">
-          <Link href="#" className="hover:text-white">Partners</Link>
-          <Link href="#" className="hover:text-white">API Access</Link>
-          <Link href="#" className="hover:text-white">Sponsorships</Link>
+          <Link href="#" className="hover:text-white">Socios</Link>
+          <Link href="#" className="hover:text-white">Acceso a la API</Link>
+          <Link href="#" className="hover:text-white">Patrocinios</Link>
         </div>
       </div>
     </footer>

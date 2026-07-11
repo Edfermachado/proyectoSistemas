@@ -10,26 +10,26 @@ export default function Hero() {
             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
               stars
             </span>
-            <span className="font-label-sm text-label-sm uppercase tracking-widest">Trending in Campus</span>
+            <span className="font-label-sm text-label-sm uppercase tracking-widest">Tendencias en el Campus</span>
           </div>
           <h1 className="font-display-lg text-display-lg text-surface-white">
-            Experience Your <span className="text-academic-gold">University Journey</span> To The Fullest.
+            Vive tu <span className="text-academic-gold">Experiencia Universitaria</span> al Máximo.
           </h1>
           <p className="font-body-lg text-body-lg text-on-primary-container/80 max-w-xl">
-            From high-stakes championships to late-night faculty galas, find every ticket to the moments that define your student life.
+            Desde campeonatos importantes hasta galas nocturnas de la facultad, encuentra cada boleto para los momentos que definen tu vida estudiantil.
           </p>
           <div className="bg-surface-white p-2 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-outline-variant">
             <div className="flex-1 flex items-center px-4 border-r border-outline-variant/50">
               <span className="material-symbols-outlined text-university-blue mr-3">school</span>
               <input
                 type="text"
-                placeholder="Search by Faculty or University"
+                placeholder="Buscar por Facultad o Universidad"
                 className="w-full border-none focus:ring-0 text-body-md py-3 text-university-blue focus:outline-none"
               />
             </div>
             <button className="bg-university-blue text-surface-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-innovation-purple transition-all duration-300">
               <span className="material-symbols-outlined">search</span>
-              Find Events
+              Buscar Eventos
             </button>
           </div>
           <div className="flex items-center gap-4 pt-4">
@@ -62,7 +62,7 @@ export default function Hero() {
                 />
               </div>
             </div>
-            <p className="text-on-primary-container/60 text-label-md font-medium">+15k students booked this week</p>
+            <p className="text-on-primary-container/60 text-label-md font-medium">+15k estudiantes reservaron esta semana</p>
           </div>
         </div>
         <div className="hidden lg:block relative group">
@@ -77,11 +77,11 @@ export default function Hero() {
             />
             <div className="absolute bottom-0 left-0 right-0 p-8 gradient-overlay flex flex-col justify-end">
               <div className="bg-innovation-purple text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest w-fit mb-3">
-                Live Now
+                En Vivo
               </div>
-              <h3 className="text-white font-headline-md text-headline-md mb-2">Annual Engineering Expo 2024</h3>
+              <h3 className="text-white font-headline-md text-headline-md mb-2">Exposición Anual de Ingeniería 2024</h3>
               <p className="text-white/80 text-body-md flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">location_on</span> Main Tech Plaza
+                <span className="material-symbols-outlined text-sm">location_on</span> Plaza Tecnológica Principal
               </p>
             </div>
           </div>

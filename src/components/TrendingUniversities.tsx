@@ -13,7 +13,7 @@ export default function TrendingUniversities() {
       </div>
       <div className="max-w-container-max mx-auto px-margin-desktop relative z-10">
         <h2 className="font-headline-lg text-headline-lg text-center mb-16">
-          Trusted by Top <span className="text-academic-gold">Universities</span>
+          Con la confianza de las Mejores <span className="text-academic-gold">Universidades</span>
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center opacity-80">
           {unis.map((u, i) => (

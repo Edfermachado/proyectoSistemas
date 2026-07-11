@@ -27,16 +27,16 @@ export default function Header() {
           </Link>
           <nav className="hidden md:flex gap-6 items-center">
             <Link href="#" className="font-body-md text-label-md text-academic-gold font-bold border-b-2 border-academic-gold pb-1">
-              Explore
+              Explorar
             </Link>
             <Link href="/universities" className="font-body-md text-label-md text-surface-variant hover:text-academic-gold transition-colors">
-              Universities
+              Universidades
+            </Link>
+            <Link href="/faculties" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
+              Facultades
             </Link>
             <Link href="#" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
-              Faculties
-            </Link>
-            <Link href="#" className="font-body-md text-label-md text-surface-variant hover:text-surface-white transition-colors">
-              Help
+              Ayuda
             </Link>
           </nav>
         </div>
@@ -45,7 +45,7 @@ export default function Header() {
             <span className="material-symbols-outlined text-surface-white text-lg mr-2">search</span>
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder="Buscar eventos..."
               className="bg-transparent border-none focus:ring-0 text-white placeholder-white/50 text-label-md w-48 focus:outline-none"
             />
           </div>
@@ -57,7 +57,7 @@ export default function Header() {
               account_circle
             </button>
             <button className="bg-academic-gold text-university-blue px-6 py-2 rounded-full font-bold text-label-md hover:scale-105 active:scale-95 duration-150 shadow-lg">
-              Create Event
+              Crear Evento
             </button>
           </div>
         </div>

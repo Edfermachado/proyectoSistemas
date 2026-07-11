@@ -1,20 +1,20 @@
 export default function FacultySelector() {
   const faculties = [
-    { icon: "engineering", name: "Engineering" },
-    { icon: "medical_services", name: "Medicine" },
-    { icon: "palette", name: "Arts" },
-    { icon: "history_edu", name: "Humanities" },
-    { icon: "sports_basketball", name: "Sports" },
-    { icon: "science", name: "Science" },
-    { icon: "account_balance", name: "Business" },
-    { icon: "language", name: "Languages" },
+    { icon: "engineering", name: "Ingeniería" },
+    { icon: "medical_services", name: "Medicina" },
+    { icon: "palette", name: "Artes" },
+    { icon: "history_edu", name: "Humanidades" },
+    { icon: "sports_basketball", name: "Deportes" },
+    { icon: "science", name: "Ciencias" },
+    { icon: "account_balance", name: "Negocios" },
+    { icon: "language", name: "Idiomas" },
   ];
 
   return (
     <section className="py-12 bg-surface-container-low border-b border-outline-variant">
       <div className="max-w-container-max mx-auto px-margin-desktop">
         <h2 className="font-headline-md text-headline-md text-university-blue mb-8">
-          Browse by Faculty
+          Explorar por Facultad
         </h2>
         <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
           {faculties.map((faculty, i) => (

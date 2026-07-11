@@ -7,10 +7,10 @@ export default function FeaturedEvents() {
       image: "/images/event_basketball.png",
       month: "Jun",
       day: "28",
-      category: "Inter-Uni Sports",
-      title: "University Basketball Cup Finals",
-      location: "Multi-Sport Indoor Arena",
-      time: "18:00 PM - 21:00 PM",
+      category: "Deportes Inter-Uni",
+      title: "Finales de la Copa Universitaria de Baloncesto",
+      location: "Arena Multideportiva",
+      time: "18:00 - 21:00",
       price: "$12.50",
     },
     {
@@ -18,10 +18,10 @@ export default function FeaturedEvents() {
       image: "/images/event_gala.png",
       month: "Jul",
       day: "05",
-      category: "Campus Festivals",
-      title: "Summer Vibes: Faculty of Arts Gala",
-      location: "West Wing Gardens",
-      time: "20:00 PM - Late",
+      category: "Festivales",
+      title: "Vibras de Verano: Gala de Artes",
+      location: "Jardines del Ala Oeste",
+      time: "20:00 - 02:00",
       price: "$25.00",
     },
     {
@@ -29,11 +29,11 @@ export default function FeaturedEvents() {
       image: "/images/event_ai.png",
       month: "Jul",
       day: "12",
-      category: "Academic Conferences",
-      title: "AI & The Future of Higher Ed",
-      location: "Great Auditorium Hall",
-      time: "09:00 AM - 16:00 PM",
-      price: "FREE",
+      category: "Académico",
+      title: "IA y el Futuro de la Educación",
+      location: "Gran Auditorio",
+      time: "09:00 - 16:00",
+      price: "GRATIS",
       isFree: true,
     },
   ];
@@ -44,18 +44,18 @@ export default function FeaturedEvents() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
             <h2 className="font-headline-lg text-headline-lg text-university-blue mb-4">
-              Featured Campus Events
+              Eventos Destacados
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-lg">
-              Hand-picked experiences across all departments and universities.
+              Experiencias seleccionadas de todos los departamentos y facultades.
             </p>
           </div>
           <div className="flex gap-4">
             <button className="px-6 py-2 rounded-full border border-university-blue text-university-blue font-semibold hover:bg-university-blue hover:text-white transition-all">
-              Today
+              Hoy
             </button>
             <button className="px-6 py-2 rounded-full bg-university-blue text-white font-semibold shadow-md">
-              This Weekend
+              Este Fin de Semana
             </button>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function FeaturedEvents() {
                     {evt.price}
                   </span>
                   <button className="bg-university-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">
-                    {evt.isFree ? "Register" : "Buy Ticket"}
+                    {evt.isFree ? "Inscribirse" : "Comprar Entrada"}
                     <span className="material-symbols-outlined text-sm">
                       {evt.isFree ? "app_registration" : "shopping_cart"}
                     </span>
