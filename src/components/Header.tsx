@@ -2,11 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (searchQuery.trim()) {
+        router.push(`/events?q=${encodeURIComponent(searchQuery.trim())}`);
+      } else {
+        router.push("/events");
+      }
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,6 +83,9 @@ export default function Header() {
             <span className="material-symbols-outlined text-surface-white text-lg mr-2">search</span>
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               placeholder="Buscar eventos..."
               className="bg-transparent border-none focus:ring-0 text-white placeholder-white/50 text-label-md w-48 focus:outline-none"
             />
@@ -79,9 +94,9 @@ export default function Header() {
             <button className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all">
               notifications
             </button>
-            <button className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all">
+            <Link href="/login" className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all flex items-center justify-center">
               account_circle
-            </button>
+            </Link>
             <button className="bg-academic-gold text-university-blue px-6 py-2 rounded-full font-bold text-label-md hover:scale-105 active:scale-95 duration-150 shadow-lg">
               Crear Evento
             </button>
