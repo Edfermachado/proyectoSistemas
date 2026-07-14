@@ -7,9 +7,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = await getSession();
   if (!session || session.role !== 'superadmin') redirect('/admin/login');
   return (
-    <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden">
+    <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden relative">
+      {/* Mobile Sidebar Toggle */}
+      <input type="checkbox" id="mobile-sidebar-toggle" className="peer hidden" />
+      
+      {/* Overlay */}
+      <label htmlFor="mobile-sidebar-toggle" className="md:hidden fixed inset-0 bg-black/50 z-30 hidden peer-checked:block"></label>
+
       {/* Sidebar */}
-      <aside className="w-72 bg-surface-container-lowest border-r border-outline-variant flex flex-col shadow-sm z-20">
+      <aside className="fixed inset-y-0 left-0 transform -translate-x-full peer-checked:translate-x-0 md:relative md:translate-x-0 transition-transform duration-300 w-72 bg-surface-container-lowest border-r border-outline-variant flex flex-col shadow-sm z-40">
         <div className="p-8 border-b border-outline-variant/50">
           <h1 className="font-headline-lg text-2xl text-university-blue font-bold tracking-tighter flex items-center gap-3">
             <span className="material-symbols-outlined text-academic-gold text-3xl">school</span>
@@ -67,8 +73,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-surface custom-scrollbar relative">
-        <header className="glass-header sticky top-0 z-10 px-10 py-5 border-b border-outline-variant/30 flex justify-end items-center text-white shadow-sm">
-          <div className="flex items-center gap-6">
+        <header className="glass-header sticky top-0 z-10 px-4 md:px-10 py-5 border-b border-outline-variant/30 flex justify-between md:justify-end items-center text-white shadow-sm">
+          <label htmlFor="mobile-sidebar-toggle" className="md:hidden cursor-pointer flex items-center bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors">
+            <span className="material-symbols-outlined">menu</span>
+          </label>
+          <div className="flex items-center gap-4 md:gap-6">
             <div className="flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-academic-gold opacity-75"></span>

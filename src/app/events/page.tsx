@@ -108,7 +108,7 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
                 : "Descubre conferencias, deportes, talleres y más en tu universidad."}
           </p>
           
-          <form className="mt-8 max-w-2xl animate-fade-in flex gap-2" style={{ animationDelay: "200ms" }}>
+          <form className="mt-8 max-w-2xl animate-fade-in flex flex-col sm:flex-row gap-2" style={{ animationDelay: "200ms" }}>
             {facultyId && <input type="hidden" name="faculty" value={facultyId} />}
             {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
             <div className="flex-1 flex items-center bg-white/10 rounded-xl px-4 py-3 border border-white/20 focus-within:border-academic-gold transition-colors">

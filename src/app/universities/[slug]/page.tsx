@@ -57,7 +57,7 @@ export default async function UniversityFacultiesPage({ params }: { params: Prom
       {/* Faculties Grid */}
       <section className="py-24 bg-surface-container-lowest">
         <div className="max-w-container-max mx-auto px-margin-desktop">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-12">
             <h2 className="font-headline-md text-university-blue">Facultades Disponibles</h2>
             <div className="bg-academic-gold/20 text-academic-gold px-4 py-1 rounded-full text-sm font-bold">
               {university.tenants.length} Facultades

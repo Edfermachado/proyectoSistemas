@@ -46,7 +46,7 @@ export default async function Hero() {
             Desde campeonatos importantes hasta galas nocturnas de la facultad, encuentra cada boleto para los momentos que definen tu vida estudiantil.
           </p>
           <form action="/events" method="GET" className="bg-surface-white p-2 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-outline-variant">
-            <div className="flex-1 flex items-center px-4 border-r border-outline-variant/50">
+            <div className="flex-1 flex items-center px-4 pb-2 md:pb-0 border-b md:border-b-0 md:border-r border-outline-variant/50">
               <span className="material-symbols-outlined text-university-blue mr-3">school</span>
               <input
                 type="text"
