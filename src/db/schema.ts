@@ -6,6 +6,7 @@ export const organizerLevelEnum = pgEnum('organizer_level', ['academico', 'amate
 export const visibilityEnum = pgEnum('visibility', ['publico', 'privado']);
 export const registrationStatusEnum = pgEnum('registration_status', ['registrado', 'confirmado', 'pago_pendiente']);
 export const requestTypeEnum = pgEnum('request_type', ['soporte_academico', 'patrocinio', 'cobertura_prensa', 'derechos_transmision']);
+export const attendeeTypeEnum = pgEnum('attendee_type', ['estudiante', 'foraneo']);
 
 export const universities = pgTable('universities', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -66,6 +67,7 @@ export const attendees = pgTable('attendees', {
   email: varchar('email', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 50 }).notNull(),
   status: registrationStatusEnum('status').default('registrado'),
+  attendeeType: attendeeTypeEnum('attendee_type').default('estudiante'),
   userId: uuid('user_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
 });

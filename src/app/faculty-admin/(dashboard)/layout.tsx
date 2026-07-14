@@ -23,6 +23,10 @@ export default async function FacultyAdminLayout({ children }: { children: React
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
           </Link>
+          <Link href="/faculty-admin/metrics" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">bar_chart</span>
+            Métricas Estratégicas
+          </Link>
           <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">local_activity</span>
             Mis Eventos
