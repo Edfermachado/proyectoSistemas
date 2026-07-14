@@ -1,14 +1,24 @@
 "use client";
 
-import { useActionState } from "react";
-import { loginUser } from "@/app/actions/auth";
+import { useActionState, useState } from "react";
+import { loginUser, loginFacultyAdmin } from "@/app/actions/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(loginUser, undefined);
+  const [activeTab, setActiveTab] = useState<"comunidad" | "facultad">("comunidad");
+  
+  // Create unified action state wrapper
+  const [state, formAction, pending] = useActionState(async (prevState: any, formData: FormData) => {
+    const roleType = formData.get("roleType");
+    if (roleType === "facultad") {
+      return await loginFacultyAdmin(prevState, formData);
+    } else {
+      return await loginUser(prevState, formData);
+    }
+  }, undefined);
 
   return (
     <div className="bg-surface-bright text-on-surface font-body-md min-h-screen flex flex-col pt-16">
@@ -26,10 +36,12 @@ export default function LoginPage() {
                 <div className="h-1.5 w-24 bg-academic-gold rounded-full"></div>
               </div>
               <h1 className="font-headline-lg text-4xl mb-4 font-bold leading-tight">
-                Bienvenido de nuevo a tu comunidad
+                {activeTab === "comunidad" ? "Bienvenido de nuevo a tu comunidad" : "Gestión académica y administrativa"}
               </h1>
               <p className="font-body-lg text-base text-surface-variant opacity-90 max-w-sm leading-relaxed">
-                Conéctate con los eventos académicos, deportivos y culturales más importantes de tu campus.
+                {activeTab === "comunidad" 
+                  ? "Conéctate con los eventos académicos, deportivos y culturales más importantes de tu campus."
+                  : "Accede al portal administrativo de tu facultad para gestionar eventos y aforos."}
               </p>
             </div>
             {/* Thematic Image */}
@@ -47,12 +59,39 @@ export default function LoginPage() {
 
           {/* Right Side: Login Form */}
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-white">
+            
+            {/* Tabs */}
+            <div className="flex bg-surface-container-lowest rounded-xl p-1 mb-8 shadow-sm border border-outline-variant/30">
+              <button
+                onClick={() => setActiveTab("comunidad")}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                  activeTab === "comunidad" 
+                    ? "bg-university-blue text-white shadow-md" 
+                    : "text-on-surface-variant hover:bg-surface-container-low"
+                }`}
+              >
+                Comunidad
+              </button>
+              <button
+                onClick={() => setActiveTab("facultad")}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                  activeTab === "facultad" 
+                    ? "bg-academic-gold text-university-blue shadow-md" 
+                    : "text-on-surface-variant hover:bg-surface-container-low"
+                }`}
+              >
+                Facultad
+              </button>
+            </div>
+
             <div className="mb-8 text-center md:text-left">
               <h2 className="font-headline-md text-3xl text-university-blue mb-2 font-bold">
-                Iniciar Sesión
+                {activeTab === "comunidad" ? "Iniciar Sesión" : "Portal de Facultad"}
               </h2>
               <p className="font-body-md text-sm text-slate-500">
-                Ingresa tus credenciales para continuar
+                {activeTab === "comunidad" 
+                  ? "Ingresa tus credenciales para continuar" 
+                  : "Ingreso exclusivo para administradores y gestores"}
               </p>
             </div>
 
@@ -63,22 +102,28 @@ export default function LoginPage() {
             )}
 
             <form action={formAction} className="space-y-6">
-              {/* SSO Option (Prominent) */}
-              <button
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-university-blue text-university-blue font-bold text-sm rounded-xl hover:bg-university-blue hover:text-white transition-all duration-300 cursor-pointer"
-                type="button"
-              >
-                <span className="material-symbols-outlined">school</span>
-                Ingresar con mi Universidad
-              </button>
+              <input type="hidden" name="roleType" value={activeTab} />
 
-              <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-outline-variant"></div>
-                <span className="flex-shrink mx-4 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                  O accede con
-                </span>
-                <div className="flex-grow border-t border-outline-variant"></div>
-              </div>
+              {activeTab === "comunidad" && (
+                <>
+                  {/* SSO Option (Prominent) */}
+                  <button
+                    className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-university-blue text-university-blue font-bold text-sm rounded-xl hover:bg-university-blue hover:text-white transition-all duration-300 cursor-pointer"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined">school</span>
+                    Ingresar con mi Universidad
+                  </button>
+
+                  <div className="relative flex items-center py-2">
+                    <div className="flex-grow border-t border-outline-variant"></div>
+                    <span className="flex-shrink mx-4 text-slate-500 font-bold text-xs uppercase tracking-wider">
+                      O accede con
+                    </span>
+                    <div className="flex-grow border-t border-outline-variant"></div>
+                  </div>
+                </>
+              )}
 
               {/* Input Fields */}
               <div className="space-y-4">
@@ -94,7 +139,7 @@ export default function LoginPage() {
                       required
                       name="email"
                       id="email"
-                      placeholder="ejemplo@universidad.edu"
+                      placeholder={activeTab === "comunidad" ? "ejemplo@estudiante.edu" : "admin@facultad.edu"}
                       type="email"
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-outline-variant focus:ring-2 focus:ring-university-blue focus:border-university-blue outline-none transition-all text-sm"
                     />
@@ -126,7 +171,7 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-outline-variant text-university-blue focus:ring-university-blue"
+                    className={`w-4 h-4 rounded border-outline-variant focus:ring-university-blue ${activeTab === 'facultad' ? 'text-academic-gold' : 'text-university-blue'}`}
                   />
                   <span className="text-sm text-on-surface-variant group-hover:text-university-blue transition-colors font-medium">
                     Recordarme
@@ -134,7 +179,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="#"
-                  className="text-sm font-semibold text-innovation-purple hover:underline"
+                  className={`text-sm font-semibold hover:underline ${activeTab === 'facultad' ? 'text-university-blue' : 'text-innovation-purple'}`}
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -143,7 +188,11 @@ export default function LoginPage() {
               {/* Submit */}
               <button
                 disabled={pending}
-                className="w-full bg-university-blue text-on-primary font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:bg-primary-container transition-all active:scale-98 transform duration-150 cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
+                className={`w-full font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-98 transform duration-150 cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed ${
+                  activeTab === 'facultad' 
+                    ? 'bg-academic-gold text-university-blue hover:bg-yellow-400' 
+                    : 'bg-university-blue text-white hover:bg-primary-container'
+                }`}
                 type="submit"
               >
                 {pending ? (
@@ -151,17 +200,19 @@ export default function LoginPage() {
                     <span className="material-symbols-outlined animate-spin">sync</span> Cargando...
                   </span>
                 ) : (
-                  "Iniciar Sesión"
+                  activeTab === "comunidad" ? "Iniciar Sesión" : "Acceder al Portal"
                 )}
               </button>
 
               {/* Sign Up */}
-              <p className="text-center text-sm text-slate-500 pt-2 font-medium">
-                ¿No tienes cuenta?{" "}
-                <Link href="/register" className="text-academic-gold font-bold hover:underline">
-                  Regístrate
-                </Link>
-              </p>
+              {activeTab === "comunidad" && (
+                <p className="text-center text-sm text-slate-500 pt-2 font-medium">
+                  ¿No tienes cuenta?{" "}
+                  <Link href="/register" className="text-academic-gold font-bold hover:underline">
+                    Regístrate
+                  </Link>
+                </p>
+              )}
             </form>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import { createSession, deleteSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -28,7 +28,7 @@ export async function loginFacultyAdmin(prevState: any, formData: FormData) {
     where: and(
       eq(users.email, email),
       eq(users.passwordHash, password), // Simple auth para este prototipo
-      eq(users.role, "tenant_admin")
+      or(eq(users.role, "tenant_admin"), eq(users.role, "event_manager"))
     ),
   });
 
