@@ -1,3 +1,4 @@
+import { getSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
 import sharp from "sharp";
@@ -76,6 +77,11 @@ export async function POST(request: Request) {
       imageUrl = `/uploads/${fileName}`;
     }
 
+    const session = await getSession();
+    
+    // Default to 'pendiente' if event_manager, 'aprobado' if tenant_admin
+    const status = session?.role === "event_manager" ? "pendiente" : "aprobado";
+
     // Delegamos la lógica de validación de colisiones e inserción al servicio
     const newEvent = await EventsService.createEvent({
       title,
@@ -88,7 +94,8 @@ export async function POST(request: Request) {
       imageUrl,
       capacity,
       visibility,
-      requiresIpProtection
+      requiresIpProtection,
+      status
     });
 
     return NextResponse.json(newEvent, { status: 201 });

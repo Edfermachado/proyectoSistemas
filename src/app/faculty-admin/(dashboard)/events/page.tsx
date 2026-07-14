@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { events as eventsSchema, tenants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export default async function FacultyEventsPage() {
   const session = await getSession();
@@ -20,6 +21,13 @@ export default async function FacultyEventsPage() {
     with: { space: true },
     orderBy: (events, { desc }) => [desc(events.createdAt)],
   }) : [];
+
+  async function approveEvent(formData: FormData) {
+    "use server";
+    const eventId = formData.get("eventId") as string;
+    await db.update(eventsSchema).set({ status: 'aprobado' }).where(eq(eventsSchema.id, eventId));
+    revalidatePath("/faculty-admin/events");
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -57,6 +65,7 @@ export default async function FacultyEventsPage() {
                   <th className="px-6 py-4 font-title-sm text-university-blue">Fecha</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Espacio</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Precio</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Estado</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Asistentes</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
@@ -71,15 +80,35 @@ export default async function FacultyEventsPage() {
                       <span className={`font-bold ${ (e.price?.toUpperCase() === 'FREE' || e.price?.toUpperCase() === 'GRATIS') ? 'text-green-600' : 'text-university-blue' }`}>
                         {e.price}
                       </span>
+                    <td className="px-6 py-4 text-on-surface-variant">
+                      <span className={`font-bold text-xs uppercase px-2 py-1 rounded-full ${
+                        e.status === 'aprobado' ? 'bg-green-100 text-green-800' :
+                        e.status === 'rechazado' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {e.status}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
-                      <Link href={`/faculty-admin/events/${e.id}/attendees`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-university-blue/10 text-university-blue rounded-lg text-xs font-bold hover:bg-university-blue hover:text-white transition-colors">
-                        <span className="material-symbols-outlined text-xs">group</span>
-                        Ver Asistentes
-                      </Link>
+                      {e.status === 'aprobado' ? (
+                        <Link href={`/faculty-admin/events/${e.id}/attendees`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-university-blue/10 text-university-blue rounded-lg text-xs font-bold hover:bg-university-blue hover:text-white transition-colors">
+                          <span className="material-symbols-outlined text-xs">group</span>
+                          Ver Asistentes
+                        </Link>
+                      ) : (
+                        <span className="text-xs text-on-surface-variant italic">Requiere aprobación</span>
+                      )}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                      {session.role === 'tenant_admin' && e.status === 'pendiente' && (
+                        <form action={approveEvent}>
+                          <input type="hidden" name="eventId" value={e.id} />
+                          <button type="submit" className="text-green-600 hover:text-green-800 p-2 transition-colors tooltip" title="Aprobar Evento">
+                            <span className="material-symbols-outlined text-sm">check_circle</span>
+                          </button>
+                        </form>
+                      )}
                       <Link href={`/faculty-admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
                         <span className="material-symbols-outlined text-sm">edit</span>
                       </Link>

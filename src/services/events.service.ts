@@ -72,7 +72,7 @@ export class EventsService {
   /**
    * Crea un evento validando las reglas de negocio.
    */
-  static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean }) {
+  static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean; status?: string }) {
     const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date, data.duration);
     
     if (hasConflict) {
@@ -87,7 +87,7 @@ export class EventsService {
   /**
    * Actualiza un evento validando las reglas de negocio.
    */
-  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; duration: number; price: string; spaceId: string; description: string; imageUrl: string | null; capacity: number; visibility: "publico" | "privado"; requiresIpProtection: boolean }>) {
+  static async updateEvent(id: string, data: Partial<{ title: string; date: Date; duration: number; price: string; spaceId: string; description: string; imageUrl: string | null; capacity: number; visibility: "publico" | "privado"; requiresIpProtection: boolean; status: string }>) {
     if (data.spaceId || data.date || data.duration) {
       const currentEvent = await this.getEventById(id);
       if (!currentEvent) throw new Error("Event not found");

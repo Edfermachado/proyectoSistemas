@@ -62,6 +62,16 @@ export default async function AdminDashboard() {
             </div>
           </Link>
 
+          <Link href="/admin/categories" className="event-card-hover bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex items-center justify-between group shadow-sm">
+            <div>
+              <h3 className="font-title-lg text-university-blue group-hover:text-innovation-purple transition-colors">Categorías</h3>
+              <p className="text-label-sm text-on-surface-variant mt-2">Agrupar y clasificar entidades</p>
+            </div>
+            <div className="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-innovation-purple/10 transition-colors">
+              <span className="material-symbols-outlined text-university-blue group-hover:text-innovation-purple">arrow_forward</span>
+            </div>
+          </Link>
+
           <Link href="/admin/users" className="event-card-hover bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex items-center justify-between group shadow-sm">
             <div>
               <h3 className="font-title-lg text-university-blue group-hover:text-innovation-purple transition-colors">Administradores</h3>

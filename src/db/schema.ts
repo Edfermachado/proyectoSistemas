@@ -66,6 +66,7 @@ export const events = pgTable('events', {
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
   capacity: integer('capacity'),
   visibility: visibilityEnum('visibility').default('publico'),
+  status: varchar('status', { length: 50 }).default('aprobado'), // roles: pendiente, aprobado, rechazado
   requiresIpProtection: boolean('requires_ip_protection').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });

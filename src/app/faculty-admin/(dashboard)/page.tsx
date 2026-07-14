@@ -47,6 +47,44 @@ export default async function FacultyDashboardPage() {
             <p className="font-headline-lg text-university-blue">Calendario</p>
           </div>
         </Link>
+        <Link 
+          href="/faculty-admin/metrics" 
+          className="bg-surface-white rounded-3xl p-6 border border-outline-variant shadow-sm flex items-center gap-4 hover:shadow-md hover:border-university-blue/30 transition-all cursor-pointer group"
+        >
+          <div className="w-16 h-16 bg-innovation-purple/10 text-innovation-purple rounded-2xl flex items-center justify-center group-hover:bg-innovation-purple group-hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-3xl">bar_chart</span>
+          </div>
+          <div>
+            <p className="text-on-surface-variant font-label-md">Reportes</p>
+            <p className="font-headline-lg text-university-blue">Métricas</p>
+          </div>
+        </Link>
+        <Link 
+          href="/faculty-admin/requests" 
+          className="bg-surface-white rounded-3xl p-6 border border-outline-variant shadow-sm flex items-center gap-4 hover:shadow-md hover:border-university-blue/30 transition-all cursor-pointer group"
+        >
+          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-3xl">assignment</span>
+          </div>
+          <div>
+            <p className="text-on-surface-variant font-label-md">Atención</p>
+            <p className="font-headline-lg text-university-blue">Solicitudes</p>
+          </div>
+        </Link>
+        {session.role === 'tenant_admin' && (
+          <Link 
+            href="/faculty-admin/managers" 
+            className="bg-surface-white rounded-3xl p-6 border border-outline-variant shadow-sm flex items-center gap-4 hover:shadow-md hover:border-university-blue/30 transition-all cursor-pointer group"
+          >
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <span className="material-symbols-outlined text-3xl">manage_accounts</span>
+            </div>
+            <div>
+              <p className="text-on-surface-variant font-label-md">Cuentas</p>
+              <p className="font-headline-lg text-university-blue">Gestores</p>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   );
