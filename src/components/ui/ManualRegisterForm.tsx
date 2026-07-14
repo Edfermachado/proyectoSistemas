@@ -80,6 +80,19 @@ export function ManualRegisterForm({ eventId }: { eventId: string }) {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-bold text-university-blue mb-1">Tipo de Asistente</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">badge</span>
+                    <select name="attendeeType" required
+                      className="w-full pl-10 pr-4 py-2.5 border border-outline-variant rounded-xl focus:border-academic-gold focus:ring-1 focus:ring-academic-gold outline-none text-sm appearance-none cursor-pointer">
+                      <option value="estudiante">Estudiante Universitario</option>
+                      <option value="foraneo">Público Foráneo / General</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+
                 {error && <p className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{error}</p>}
 
                 <div className="flex gap-3 pt-2">

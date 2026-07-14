@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getSession } from "@/lib/auth";
 import { registerForEvent } from "@/app/actions/attendees.actions";
 import { findEventBySlugOrId } from "@/lib/slug-helpers";
 import type { Metadata } from "next";
@@ -22,6 +23,11 @@ export default async function RegisterEventPage({ params, searchParams }: {
 }) {
   const { slug } = await params;
   const { success } = await searchParams;
+  
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
   
   const event = await findEventBySlugOrId(slug);
   if (!event) notFound();
@@ -86,7 +92,8 @@ export default async function RegisterEventPage({ params, searchParams }: {
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
                     <input type="email" name="email" required
-                      className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-academic-gold focus:ring-2 focus:ring-academic-gold/20 outline-none transition-all"
+                      value={session.email} readOnly
+                      className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-on-surface-variant cursor-not-allowed outline-none transition-all"
                       placeholder="ejemplo@universidad.edu" />
                   </div>
                 </div>
@@ -98,6 +105,19 @@ export default async function RegisterEventPage({ params, searchParams }: {
                     <input type="tel" name="phone" required
                       className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-academic-gold focus:ring-2 focus:ring-academic-gold/20 outline-none transition-all"
                       placeholder="+58 412 1234567" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-label-md font-bold text-university-blue mb-2">Tipo de Asistente</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">badge</span>
+                    <select name="attendeeType" required
+                      className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-academic-gold focus:ring-2 focus:ring-academic-gold/20 outline-none transition-all appearance-none cursor-pointer">
+                      <option value="estudiante">Estudiante Universitario</option>
+                      <option value="foraneo">Público Foráneo / General</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
                   </div>
                 </div>
 

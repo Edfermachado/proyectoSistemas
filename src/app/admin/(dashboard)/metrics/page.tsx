@@ -12,8 +12,19 @@ export default async function SuperadminMetricsPage() {
   const [totalEvents] = await db.select({ value: count() }).from(events);
   const [totalUniversities] = await db.select({ value: count() }).from(universities);
   const [totalFaculties] = await db.select({ value: count() }).from(tenants);
-  const [totalAttendees] = await db.select({ value: count() }).from(attendees);
   const [totalRequests] = await db.select({ value: count() }).from(eventRequests);
+  
+  const attendeesResult = await db.execute(sql`
+    SELECT 
+      COUNT(id) as value,
+      SUM(CASE WHEN attendee_type = 'estudiante' THEN 1 ELSE 0 END) as estudiantes,
+      SUM(CASE WHEN attendee_type = 'foraneo' THEN 1 ELSE 0 END) as foraneos
+    FROM attendees
+  `);
+  
+  const totalAttendeesValue = Number(attendeesResult[0]?.value) || 0;
+  const totalEstudiantes = Number(attendeesResult[0]?.estudiantes) || 0;
+  const totalForaneos = Number(attendeesResult[0]?.foraneos) || 0;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -53,9 +64,23 @@ export default async function SuperadminMetricsPage() {
 
         <div className="bg-surface-white rounded-3xl p-8 border border-outline-variant shadow-sm relative overflow-hidden group hover:border-innovation-purple transition-colors">
           <div className="absolute top-0 right-0 w-24 h-24 bg-innovation-purple/10 rounded-bl-[100px] transition-transform duration-500 group-hover:scale-110"></div>
-          <span className="material-symbols-outlined text-4xl mb-4 text-innovation-purple">groups</span>
+          <div className="flex justify-between">
+            <span className="material-symbols-outlined text-4xl mb-4 text-innovation-purple">groups</span>
+            <div className="text-right flex gap-3 text-xs bg-surface-container-lowest border border-outline-variant rounded-xl p-2 z-10 relative">
+                 <div>
+                   <p className="text-on-surface-variant">Estudiantes</p>
+                   <p className="font-bold text-university-blue">{totalEstudiantes}</p>
+                 </div>
+                 <div className="w-px bg-outline-variant"></div>
+                 <div>
+                   <p className="text-on-surface-variant">Foráneos</p>
+                   <p className="font-bold text-innovation-purple">{totalForaneos}</p>
+                 </div>
+            </div>
+          </div>
+          
           <h3 className="text-on-surface-variant font-bold uppercase tracking-widest text-xs mb-1">Adquisición</h3>
-          <p className="text-5xl font-black text-university-blue">{totalAttendees.value}</p>
+          <p className="text-5xl font-black text-university-blue">{totalAttendeesValue}</p>
           <p className="text-sm mt-2 text-on-surface-variant">Entradas Generadas</p>
           <div className="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center text-sm">
             <span className="text-on-surface-variant">Usuarios Totales</span>

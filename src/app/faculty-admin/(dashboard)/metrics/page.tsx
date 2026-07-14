@@ -13,9 +13,11 @@ export default async function FacultyMetricsPage() {
   const [totalEvents] = await db.select({ value: count() }).from(events).where(eq(events.tenantId, facultyId));
   const [totalSpaces] = await db.select({ value: count() }).from(spaces).where(eq(spaces.tenantId, facultyId));
   
-  // SQL Joins para obtener métricas agregadas de la facultad
   const attendeesResult = await db.execute(sql`
-    SELECT COUNT(a.id) as value
+    SELECT 
+      COUNT(a.id) as value,
+      SUM(CASE WHEN a.attendee_type = 'estudiante' THEN 1 ELSE 0 END) as estudiantes,
+      SUM(CASE WHEN a.attendee_type = 'foraneo' THEN 1 ELSE 0 END) as foraneos
     FROM attendees a
     INNER JOIN events e ON a.event_id = e.id
     WHERE e.tenant_id = ${facultyId}
@@ -29,6 +31,8 @@ export default async function FacultyMetricsPage() {
   `);
 
   const totalAttendeesValue = Number(attendeesResult[0]?.value) || 0;
+  const totalEstudiantes = Number(attendeesResult[0]?.estudiantes) || 0;
+  const totalForaneos = Number(attendeesResult[0]?.foraneos) || 0;
   const totalRequestsValue = Number(requestsResult[0]?.value) || 0;
 
   return (
@@ -60,9 +64,22 @@ export default async function FacultyMetricsPage() {
         <div className="bg-gradient-to-br from-university-blue to-innovation-purple rounded-3xl p-6 text-white shadow-lg relative overflow-hidden group md:col-span-2">
           <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
           <div className="relative z-10 flex flex-col h-full justify-between">
-            <div>
-              <span className="material-symbols-outlined text-3xl mb-3 opacity-80">groups</span>
-              <p className="text-xs uppercase tracking-widest font-bold text-white/80">Impacto y Audiencia</p>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="material-symbols-outlined text-3xl mb-3 opacity-80">groups</span>
+                <p className="text-xs uppercase tracking-widest font-bold text-white/80">Impacto y Audiencia</p>
+              </div>
+              <div className="text-right flex gap-4 bg-black/20 rounded-xl p-3">
+                 <div>
+                   <p className="text-sm text-white/70">Estudiantes</p>
+                   <p className="font-bold">{totalEstudiantes}</p>
+                 </div>
+                 <div className="w-px bg-white/20"></div>
+                 <div>
+                   <p className="text-sm text-white/70">Foráneos</p>
+                   <p className="font-bold">{totalForaneos}</p>
+                 </div>
+              </div>
             </div>
             <div className="flex items-end justify-between mt-4">
               <div>

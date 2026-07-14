@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { findEventBySlugOrId } from "@/lib/slug-helpers";
+import { getSession } from "@/lib/auth";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -26,6 +27,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const event = await findEventBySlugOrId(slug);
   if (!event) notFound();
+
+  const session = await getSession();
 
   const eDate = new Date(event.date);
   const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
@@ -107,12 +110,21 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
               </div>
             </div>
 
-            <Link href={`/events/${eventSlugOrId}/register`} className="block">
-              <button className="w-full bg-academic-gold text-university-blue py-4 rounded-xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-md mb-4 flex items-center justify-center gap-2">
-                {isFree ? "Inscribirse Ahora" : "Comprar Entrada"}
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
-            </Link>
+            {session ? (
+              <Link href={`/events/${eventSlugOrId}/register`} className="block">
+                <button className="w-full bg-academic-gold text-university-blue py-4 rounded-xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-md mb-4 flex items-center justify-center gap-2">
+                  {isFree ? "Inscribirse Ahora" : "Comprar Entrada"}
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+              </Link>
+            ) : (
+              <Link href={`/login`} className="block">
+                <button className="w-full bg-surface-container-high text-university-blue py-4 rounded-xl font-bold text-lg hover:bg-surface-container-highest transition-colors shadow-sm mb-4 border border-outline-variant flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined">lock</span>
+                  Inicia Sesión para Registrarte
+                </button>
+              </Link>
+            )}
             
             <p className="text-center text-xs text-on-surface-variant">
               Al registrarte aceptas las <Link href="#" className="underline">políticas del evento</Link>.
