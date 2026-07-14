@@ -24,7 +24,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
           </h1>
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Faculty Portal</p>
         </div>
-        <nav className="flex-1 p-6 space-y-3 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 p-6 space-y-3 overflow-y-auto scrollbar-hide">
           <Link href="/faculty-admin" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
@@ -63,7 +63,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
       </aside>
       
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-surface custom-scrollbar relative">
+      <main className="flex-1 overflow-y-auto bg-surface scrollbar-hide relative">
         <header className="glass-header sticky top-0 z-10 px-4 md:px-10 py-5 border-b border-outline-variant/30 flex justify-between md:justify-end items-center text-white shadow-sm">
           <label htmlFor="mobile-sidebar-toggle" className="md:hidden cursor-pointer flex items-center bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-colors">
             <span className="material-symbols-outlined">menu</span>
