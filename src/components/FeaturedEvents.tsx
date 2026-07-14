@@ -1,42 +1,23 @@
 import Image from "next/image";
+import { db } from "@/db";
+import { eq } from "drizzle-orm";
+import { events } from "@/db/schema";
+import Link from "next/link";
 
-export default function FeaturedEvents() {
-  const events = [
-    {
-      id: 1,
-      image: "/images/event_basketball.png",
-      month: "Jun",
-      day: "28",
-      category: "Deportes Inter-Uni",
-      title: "Finales de la Copa Universitaria de Baloncesto",
-      location: "Arena Multideportiva",
-      time: "18:00 - 21:00",
-      price: "$12.50",
+export default async function FeaturedEvents() {
+  const featuredEvents = await db.query.events.findMany({
+    where: eq(events.isFeatured, true),
+    with: {
+      space: true,
+      tenant: {
+        with: {
+          category: true
+        }
+      }
     },
-    {
-      id: 2,
-      image: "/images/event_gala.png",
-      month: "Jul",
-      day: "05",
-      category: "Festivales",
-      title: "Vibras de Verano: Gala de Artes",
-      location: "Jardines del Ala Oeste",
-      time: "20:00 - 02:00",
-      price: "$25.00",
-    },
-    {
-      id: 3,
-      image: "/images/event_ai.png",
-      month: "Jul",
-      day: "12",
-      category: "Académico",
-      title: "IA y el Futuro de la Educación",
-      location: "Gran Auditorio",
-      time: "09:00 - 16:00",
-      price: "GRATIS",
-      isFree: true,
-    },
-  ];
+    limit: 6,
+    orderBy: (events, { desc }) => [desc(events.createdAt)],
+  });
 
   return (
     <section className="py-20">
@@ -59,67 +40,86 @@ export default function FeaturedEvents() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events.map((evt) => (
-            <article
-              key={evt.id}
-              className="event-card-hover bg-surface-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant group"
-            >
-              <div className="relative h-64 overflow-hidden">
-                <Image
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover"
-                  src={evt.image}
-                  alt={evt.title}
-                />
-                <div className="absolute top-4 left-4 bg-surface-white rounded-xl p-2 text-center shadow-md border border-outline-variant min-w-[50px]">
-                  <span className="block text-university-blue font-bold text-label-sm leading-tight uppercase">
-                    {evt.month}
-                  </span>
-                  <span className="block text-university-blue font-black text-headline-sm leading-none">
-                    {evt.day}
-                  </span>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <span className="bg-innovation-purple text-white px-3 py-1 rounded-full text-label-sm font-bold shadow-lg">
-                    {evt.category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-title-lg text-title-lg text-university-blue mb-3 group-hover:text-innovation-purple transition-colors">
-                  {evt.title}
-                </h3>
-                <div className="space-y-2 mb-6">
-                  <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
-                    <span className="material-symbols-outlined text-sm">location_on</span>
-                    {evt.location}
-                  </p>
-                  <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
-                    <span className="material-symbols-outlined text-sm">schedule</span>
-                    {evt.time}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`font-extrabold text-headline-sm ${
-                      evt.isFree ? "text-green-600" : "text-university-blue"
-                    }`}
-                  >
-                    {evt.price}
-                  </span>
-                  <button className="bg-university-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">
-                    {evt.isFree ? "Inscribirse" : "Comprar Entrada"}
-                    <span className="material-symbols-outlined text-sm">
-                      {evt.isFree ? "app_registration" : "shopping_cart"}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+
+        {featuredEvents.length === 0 ? (
+          <div className="text-center py-12 bg-surface-container-lowest rounded-3xl border border-outline-variant/30">
+            <span className="material-symbols-outlined text-4xl text-outline mb-3">event_busy</span>
+            <p className="text-on-surface-variant font-body-md">Por el momento no hay eventos destacados.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredEvents.map((evt) => {
+              const month = evt.date.toLocaleString('es', { month: 'short' }).toUpperCase();
+              const day = evt.date.toLocaleString('es', { day: '2-digit' });
+              const time = evt.date.toLocaleString('es', { hour: '2-digit', minute: '2-digit' });
+              const isFree = Number(evt.price) === 0;
+
+              return (
+                <article
+                  key={evt.id}
+                  className="event-card-hover bg-surface-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant group"
+                >
+                  <div className="relative h-64 overflow-hidden">
+                    <Image
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover"
+                      src={evt.imageUrl || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1470&auto=format&fit=crop"}
+                      alt={evt.title}
+                    />
+                    <div className="absolute top-4 left-4 bg-surface-white rounded-xl p-2 text-center shadow-md border border-outline-variant min-w-[50px]">
+                      <span className="block text-university-blue font-bold text-label-sm leading-tight uppercase">
+                        {month}
+                      </span>
+                      <span className="block text-university-blue font-black text-headline-sm leading-none">
+                        {day}
+                      </span>
+                    </div>
+                    {evt.tenant?.category && (
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-innovation-purple text-white px-3 py-1 rounded-full text-label-sm font-bold shadow-lg">
+                          {evt.tenant.category.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-title-lg text-title-lg text-university-blue mb-3 group-hover:text-innovation-purple transition-colors truncate">
+                      {evt.title}
+                    </h3>
+                    <div className="space-y-2 mb-6">
+                      <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
+                        <span className="material-symbols-outlined text-sm">location_on</span>
+                        <span className="truncate">{evt.space?.name}</span>
+                      </p>
+                      <p className="flex items-center gap-2 text-on-surface-variant text-label-md">
+                        <span className="material-symbols-outlined text-sm">schedule</span>
+                        {time}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`font-extrabold text-headline-sm ${
+                          isFree ? "text-green-600" : "text-university-blue"
+                        }`}
+                      >
+                        {isFree ? "GRATIS" : `$${evt.price}`}
+                      </span>
+                      <Link href={`/events/${evt.slug || evt.id}`}>
+                        <button className="bg-university-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">
+                          {isFree ? "Inscribirse" : "Comprar"}
+                          <span className="material-symbols-outlined text-sm">
+                            {isFree ? "app_registration" : "shopping_cart"}
+                          </span>
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

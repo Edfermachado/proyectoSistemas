@@ -1,10 +1,37 @@
 import Image from "next/image";
+import HeroCarousel from "./HeroCarousel";
+import { db } from "@/db";
+import { count } from "drizzle-orm";
+import { attendees, events } from "@/db/schema";
 
-export default function Hero() {
+export default async function Hero() {
+  // Get dynamic attendee count
+  const attendeesCountResult = await db.select({ value: count() }).from(attendees);
+  const totalAttendees = attendeesCountResult[0].value || 0;
+  
+  // Format the number (e.g., 1500 -> "1.5k", 500 -> "500")
+  const formattedAttendees = totalAttendees >= 1000 
+    ? `${(totalAttendees / 1000).toFixed(1).replace('.0', '')}k` 
+    : totalAttendees.toString();
+
+  // Get recent events for the carousel
+  const recentEventsRaw = await db.query.events.findMany({
+    orderBy: (events, { desc }) => [desc(events.createdAt)],
+    limit: 4,
+    with: { space: true }
+  });
+
+  const carouselEvents = recentEventsRaw.map(e => ({
+    id: e.id,
+    title: e.title,
+    imageUrl: e.imageUrl,
+    spaceName: e.space?.name
+  }));
+
   return (
     <section className="relative pt-24 pb-12 overflow-hidden bg-university-blue min-h-[85vh] flex items-center">
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none"></div>
-      <div className="max-w-container-max mx-auto px-margin-desktop grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div className="max-w-container-max mx-auto px-margin-desktop grid lg:grid-cols-2 gap-12 items-center relative z-10 w-full">
         <div className="space-y-8 animate-fade-in">
           <div className="inline-flex items-center gap-2 bg-academic-gold/20 text-academic-gold px-4 py-1 rounded-full border border-academic-gold/30">
             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -63,30 +90,17 @@ export default function Hero() {
                 />
               </div>
             </div>
-            <p className="text-on-primary-container/60 text-label-md font-medium">+15k estudiantes reservaron esta semana</p>
+            <p className="text-on-primary-container/60 text-label-md font-medium">
+              {totalAttendees > 0 
+                ? `+${formattedAttendees} estudiantes ya reservaron`
+                : "Sé el primero en reservar"}
+            </p>
           </div>
         </div>
-        <div className="hidden lg:block relative group">
-          <div className="absolute -inset-4 bg-academic-gold rounded-[2rem] rotate-3 opacity-20 group-hover:rotate-6 transition-transform"></div>
-          <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/5] border-4 border-surface-white/10">
-            <Image
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
-              alt="Live Event"
-              src="/images/hero_event_live.png"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-8 gradient-overlay flex flex-col justify-end">
-              <div className="bg-innovation-purple text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest w-fit mb-3">
-                En Vivo
-              </div>
-              <h3 className="text-white font-headline-md text-headline-md mb-2">Exposición Anual de Ingeniería 2024</h3>
-              <p className="text-white/80 text-body-md flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">location_on</span> Plaza Tecnológica Principal
-              </p>
-            </div>
-          </div>
-        </div>
+        
+        {/* Carousel Component */}
+        <HeroCarousel events={carouselEvents} />
+        
       </div>
     </section>
   );

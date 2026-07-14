@@ -54,27 +54,44 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                   <th className="px-6 py-4 font-title-sm text-university-blue">Evento</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Fecha</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Facultad</th>
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Espacio</th>
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Precio</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Destacado</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {events.map((e) => (
-                  <tr key={e.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-university-blue">{e.title}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.tenant?.name}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.space?.name}</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{e.price}</td>
-                    <td className="px-6 py-4 text-right">
-                      <Link href={`/admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
-                        <span className="material-symbols-outlined text-sm">edit</span>
-                      </Link>
-                      <DeleteButton endpoint="events" id={e.id} />
-                    </td>
-                  </tr>
-                ))}
+                {events.map((e) => {
+                  async function toggleFeature() {
+                    "use server";
+                    const { db } = await import("@/db");
+                    const { events } = await import("@/db/schema");
+                    const { eq } = await import("drizzle-orm");
+                    const { revalidatePath } = await import("next/cache");
+                    await db.update(events).set({ isFeatured: !e.isFeatured }).where(eq(events.id, e.id));
+                    revalidatePath("/admin/events");
+                    revalidatePath("/");
+                  }
+
+                  return (
+                    <tr key={e.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-university-blue">{e.title}</td>
+                      <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-on-surface-variant">{e.tenant?.name}</td>
+                      <td className="px-6 py-4 text-center">
+                        <form action={toggleFeature}>
+                          <button type="submit" title={e.isFeatured ? "Quitar destacado" : "Destacar evento"} className={`p-2 rounded-full transition-colors ${e.isFeatured ? 'text-academic-gold bg-academic-gold/10 hover:bg-academic-gold/20' : 'text-slate-400 hover:text-academic-gold hover:bg-surface-container'}`}>
+                            <span className={`material-symbols-outlined ${e.isFeatured ? 'icon-filled' : ''}`}>star</span>
+                          </button>
+                        </form>
+                      </td>
+                      <td className="px-6 py-4 text-right flex items-center justify-end">
+                        <Link href={`/admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
+                          <span className="material-symbols-outlined text-sm">edit</span>
+                        </Link>
+                        <DeleteButton endpoint="events" id={e.id} />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

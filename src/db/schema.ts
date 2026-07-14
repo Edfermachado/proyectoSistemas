@@ -68,6 +68,7 @@ export const events = pgTable('events', {
   visibility: visibilityEnum('visibility').default('publico'),
   status: varchar('status', { length: 50 }).default('aprobado'), // roles: pendiente, aprobado, rechazado
   requiresIpProtection: boolean('requires_ip_protection').default(false),
+  isFeatured: boolean('is_featured').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
