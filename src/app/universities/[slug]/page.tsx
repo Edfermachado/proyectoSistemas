@@ -38,9 +38,16 @@ export default async function UniversityFacultiesPage({ params }: { params: Prom
             <span className="material-symbols-outlined text-sm mr-2">arrow_back</span>
             Volver a Universidades
           </Link>
-          <h1 className="font-display-lg text-display-lg text-surface-white animate-fade-in">
-            {university.name}
-          </h1>
+          <div className="flex flex-col items-center justify-center">
+            {university.logoUrl && (
+              <div className="w-24 h-24 bg-surface-white rounded-3xl p-3 mb-6 shadow-lg transform hover:scale-105 transition-transform duration-300">
+                <img src={university.logoUrl} alt={`Logo de ${university.name}`} className="w-full h-full object-contain" />
+              </div>
+            )}
+            <h1 className="font-display-lg text-display-lg text-surface-white animate-fade-in">
+              {university.name}
+            </h1>
+          </div>
           <p className="text-white/80 font-body-lg max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "100ms" }}>
             {university.description || "Explora las diferentes facultades e instituciones que conforman esta comunidad académica."}
           </p>

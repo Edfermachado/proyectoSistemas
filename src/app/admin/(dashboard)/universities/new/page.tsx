@@ -14,6 +14,7 @@ export default function NewUniversityPage() {
     const data = {
       name: formData.get("name"),
       description: formData.get("description"),
+      logoUrl: formData.get("logoUrl") || null,
     };
 
     try {
@@ -45,6 +46,10 @@ export default function NewUniversityPage() {
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Nombre de la Universidad</label>
             <input name="name" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. Universidad Central" />
+          </div>
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">URL del Logo (Opcional)</label>
+            <input name="logoUrl" type="url" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="https://ejemplo.com/logo.png" />
           </div>
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Descripción (Opcional)</label>

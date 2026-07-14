@@ -13,6 +13,7 @@ export const universities = pgTable('universities', {
   name: varchar('name', { length: 255 }).notNull().unique(),
   slug: varchar('slug', { length: 300 }).unique(),
   description: text('description'),
+  logoUrl: varchar('logo_url', { length: 500 }),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

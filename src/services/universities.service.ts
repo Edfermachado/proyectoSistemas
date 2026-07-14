@@ -16,13 +16,13 @@ export class UniversitiesService {
     });
   }
 
-  static async createUniversity(data: { name: string; description?: string }) {
+  static async createUniversity(data: { name: string; description?: string; logoUrl?: string }) {
     const slug = await generateUniqueSlug("universities", data.name);
     const [newUniv] = await db.insert(universities).values({ ...data, slug }).returning();
     return newUniv;
   }
 
-  static async updateUniversity(id: string, data: Partial<{ name: string; description: string }>) {
+  static async updateUniversity(id: string, data: Partial<{ name: string; description: string; logoUrl: string }>) {
     const slugUpdate = data.name ? { slug: await generateUniqueSlug("universities", data.name, id) } : {};
     const [updatedUniv] = await db.update(universities)
       .set({ ...data, ...slugUpdate })

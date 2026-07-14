@@ -39,9 +39,15 @@ export default async function UniversitiesPage() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-innovation-purple/5 rounded-bl-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700"></div>
                 
-                <div className="w-16 h-16 bg-university-blue/5 text-university-blue rounded-2xl flex items-center justify-center mb-6 group-hover:bg-university-blue group-hover:text-surface-white transition-colors duration-300">
-                  <span className="material-symbols-outlined text-3xl">account_balance</span>
-                </div>
+                {uni.logoUrl ? (
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 overflow-hidden bg-surface-white border border-outline-variant shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <img src={uni.logoUrl} alt={`Logo de ${uni.name}`} className="w-full h-full object-contain p-2" />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-university-blue/5 text-university-blue rounded-2xl flex items-center justify-center mb-6 group-hover:bg-university-blue group-hover:text-surface-white transition-colors duration-300">
+                    <span className="material-symbols-outlined text-3xl">account_balance</span>
+                  </div>
+                )}
                 
                 <h3 className="font-title-lg text-university-blue mb-3 group-hover:text-innovation-purple transition-colors">
                   {uni.name}

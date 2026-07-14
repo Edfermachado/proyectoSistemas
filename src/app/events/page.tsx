@@ -6,15 +6,16 @@ import { events as eventsSchema, tenants, spaces, universities } from "@/db/sche
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { findTenantBySlugOrId } from "@/lib/slug-helpers";
+import { findTenantBySlugOrId, findCategoryBySlugOrId } from "@/lib/slug-helpers";
+import { categories as categoriesSchema } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Explorar Eventos — UniEvents",
   description: "Descubre conferencias, deportes, talleres y más eventos universitarios.",
 };
 
-export default async function EventsExplorePage({ searchParams }: { searchParams: Promise<{ faculty?: string, q?: string }> }) {
-  const { faculty: facultyId, q: query } = await searchParams;
+export default async function EventsExplorePage({ searchParams }: { searchParams: Promise<{ faculty?: string, category?: string, q?: string }> }) {
+  const { faculty: facultyId, category: categorySlug, q: query } = await searchParams;
 
   // Resolve faculty from slug or ID
   let resolvedFacultyId: string | undefined;
@@ -24,6 +25,17 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
     if (tenant) {
       resolvedFacultyId = tenant.id;
       facultyName = tenant.name;
+    }
+  }
+
+  // Resolve category
+  let resolvedCategoryId: string | undefined;
+  let categoryName = "";
+  if (categorySlug) {
+    const category = await findCategoryBySlugOrId(categorySlug);
+    if (category) {
+      resolvedCategoryId = category.id;
+      categoryName = category.name;
     }
   }
 
@@ -38,6 +50,16 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
     );
   } else if (resolvedFacultyId) {
     whereClause = eq(eventsSchema.tenantId, resolvedFacultyId);
+  } else if (resolvedCategoryId && query) {
+    whereClause = and(
+      eq(tenants.categoryId, resolvedCategoryId),
+      or(
+        ilike(eventsSchema.title, `%${query}%`),
+        ilike(eventsSchema.description, `%${query}%`)
+      )
+    );
+  } else if (resolvedCategoryId) {
+    whereClause = eq(tenants.categoryId, resolvedCategoryId);
   } else if (query) {
     whereClause = or(
       ilike(eventsSchema.title, `%${query}%`),
@@ -79,11 +101,16 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
             Explorar <span className="text-academic-gold">Eventos</span>
           </h1>
           <p className="text-white/80 font-body-lg max-w-2xl animate-fade-in" style={{ animationDelay: "100ms" }}>
-            {facultyId ? `Mostrando eventos programados en ${facultyName}.` : "Descubre conferencias, deportes, talleres y más en tu universidad."}
+            {facultyId 
+              ? `Mostrando eventos programados en ${facultyName}.` 
+              : categorySlug 
+                ? `Explorando eventos en la categoría de ${categoryName}.`
+                : "Descubre conferencias, deportes, talleres y más en tu universidad."}
           </p>
           
           <form className="mt-8 max-w-2xl animate-fade-in flex gap-2" style={{ animationDelay: "200ms" }}>
             {facultyId && <input type="hidden" name="faculty" value={facultyId} />}
+            {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
             <div className="flex-1 flex items-center bg-white/10 rounded-xl px-4 py-3 border border-white/20 focus-within:border-academic-gold transition-colors">
               <span className="material-symbols-outlined text-white/50 mr-3">search</span>
               <input 
@@ -109,9 +136,9 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
             </div>
             <h3 className="font-title-lg text-university-blue mb-2">No se encontraron eventos</h3>
             <p className="text-on-surface-variant max-w-md mb-6">
-              No hay eventos programados que coincidan con tu búsqueda actual en {facultyName}.
+              No hay eventos programados que coincidan con tu búsqueda actual {facultyId ? `en ${facultyName}` : categorySlug ? `en la categoría ${categoryName}` : ""}.
             </p>
-            {(facultyId || query) && (
+            {(facultyId || categorySlug || query) && (
               <Link href="/events" className="text-academic-gold font-bold hover:underline">
                 Ver todos los eventos
               </Link>

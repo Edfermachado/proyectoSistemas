@@ -49,6 +49,16 @@ export async function findEventBySlugOrId(slugOrId: string) {
 }
 
 /**
+ * Finds a category by slug (falling back to ID).
+ */
+export async function findCategoryBySlugOrId(slugOrId: string) {
+  const where = isUUID(slugOrId)
+    ? or(eq(categories.slug, slugOrId), eq(categories.id, slugOrId))
+    : eq(categories.slug, slugOrId);
+  return db.query.categories.findFirst({ where });
+}
+
+/**
  * Generates a unique slug for an entity, appending a suffix if a collision exists.
  */
 export async function generateUniqueSlug(
