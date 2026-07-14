@@ -25,29 +25,34 @@ async function main() {
     console.log('Creando universidades...');
     const [uni1] = await db.insert(schema.universities).values({
       name: 'Universidad Central de Tecnología',
+      slug: 'universidad-central-de-tecnologia',
       description: 'Una universidad enfocada en tecnología e innovación. Cuenta con los laboratorios más avanzados de la región.',
     }).returning();
     
     const [uni2] = await db.insert(schema.universities).values({
       name: 'Universidad Nacional de Artes',
+      slug: 'universidad-nacional-de-artes',
       description: 'Cuna de la creatividad y la expresión artística, donde convergen las ideas clásicas y contemporáneas.',
     }).returning();
 
     console.log('Creando facultades (tenants)...');
     const [tenant1] = await db.insert(schema.tenants).values({
       name: 'Facultad de Ingeniería',
+      slug: 'facultad-de-ingenieria',
       description: 'Dedicada a la ingeniería, robótica y desarrollo de software moderno.',
       universityId: uni1.id,
     }).returning();
     
     const [tenant2] = await db.insert(schema.tenants).values({
       name: 'Facultad de Ciencias de la Computación',
+      slug: 'facultad-de-ciencias-de-la-computacion',
       description: 'Innovación en inteligencia artificial, ciberseguridad y ciencia de datos.',
       universityId: uni1.id,
     }).returning();
     
     const [tenant3] = await db.insert(schema.tenants).values({
       name: 'Facultad de Bellas Artes',
+      slug: 'facultad-de-bellas-artes',
       description: 'Desarrollo de habilidades en pintura, escultura, cine y medios visuales.',
       universityId: uni2.id,
     }).returning();
@@ -77,6 +82,7 @@ async function main() {
     await db.insert(schema.events).values([
       {
         title: 'Expo de Ingeniería 2026',
+        slug: 'expo-de-ingenieria-2026',
         description: 'Muestra anual de proyectos de ingeniería y robótica presentados por los alumnos.',
         date: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // En 5 días
         price: '0.00',
@@ -85,6 +91,7 @@ async function main() {
       },
       {
         title: 'Hackathon de Inteligencia Artificial',
+        slug: 'hackathon-de-inteligencia-artificial',
         description: 'Desafío de 48 horas construyendo soluciones innovadoras usando IA y Machine Learning.',
         date: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // En 10 días
         price: '10.00',
@@ -93,6 +100,7 @@ async function main() {
       },
       {
         title: 'Exposición de Arte Moderno',
+        slug: 'exposicion-de-arte-moderno',
         description: 'Exposición de los mejores trabajos de escultura y pintura de los alumnos de último año.',
         date: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // En 15 días
         price: '5.00',

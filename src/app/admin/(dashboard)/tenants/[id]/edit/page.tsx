@@ -11,6 +11,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState<any>(null);
   const [universities, setUniversities] = useState<{id: string, name: string}[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   
   // States for admins
   const [admins, setAdmins] = useState<any[]>([]);
@@ -19,6 +20,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     fetch(`/api/tenants/${id}`).then(r => r.json()).then(setInitialData);
     fetch('/api/universities').then(r => r.json()).then(setUniversities);
+    fetch('/api/categories').then(r => r.json()).then(setCategories);
     fetchAdmins();
   }, [id]);
 
@@ -38,6 +40,7 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
       name: formData.get("name"),
       description: formData.get("description"),
       universityId: formData.get("universityId") || null,
+      categoryId: formData.get("categoryId") || null,
     };
 
     try {
@@ -112,6 +115,13 @@ export default function EditTenantPage({ params }: { params: Promise<{ id: strin
             <select name="universityId" defaultValue={initialData.universityId || ""} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
               <option value="">-- Sin Universidad / Independiente --</option>
               {universities.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Categoría (Opcional)</label>
+            <select name="categoryId" defaultValue={initialData.categoryId || ""} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+              <option value="">-- Sin Categoría --</option>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div className="flex justify-end gap-4 pt-4 border-t border-outline-variant/50">

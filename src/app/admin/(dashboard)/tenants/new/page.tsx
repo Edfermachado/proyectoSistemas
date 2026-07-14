@@ -8,9 +8,11 @@ export default function NewTenantPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [universities, setUniversities] = useState<{id: string, name: string}[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
 
   useEffect(() => {
     fetch('/api/universities').then(r => r.json()).then(setUniversities);
+    fetch('/api/categories').then(r => r.json()).then(setCategories);
   }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -22,6 +24,7 @@ export default function NewTenantPage() {
       name: formData.get("name"),
       description: formData.get("description"),
       universityId: formData.get("universityId") || null,
+      categoryId: formData.get("categoryId") || null,
     };
 
     try {
@@ -63,6 +66,13 @@ export default function NewTenantPage() {
             <select name="universityId" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
               <option value="">-- Sin Universidad / Independiente --</option>
               {universities.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Categoría (Opcional)</label>
+            <select name="categoryId" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+              <option value="">-- Sin Categoría --</option>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div className="flex justify-end gap-4 pt-4 border-t border-outline-variant/50">

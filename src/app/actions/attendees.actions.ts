@@ -22,8 +22,8 @@ export async function registerForEvent(formData: FormData) {
     const userId = session.userId as string;
 
     await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType });
-    revalidatePath(`/events/${eventId}`);
-    revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
+    revalidatePath(`/events/[slug]`, "page");
+    revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
     return { success: true };
   } catch (error: any) {
     return { error: error.message };

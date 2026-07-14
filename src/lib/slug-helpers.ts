@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { universities, tenants, events } from "@/db/schema";
+import { universities, tenants, events, categories } from "@/db/schema";
 import { or, eq } from "drizzle-orm";
 import { slugify } from "@/lib/slugify";
 
@@ -52,7 +52,7 @@ export async function findEventBySlugOrId(slugOrId: string) {
  * Generates a unique slug for an entity, appending a suffix if a collision exists.
  */
 export async function generateUniqueSlug(
-  table: "universities" | "tenants" | "events",
+  table: "universities" | "tenants" | "events" | "categories",
   name: string,
   currentId?: string
 ): Promise<string> {
@@ -64,6 +64,9 @@ export async function generateUniqueSlug(
       existing = (await db.query.universities.findFirst({ where: eq(universities.slug, slug) })) ?? undefined;
     } else if (table === "tenants") {
       existing = (await db.query.tenants.findFirst({ where: eq(tenants.slug, slug) })) ?? undefined;
+    } else if (table === "categories") {
+      // Need to import categories above!
+      existing = (await db.query.categories.findFirst({ where: eq(categories.slug, slug) })) ?? undefined;
     } else {
       existing = (await db.query.events.findFirst({ where: eq(events.slug, slug) })) ?? undefined;
     }

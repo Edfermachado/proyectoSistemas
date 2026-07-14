@@ -1,13 +1,15 @@
+import Link from "next/link";
+
 export default function FacultySelector() {
   const faculties = [
-    { icon: "engineering", name: "Ingeniería" },
-    { icon: "medical_services", name: "Medicina" },
-    { icon: "palette", name: "Artes" },
-    { icon: "history_edu", name: "Humanidades" },
-    { icon: "sports_basketball", name: "Deportes" },
-    { icon: "science", name: "Ciencias" },
-    { icon: "account_balance", name: "Negocios" },
-    { icon: "language", name: "Idiomas" },
+    { icon: "engineering", name: "Ingeniería", slug: "facultad-de-ingenieria" },
+    { icon: "science", name: "Ciencias de la Computación", slug: "facultad-de-ciencias-de-la-computacion" },
+    { icon: "palette", name: "Bellas Artes", slug: "facultad-de-bellas-artes" },
+    { icon: "medical_services", name: "Medicina", slug: "" },
+    { icon: "history_edu", name: "Humanidades", slug: "" },
+    { icon: "sports_basketball", name: "Deportes", slug: "" },
+    { icon: "account_balance", name: "Negocios", slug: "" },
+    { icon: "language", name: "Idiomas", slug: "" },
   ];
 
   return (
@@ -18,7 +20,8 @@ export default function FacultySelector() {
         </h2>
         <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
           {faculties.map((faculty, i) => (
-            <button
+            <Link
+              href={faculty.slug ? `/events?faculty=${faculty.slug}` : `/events`}
               key={i}
               className="flex flex-col items-center gap-3 min-w-[120px] p-6 bg-surface-white rounded-2xl shadow-sm border border-outline-variant hover:border-university-blue hover:text-university-blue transition-all group"
             >
@@ -27,10 +30,10 @@ export default function FacultySelector() {
                   {faculty.icon}
                 </span>
               </div>
-              <span className="font-label-md text-label-md font-semibold">
+              <span className="font-label-md text-label-md font-semibold text-center leading-tight">
                 {faculty.name}
               </span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>

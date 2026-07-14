@@ -16,12 +16,21 @@ export const universities = pgTable('universities', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+export const categories = pgTable('categories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  slug: varchar('slug', { length: 300 }).unique(),
+  icon: varchar('icon', { length: 100 }), // for material symbols icon
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull().unique(),
   slug: varchar('slug', { length: 300 }).unique(),
   description: text('description'),
   universityId: uuid('university_id').references(() => universities.id),
+  categoryId: uuid('category_id').references(() => categories.id),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -85,10 +94,18 @@ export const universitiesRelations = relations(universities, ({ many }) => ({
   tenants: many(tenants),
 }));
 
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  tenants: many(tenants),
+}));
+
 export const tenantsRelations = relations(tenants, ({ one, many }) => ({
   university: one(universities, {
     fields: [tenants.universityId],
     references: [universities.id],
+  }),
+  category: one(categories, {
+    fields: [tenants.categoryId],
+    references: [categories.id],
   }),
   users: many(users),
   spaces: many(spaces),

@@ -16,13 +16,13 @@ export class TenantsService {
     });
   }
 
-  static async createTenant(data: { name: string; description?: string; universityId?: string }) {
+  static async createTenant(data: { name: string; description?: string; universityId?: string; categoryId?: string }) {
     const slug = await generateUniqueSlug("tenants", data.name);
     const [newTenant] = await db.insert(tenants).values({ ...data, slug }).returning();
     return newTenant;
   }
 
-  static async updateTenant(id: string, data: Partial<{ name: string; description: string }>) {
+  static async updateTenant(id: string, data: Partial<{ name: string; description: string; categoryId: string }>) {
     const slugUpdate = data.name ? { slug: await generateUniqueSlug("tenants", data.name, id) } : {};
     const [updatedTenant] = await db.update(tenants)
       .set({ ...data, ...slugUpdate })
