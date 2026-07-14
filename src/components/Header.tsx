@@ -94,7 +94,7 @@ export default function Header() {
             <button className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all">
               notifications
             </button>
-            <Link href="/login" className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all flex items-center justify-center">
+            <Link href="/profile" className="material-symbols-outlined hover:bg-primary-container/50 p-2 rounded-full transition-all flex items-center justify-center">
               account_circle
             </Link>
             <button className="bg-academic-gold text-university-blue px-6 py-2 rounded-full font-bold text-label-md hover:scale-105 active:scale-95 duration-150 shadow-lg">

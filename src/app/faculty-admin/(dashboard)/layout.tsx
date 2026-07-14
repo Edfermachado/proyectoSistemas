@@ -31,6 +31,10 @@ export default async function FacultyAdminLayout({ children }: { children: React
             <span className="material-symbols-outlined text-xl">calendar_month</span>
             Calendario
           </Link>
+          <Link href="/faculty-admin/requests" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">assignment</span>
+            Solicitudes
+          </Link>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
           <form action={logoutFacultyAdmin}>

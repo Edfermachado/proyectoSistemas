@@ -95,9 +95,29 @@ export default function FacultyNewEventPage() {
           
           <EventTimePicker />
           
-          <div>
-            <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
-            <input name="price" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="FREE, $10, etc." defaultValue="FREE" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
+              <input name="price" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="FREE, 10.50, etc." defaultValue="FREE" />
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Capacidad Especial (Opcional)</label>
+              <input name="capacity" type="number" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. 150 (ignora límite del espacio)" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Visibilidad</label>
+              <select name="visibility" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-3 mt-8">
+              <input type="checkbox" name="requiresIpProtection" id="requiresIpProtection" value="true" className="w-5 h-5 accent-university-blue cursor-pointer" />
+              <label htmlFor="requiresIpProtection" className="font-title-sm text-university-blue cursor-pointer">Requiere Protección Intelectual (IP)</label>
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4">

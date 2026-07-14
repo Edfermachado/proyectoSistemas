@@ -1,5 +1,11 @@
-import { pgTable, uuid, varchar, text, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, integer, boolean, pgEnum, jsonb, decimal } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import type { EventRequestMetadata } from '@/validations/requests';
+
+export const organizerLevelEnum = pgEnum('organizer_level', ['academico', 'amateur', 'registrado']);
+export const visibilityEnum = pgEnum('visibility', ['publico', 'privado']);
+export const registrationStatusEnum = pgEnum('registration_status', ['registrado', 'confirmado', 'pago_pendiente']);
+export const requestTypeEnum = pgEnum('request_type', ['soporte_academico', 'patrocinio', 'cobertura_prensa', 'derechos_transmision']);
 
 export const universities = pgTable('universities', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -24,6 +30,7 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   role: varchar('role', { length: 50 }).notNull().default('user'), // roles: superadmin, tenant_admin, user
   tenantId: uuid('tenant_id').references(() => tenants.id), // Puede ser null para el superadmin global
+  organizerLevel: organizerLevelEnum('organizer_level').default('academico'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -41,11 +48,14 @@ export const events = pgTable('events', {
   slug: varchar('slug', { length: 350 }).unique(),
   description: text('description'),
   date: timestamp('date').notNull(),
-  price: varchar('price', { length: 50 }).default('FREE'),
+  price: decimal('price', { precision: 10, scale: 2 }), 
   imageUrl: varchar('image_url', { length: 500 }),
   duration: integer('duration').notNull().default(60),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
+  capacity: integer('capacity'),
+  visibility: visibilityEnum('visibility').default('publico'),
+  requiresIpProtection: boolean('requires_ip_protection').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -55,7 +65,16 @@ export const attendees = pgTable('attendees', {
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 50 }).notNull(),
-  status: varchar('status', { length: 50 }).default('pending'),
+  status: registrationStatusEnum('status').default('registrado'),
+  userId: uuid('user_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const eventRequests = pgTable('event_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  eventId: uuid('event_id').references(() => events.id).notNull(),
+  requestType: requestTypeEnum('request_type').notNull(),
+  metadata: jsonb('metadata').$type<EventRequestMetadata>(),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -79,6 +98,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.tenantId],
     references: [tenants.id],
   }),
+  attendees: many(attendees),
 }));
 
 export const spacesRelations = relations(spaces, ({ one, many }) => ({
@@ -99,11 +119,23 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     references: [spaces.id],
   }),
   attendees: many(attendees),
+  requests: many(eventRequests),
 }));
 
 export const attendeesRelations = relations(attendees, ({ one }) => ({
   event: one(events, {
     fields: [attendees.eventId],
+    references: [events.id],
+  }),
+  user: one(users, {
+    fields: [attendees.userId],
+    references: [users.id],
+  }),
+}));
+
+export const eventRequestsRelations = relations(eventRequests, ({ one }) => ({
+  event: one(events, {
+    fields: [eventRequests.eventId],
     references: [events.id],
   }),
 }));

@@ -79,7 +79,7 @@ async function main() {
         title: 'Expo de Ingeniería 2026',
         description: 'Muestra anual de proyectos de ingeniería y robótica presentados por los alumnos.',
         date: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // En 5 días
-        price: 'FREE',
+        price: '0.00',
         tenantId: tenant1.id,
         spaceId: space1.id,
       },
@@ -87,7 +87,7 @@ async function main() {
         title: 'Hackathon de Inteligencia Artificial',
         description: 'Desafío de 48 horas construyendo soluciones innovadoras usando IA y Machine Learning.',
         date: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // En 10 días
-        price: '$10.00',
+        price: '10.00',
         tenantId: tenant2.id,
         spaceId: space2.id, 
       },
@@ -95,11 +95,20 @@ async function main() {
         title: 'Exposición de Arte Moderno',
         description: 'Exposición de los mejores trabajos de escultura y pintura de los alumnos de último año.',
         date: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // En 15 días
-        price: '$5.00',
+        price: '5.00',
         tenantId: tenant3.id,
         spaceId: space3.id,
       }
     ]);
+
+    console.log('Creando usuario root...');
+    await db.insert(schema.users).values({
+      email: 'admin@gmail.com',
+      passwordHash: 'admin',
+      role: 'superadmin',
+      tenantId: tenant1.id, // For faculty portal fallback
+      organizerLevel: 'registrado'
+    });
 
     console.log('✅ Seeder completado con éxito!');
   } catch (error) {

@@ -34,6 +34,10 @@ export async function POST(request: Request) {
     const price = formData.get("price") as string;
     const tenantId = formData.get("tenantId") as string;
     const spaceId = formData.get("spaceId") as string;
+    const capacityStr = formData.get("capacity") as string;
+    const capacity = capacityStr ? parseInt(capacityStr) : undefined;
+    const visibility = (formData.get("visibility") as "publico" | "privado") || "publico";
+    const requiresIpProtection = formData.get("requiresIpProtection") === "true";
     const image = formData.get("image") as File | null;
 
     let imageUrl = null;
@@ -81,7 +85,10 @@ export async function POST(request: Request) {
       tenantId,
       spaceId,
       description,
-      imageUrl
+      imageUrl,
+      capacity,
+      visibility,
+      requiresIpProtection
     });
 
     return NextResponse.json(newEvent, { status: 201 });
