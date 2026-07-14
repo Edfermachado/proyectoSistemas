@@ -79,13 +79,13 @@ async function main() {
     console.log('Creando eventos...');
     const now = new Date();
     
-    await db.insert(schema.events).values([
+    const eventsInserted = await db.insert(schema.events).values([
       {
         title: 'Expo de Ingeniería 2026',
         slug: 'expo-de-ingenieria-2026',
         description: 'Muestra anual de proyectos de ingeniería y robótica presentados por los alumnos.',
         date: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // En 5 días
-        price: '0.00',
+        price: 'GRATIS',
         tenantId: tenant1.id,
         spaceId: space1.id,
       },
@@ -107,16 +107,62 @@ async function main() {
         tenantId: tenant3.id,
         spaceId: space3.id,
       }
-    ]);
+    ]).returning();
 
-    console.log('Creando usuario root...');
-    await db.insert(schema.users).values({
+    console.log('Creando usuario root y roles de prueba...');
+    const [superadmin] = await db.insert(schema.users).values({
       email: 'admin@gmail.com',
       passwordHash: 'admin',
       role: 'superadmin',
       tenantId: tenant1.id, // For faculty portal fallback
       organizerLevel: 'registrado'
-    });
+    }).returning();
+
+    const [accessControl] = await db.insert(schema.users).values({
+      email: 'portero@gmail.com',
+      passwordHash: 'portero123',
+      role: 'access_control',
+      tenantId: tenant1.id,
+      organizerLevel: 'registrado'
+    }).returning();
+
+    const [regularUser] = await db.insert(schema.users).values({
+      email: 'estudiante@gmail.com',
+      passwordHash: '123456',
+      role: 'user',
+      organizerLevel: 'registrado'
+    }).returning();
+
+    console.log('Inscribiendo estudiante en eventos (Generando QRs)...');
+    
+    // Inscribir en evento GRATIS (status: confirmado automático)
+    const [attendeeFree] = await db.insert(schema.attendees).values({
+      eventId: eventsInserted[0].id,
+      userId: regularUser.id,
+      name: 'Estudiante Prueba',
+      email: regularUser.email,
+      phone: '+58 412 0000000',
+      status: 'confirmado',
+      attendeeType: 'estudiante'
+    }).returning();
+
+    // Inscribir en evento PAGO (status: pago_pendiente)
+    const [attendeePaid] = await db.insert(schema.attendees).values({
+      eventId: eventsInserted[1].id,
+      userId: regularUser.id,
+      name: 'Estudiante Prueba',
+      email: regularUser.email,
+      phone: '+58 412 0000000',
+      status: 'pago_pendiente',
+      attendeeType: 'estudiante'
+    }).returning();
+
+    console.log('\n--- DATOS PARA PRUEBA DE ESCÁNER QR ---');
+    console.log(`🔑 QR Válido (Evento Gratis): ${attendeeFree.ticketToken}`);
+    console.log(`⏳ QR Pendiente (Evento Pago): ${attendeePaid.ticketToken}`);
+    console.log(`👤 Usuario de prueba: estudiante@gmail.com (123456)`);
+    console.log(`💂 Control de Acceso: portero@gmail.com (portero123)`);
+    console.log('----------------------------------------\n');
 
     console.log('✅ Seeder completado con éxito!');
   } catch (error) {

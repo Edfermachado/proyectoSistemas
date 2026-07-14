@@ -79,8 +79,14 @@ export class EventsService {
       throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
     }
 
+    // Normalizar precio: si es 0, transformarlo a GRATIS
+    let normalizedPrice = data.price;
+    if (normalizedPrice && (normalizedPrice === "0" || normalizedPrice === "0.00" || parseFloat(normalizedPrice) === 0)) {
+      normalizedPrice = "GRATIS";
+    }
+
     const slug = await generateUniqueSlug("events", data.title);
-    const [newEvent] = await db.insert(events).values({ ...data, slug }).returning();
+    const [newEvent] = await db.insert(events).values({ ...data, price: normalizedPrice, slug }).returning();
     return newEvent;
   }
 
@@ -106,8 +112,16 @@ export class EventsService {
     // Regenerate slug if title changed
     const slugUpdate = data.title ? { slug: await generateUniqueSlug("events", data.title, id) } : {};
 
+    // Normalizar precio: si es 0, transformarlo a GRATIS
+    let normalizedPrice = data.price;
+    if (normalizedPrice !== undefined) {
+      if (normalizedPrice === "0" || normalizedPrice === "0.00" || parseFloat(normalizedPrice) === 0) {
+        normalizedPrice = "GRATIS";
+      }
+    }
+
     const [updatedEvent] = await db.update(events)
-      .set({ ...data, ...slugUpdate })
+      .set({ ...data, ...(normalizedPrice !== undefined ? { price: normalizedPrice } : {}), ...slugUpdate })
       .where(eq(events.id, id))
       .returning();
     return updatedEvent;
