@@ -11,12 +11,15 @@
     "seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@types/qrcode.react": "^3.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "html5-qrcode": "^2.3.8",
     "jose": "^6.2.3",
     "next": "16.2.10",
     "postgres": "^3.4.9",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sharp": "^0.35.3",

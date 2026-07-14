@@ -81,6 +81,8 @@ export const attendees = pgTable('attendees', {
   status: registrationStatusEnum('status').default('registrado'),
   attendeeType: attendeeTypeEnum('attendee_type').default('estudiante'),
   userId: uuid('user_id').references(() => users.id),
+  ticketToken: uuid('ticket_token').defaultRandom().unique(),
+  scannedAt: timestamp('scanned_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

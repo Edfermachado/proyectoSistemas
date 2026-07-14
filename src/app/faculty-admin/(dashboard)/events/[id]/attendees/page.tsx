@@ -2,12 +2,17 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { events as eventsSchema } from "@/db/schema";
 import { AttendeesService } from "@/services/attendees.service";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ConfirmPaymentButton } from "@/components/ui/ConfirmPaymentButton";
 import { ManualRegisterForm } from "@/components/ui/ManualRegisterForm";
 import Link from "next/link";
 
+import { getSession } from "@/lib/auth";
+
 export default async function EventAttendeesPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session || !session.tenantId) redirect("/faculty-admin/login");
+
   const { id } = await params;
 
   const event = await db.query.events.findFirst({
@@ -15,7 +20,7 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
     with: { space: true, tenant: true }
   });
 
-  if (!event) notFound();
+  if (!event || event.tenantId !== session.tenantId) notFound();
 
   const attendees = await AttendeesService.getAttendeesByEvent(id);
   const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';

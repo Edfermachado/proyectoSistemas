@@ -12,6 +12,8 @@ export default async function FacultyEventsPage() {
   const session = await getSession();
   if (!session || !session.tenantId) redirect("/faculty-admin/login");
 
+  const isAccessControl = session.role === 'access_control';
+
   const faculty = await db.query.tenants.findFirst({
     where: eq(tenants.id, session.tenantId as string),
   });
@@ -38,11 +40,13 @@ export default async function FacultyEventsPage() {
             Gestiona los eventos exclusivos de <span className="font-bold text-academic-gold">{faculty?.name || "tu facultad"}</span>.
           </p>
         </div>
-        <Link href="/faculty-admin/events/new">
-          <Button variant="primary" icon="event">
-            Crear Evento
-          </Button>
-        </Link>
+        {!isAccessControl && (
+          <Link href="/faculty-admin/events/new">
+            <Button variant="primary" icon="event">
+              Crear Evento
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -102,18 +106,24 @@ export default async function FacultyEventsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                      {session.role === 'tenant_admin' && e.status === 'pendiente' && (
-                        <form action={approveEvent}>
-                          <input type="hidden" name="eventId" value={e.id} />
-                          <button type="submit" className="text-green-600 hover:text-green-800 p-2 transition-colors tooltip" title="Aprobar Evento">
-                            <span className="material-symbols-outlined text-sm">check_circle</span>
-                          </button>
-                        </form>
+                      {!isAccessControl ? (
+                        <>
+                          {session.role === 'tenant_admin' && e.status === 'pendiente' && (
+                            <form action={approveEvent}>
+                              <input type="hidden" name="eventId" value={e.id} />
+                              <button type="submit" className="text-green-600 hover:text-green-800 p-2 transition-colors tooltip" title="Aprobar Evento">
+                                <span className="material-symbols-outlined text-sm">check_circle</span>
+                              </button>
+                            </form>
+                          )}
+                          <Link href={`/faculty-admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
+                            <span className="material-symbols-outlined text-sm">edit</span>
+                          </Link>
+                          <DeleteButton endpoint="events" id={e.id} />
+                        </>
+                      ) : (
+                        <span className="text-xs text-on-surface-variant italic">Solo lectura</span>
                       )}
-                      <Link href={`/faculty-admin/events/${e.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
-                        <span className="material-symbols-outlined text-sm">edit</span>
-                      </Link>
-                      <DeleteButton endpoint="events" id={e.id} />
                     </td>
                   </tr>
                 ))}

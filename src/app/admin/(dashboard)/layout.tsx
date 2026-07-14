@@ -52,6 +52,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="material-symbols-outlined text-xl">local_activity</span>
             Eventos
           </Link>
+          <Link href="/admin/scanner" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">qr_code_scanner</span>
+            Escáner QR
+          </Link>
           <Link href="/admin/spaces" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">location_city</span>
             Espacios

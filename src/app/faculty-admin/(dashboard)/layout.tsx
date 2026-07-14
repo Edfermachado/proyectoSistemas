@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 export default async function FacultyAdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  if (!session || (session.role !== 'tenant_admin' && session.role !== 'event_manager')) redirect('/faculty-admin/login');
+  if (!session || !['tenant_admin', 'event_manager', 'access_control'].includes(session.role as string)) redirect('/faculty-admin/login');
 
   return (
     <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden relative">
@@ -25,32 +25,46 @@ export default async function FacultyAdminLayout({ children }: { children: React
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Faculty Portal</p>
         </div>
         <nav className="flex-1 p-6 space-y-3 overflow-y-auto scrollbar-hide">
-          <Link href="/faculty-admin" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">dashboard</span>
-            Dashboard
-          </Link>
-          <Link href="/faculty-admin/metrics" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">bar_chart</span>
-            Métricas Estratégicas
-          </Link>
-          <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">local_activity</span>
-            Mis Eventos
-          </Link>
-          <Link href="/faculty-admin/calendar" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">calendar_month</span>
-            Calendario
-          </Link>
-          <Link href="/faculty-admin/requests" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">assignment</span>
-            Solicitudes
-          </Link>
-          {session.role === 'tenant_admin' && (
-            <Link href="/faculty-admin/managers" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-              <span className="material-symbols-outlined text-xl">manage_accounts</span>
-              Gestores de Eventos
+          {session.role !== 'access_control' && (
+            <>
+              <Link href="/faculty-admin" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                <span className="material-symbols-outlined text-xl">dashboard</span>
+                Dashboard
+              </Link>
+              <Link href="/faculty-admin/metrics" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                <span className="material-symbols-outlined text-xl">bar_chart</span>
+                Métricas Estratégicas
+              </Link>
+              <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                <span className="material-symbols-outlined text-xl">local_activity</span>
+                Mis Eventos
+              </Link>
+              <Link href="/faculty-admin/calendar" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                <span className="material-symbols-outlined text-xl">calendar_month</span>
+                Calendario
+              </Link>
+              <Link href="/faculty-admin/requests" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                <span className="material-symbols-outlined text-xl">assignment</span>
+                Solicitudes
+              </Link>
+              {session.role === 'tenant_admin' && (
+                <Link href="/faculty-admin/managers" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                  <span className="material-symbols-outlined text-xl">manage_accounts</span>
+                  Gestores de Eventos
+                </Link>
+              )}
+            </>
+          )}
+          {session.role === 'access_control' && (
+            <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+              <span className="material-symbols-outlined text-xl">group</span>
+              Eventos y Asistentes
             </Link>
           )}
+          <Link href="/faculty-admin/scanner" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">qr_code_scanner</span>
+            Escáner QR
+          </Link>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
           <form action={logoutFacultyAdmin}>
@@ -81,7 +95,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
               <div className="text-right hidden md:block">
                 <p className="font-bold text-sm">{String(session.email)}</p>
                 <p className="text-xs text-academic-gold font-bold uppercase tracking-widest">
-                  {session.role === 'tenant_admin' ? 'Admin Facultad' : 'Gestor Eventos'}
+                  {session.role === 'tenant_admin' ? 'Admin Facultad' : session.role === 'event_manager' ? 'Gestor Eventos' : 'Control Acceso'}
                 </p>
               </div>
               <div className="w-12 h-12 rounded-full bg-academic-gold flex items-center justify-center text-university-blue font-black border-2 border-white/20 text-lg shadow-inner uppercase">
