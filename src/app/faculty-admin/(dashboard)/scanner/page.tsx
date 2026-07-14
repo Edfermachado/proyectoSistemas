@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import Link from "next/link";
+import { Html5Qrcode } from "html5-qrcode";
 
 type ScanStatus = "idle" | "loading" | "success" | "duplicate" | "error";
 
@@ -10,25 +9,39 @@ export default function ScannerPage() {
   const [status, setStatus] = useState<ScanStatus>("idle");
   const [message, setMessage] = useState("");
   const [details, setDetails] = useState<any>(null);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  
+  const [isScanning, setIsScanning] = useState(false);
+  const [cameraError, setCameraError] = useState("");
+  
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
-    // Only initialize the scanner once
-    if (!scannerRef.current) {
-      scannerRef.current = new Html5QrcodeScanner("reader", {
-        qrbox: { width: 250, height: 250 },
-        fps: 10,
-        aspectRatio: 1.0
-      }, false);
-      
-      scannerRef.current.render(
+    // Inicializar la instancia base (sin arrancar la cámara aún)
+    scannerRef.current = new Html5Qrcode("reader");
+
+    return () => {
+      // Limpieza en caso de desmontaje del componente
+      if (scannerRef.current && scannerRef.current.isScanning) {
+        scannerRef.current.stop().catch(console.error);
+      }
+    };
+  }, []);
+
+  const startScanning = async () => {
+    if (!scannerRef.current) return;
+    setCameraError("");
+    
+    try {
+      await scannerRef.current.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
         async (decodedText) => {
-          if (status === "loading") return;
+          // Prevenir múltiples lecturas consecutivas mientras procesamos
+          if (isProcessingRef.current) return;
           
+          isProcessingRef.current = true;
           setStatus("loading");
-          if (scannerRef.current) {
-            scannerRef.current.pause(true); // Pause scanning
-          }
 
           try {
             const res = await fetch('/api/tickets/validate', {
@@ -58,29 +71,37 @@ export default function ScannerPage() {
             setDetails(null);
           }
 
-          // Resume after 3 seconds
+          // Esperar unos segundos antes de permitir otra lectura
           setTimeout(() => {
             setStatus("idle");
             setMessage("");
             setDetails(null);
-            if (scannerRef.current) {
-              scannerRef.current.resume();
-            }
+            isProcessingRef.current = false;
           }, 3500);
         },
         (error) => {
-          // Ignore frequent scan errors
+          // Ignorar los errores frecuentes de "código no encontrado" frame por frame
         }
       );
+      setIsScanning(true);
+    } catch (err) {
+      console.error("Error iniciando cámara:", err);
+      setCameraError("No se pudo acceder a la cámara. Verifica los permisos de tu navegador.");
     }
+  };
 
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
+  const stopScanning = async () => {
+    if (scannerRef.current && scannerRef.current.isScanning) {
+      try {
+        await scannerRef.current.stop();
+        setIsScanning(false);
+        setStatus("idle");
+        isProcessingRef.current = false;
+      } catch (err) {
+        console.error("Error deteniendo cámara:", err);
       }
-    };
-  }, []);
+    }
+  };
 
   return (
     <div className="flex flex-col animate-fade-in">
@@ -92,7 +113,7 @@ export default function ScannerPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-[500px] bg-surface-white rounded-3xl overflow-hidden shadow-xl border border-outline-variant relative">
+        <div className="w-full lg:w-[500px] bg-surface-white rounded-3xl overflow-hidden shadow-xl border border-outline-variant relative flex flex-col">
           
           {/* Overlay Status */}
           {status !== "idle" && (
@@ -131,8 +152,36 @@ export default function ScannerPage() {
           )}
 
           {/* Scanner Container */}
-          <div className="bg-surface-container-lowest p-2">
-            <div id="reader" className="w-full min-h-[350px] [&_#reader__dashboard_section_csr]:hidden [&_button]:bg-university-blue [&_button]:text-white [&_button]:px-6 [&_button]:py-2 [&_button]:rounded-xl [&_button]:font-bold [&_button]:shadow-md [&_select]:p-3 [&_select]:rounded-xl [&_select]:border-outline-variant [&_select]:bg-surface-white [&_select]:text-on-surface"></div>
+          <div className="bg-black flex-1 relative min-h-[350px] flex items-center justify-center">
+            {!isScanning && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50 p-6 text-center z-10">
+                <span className="material-symbols-outlined text-6xl mb-4 opacity-50">qr_code_scanner</span>
+                <p>La cámara está apagada.</p>
+                {cameraError && <p className="text-error mt-2 text-sm">{cameraError}</p>}
+              </div>
+            )}
+            <div id="reader" className="w-full h-full"></div>
+          </div>
+          
+          {/* Custom Controls */}
+          <div className="p-4 bg-surface-container-lowest border-t border-outline-variant flex justify-center gap-4">
+            {!isScanning ? (
+              <button 
+                onClick={startScanning}
+                className="flex items-center gap-2 px-6 py-3 bg-university-blue text-white rounded-xl font-bold shadow-md hover:bg-university-blue/90 transition-colors w-full justify-center"
+              >
+                <span className="material-symbols-outlined">videocam</span>
+                Iniciar Escáner
+              </button>
+            ) : (
+              <button 
+                onClick={stopScanning}
+                className="flex items-center gap-2 px-6 py-3 bg-error text-white rounded-xl font-bold shadow-md hover:bg-error/90 transition-colors w-full justify-center"
+              >
+                <span className="material-symbols-outlined">videocam_off</span>
+                Detener Escáner
+              </button>
+            )}
           </div>
         </div>
 
@@ -144,7 +193,7 @@ export default function ScannerPage() {
           <ul className="space-y-4 text-on-surface-variant font-body-md">
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-university-blue mt-0.5">filter_1</span>
-              <div>Asegúrate de otorgar permisos de cámara al navegador al solicitarlo.</div>
+              <div>Haz clic en <strong>Iniciar Escáner</strong> y otorga permisos de cámara al navegador si se solicita.</div>
             </li>
             <li className="flex items-start gap-3">
               <span className="material-symbols-outlined text-university-blue mt-0.5">filter_2</span>
