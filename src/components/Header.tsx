@@ -39,9 +39,10 @@ export default function Header() {
           <Link href="/" className="font-headline-md text-headline-md font-bold text-surface-white tracking-tighter">
             UniEvents
           </Link>
-          <nav className="hidden md:flex gap-6 items-center">
+          <nav className="hidden md:flex gap-6 items-center" suppressHydrationWarning>
             <Link 
               href="/events" 
+              suppressHydrationWarning
               className={`font-body-md text-label-md transition-colors ${
                 pathname === "/" || pathname?.startsWith("/events")
                   ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
@@ -52,6 +53,7 @@ export default function Header() {
             </Link>
             <Link 
               href="/universities" 
+              suppressHydrationWarning
               className={`font-body-md text-label-md transition-colors ${
                 pathname?.startsWith("/universities")
                   ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
@@ -62,6 +64,7 @@ export default function Header() {
             </Link>
             <Link 
               href="/faculties" 
+              suppressHydrationWarning
               className={`font-body-md text-label-md transition-colors ${
                 pathname?.startsWith("/faculties")
                   ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
@@ -71,8 +74,13 @@ export default function Header() {
               Facultades
             </Link>
             <Link 
-              href="#" 
-              className={`font-body-md text-label-md transition-colors text-surface-variant hover:text-surface-white`}
+              href="/help/contact" 
+              suppressHydrationWarning
+              className={`font-body-md text-label-md transition-colors ${
+                pathname?.startsWith("/help")
+                  ? "text-academic-gold font-bold border-b-2 border-academic-gold pb-1"
+                  : "text-surface-variant hover:text-surface-white"
+              }`}
             >
               Ayuda
             </Link>

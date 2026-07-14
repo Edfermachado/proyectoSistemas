@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </h1>
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Backoffice Portal</p>
         </div>
-        <nav className="flex-1 p-6 space-y-3">
+        <nav className="flex-1 p-6 space-y-3 overflow-y-auto custom-scrollbar">
           <Link href="/admin" className="flex items-center gap-4 px-5 py-4 text-university-blue bg-primary-fixed rounded-2xl shadow-sm border border-primary-fixed-dim font-bold transition-all hover:shadow-md">
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
@@ -49,6 +49,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/spaces" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">location_city</span>
             Espacios
+          </Link>
+          <Link href="/admin/settings" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+            <span className="material-symbols-outlined text-xl">settings</span>
+            Configuración
           </Link>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">

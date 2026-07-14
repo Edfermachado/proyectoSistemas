@@ -91,6 +91,13 @@ export const eventRequests = pgTable('event_requests', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+export const systemSettings = pgTable('system_settings', {
+  key: varchar('key', { length: 100 }).primaryKey(),
+  value: text('value').notNull(),
+  description: text('description'),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
 // Configuración de Relaciones (Drizzle Relations)
 export const universitiesRelations = relations(universities, ({ many }) => ({
   tenants: many(tenants),

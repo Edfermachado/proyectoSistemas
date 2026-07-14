@@ -80,6 +80,7 @@ export default async function FacultyEventsPage() {
                       <span className={`font-bold ${ (e.price?.toUpperCase() === 'FREE' || e.price?.toUpperCase() === 'GRATIS') ? 'text-green-600' : 'text-university-blue' }`}>
                         {e.price}
                       </span>
+                    </td>
                     <td className="px-6 py-4 text-on-surface-variant">
                       <span className={`font-bold text-xs uppercase px-2 py-1 rounded-full ${
                         e.status === 'aprobado' ? 'bg-green-100 text-green-800' :

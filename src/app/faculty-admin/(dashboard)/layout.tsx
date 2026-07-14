@@ -18,7 +18,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
           </h1>
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Faculty Portal</p>
         </div>
-        <nav className="flex-1 p-6 space-y-3">
+        <nav className="flex-1 p-6 space-y-3 overflow-y-auto custom-scrollbar">
           <Link href="/faculty-admin" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
             <span className="material-symbols-outlined text-xl">dashboard</span>
             Dashboard
