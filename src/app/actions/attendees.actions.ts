@@ -21,10 +21,10 @@ export async function registerForEvent(formData: FormData) {
     const email = session.email as string;
     const userId = session.userId as string;
 
-    await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType });
+    const newAttendee = await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType });
     revalidatePath(`/events/[slug]`, "page");
     revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
-    return { success: true };
+    return { success: true, ticketToken: newAttendee.ticketToken };
   } catch (error: any) {
     return { error: error.message };
   }

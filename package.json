@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx src/db/seed.ts"
+    "seed": "tsx src/db/seed.ts",
+    "cleanup-qrs": "tsx scripts/cleanup-qrs.ts"
   },
   "dependencies": {
     "@types/qrcode.react": "^3.0.0",

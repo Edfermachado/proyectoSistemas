@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { registerForEvent } from "@/app/actions/attendees.actions";
 import { findEventBySlugOrId } from "@/lib/slug-helpers";
+import TicketQR from "@/components/TicketQR";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -19,10 +20,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function RegisterEventPage({ params, searchParams }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; ticket?: string }>;
 }) {
   const { slug } = await params;
-  const { success } = await searchParams;
+  const { success, ticket } = await searchParams;
   
   const session = await getSession();
   if (!session) {
@@ -39,7 +40,7 @@ export default async function RegisterEventPage({ params, searchParams }: {
     "use server";
     const res = await registerForEvent(formData);
     if (res.success) {
-      redirect(`/events/${eventSlugOrId}/register?success=true`);
+      redirect(`/events/${eventSlugOrId}/register?success=true${res.ticketToken ? `&ticket=${res.ticketToken}` : ''}`);
     }
   }
 
@@ -52,17 +53,26 @@ export default async function RegisterEventPage({ params, searchParams }: {
           <div className="absolute top-0 right-0 w-32 h-32 bg-academic-gold/10 rounded-bl-full -translate-y-1/2 translate-x-1/2"></div>
           
           {success ? (
-            <div className="text-center space-y-6 animate-fade-in">
-              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="text-center space-y-6 animate-fade-in flex flex-col items-center">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
                 <span className="material-symbols-outlined text-5xl">check_circle</span>
               </div>
               <h2 className="font-display-sm text-university-blue">¡Registro Completado!</h2>
-              <p className="text-on-surface-variant font-body-md">
+              <p className="text-on-surface-variant font-body-md max-w-sm mx-auto">
                 Te has registrado exitosamente en <strong>{event.title}</strong>.
                 {!isFree && " Por favor, realiza tu pago y contacta a la facultad para que confirmen tu entrada."}
               </p>
+              
+              {isFree && ticket && (
+                <div className="my-8 w-full">
+                  <p className="text-sm font-bold text-university-blue mb-4">Tu entrada está lista. Presenta este código en puerta:</p>
+                  <TicketQR token={ticket} />
+                  <p className="text-xs text-on-surface-variant mt-4">También puedes encontrar esta entrada guardada en tu perfil en cualquier momento.</p>
+                </div>
+              )}
+
               <Link href={`/events/${eventSlugOrId}`}>
-                <button className="mt-8 bg-university-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-innovation-purple transition-colors">
+                <button className="mt-4 bg-university-blue text-white px-8 py-3 rounded-xl font-bold hover:bg-innovation-purple transition-colors">
                   Volver al Evento
                 </button>
               </Link>

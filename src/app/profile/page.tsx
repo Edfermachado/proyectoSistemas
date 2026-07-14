@@ -8,9 +8,11 @@ import { db } from "@/db";
 import { attendees } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logoutUser } from "@/app/actions/auth";
+import TicketQR from "@/components/TicketQR";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ viewTicket?: string }> }) {
   const session = await getSession();
+  const { viewTicket } = await searchParams;
 
   if (!session || session.role !== "user") {
     redirect("/login");
@@ -53,6 +55,7 @@ export default async function ProfilePage() {
       image: ev.imageUrl || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600",
       status: reg.status === "pending" ? "Pendiente" : "Confirmado",
       tenantName: ev.tenant?.name || "UniEvents",
+      ticketToken: reg.ticketToken,
     };
   });
 
@@ -72,6 +75,18 @@ export default async function ProfilePage() {
       </div>
       
       <Header />
+
+      {/* Ticket Modal Overlay */}
+      {viewTicket && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface-white p-2 rounded-[2rem] shadow-2xl relative max-w-sm w-full mx-auto">
+            <Link href="/profile" scroll={false} className="absolute top-4 right-4 z-10 w-8 h-8 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-error transition-colors">
+              <span className="material-symbols-outlined text-sm">close</span>
+            </Link>
+            <TicketQR token={viewTicket} />
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-32">
         
@@ -163,10 +178,14 @@ export default async function ProfilePage() {
                       </p>
                       
                       <div className="mt-auto flex flex-wrap gap-3">
-                        <button className="bg-university-blue/10 hover:bg-university-blue/20 text-university-blue px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
-                          Ver Entrada
-                        </button>
+                        {event.status === "Confirmado" && event.ticketToken ? (
+                          <Link href={`/profile?viewTicket=${event.ticketToken}`} scroll={false} className="bg-university-blue/10 hover:bg-university-blue/20 text-university-blue px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
+                            Ver Entrada
+                          </Link>
+                        ) : (
+                          <span className="text-xs text-on-surface-variant italic py-2">Pendiente de confirmación</span>
+                        )}
                       </div>
                     </div>
                   </div>
