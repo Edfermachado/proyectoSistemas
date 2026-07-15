@@ -51,7 +51,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/faculty-admin/login" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/login" className="text-surface-variant hover:text-academic-gold transition-all">
                 Panel de Facultad
               </Link>
             </li>

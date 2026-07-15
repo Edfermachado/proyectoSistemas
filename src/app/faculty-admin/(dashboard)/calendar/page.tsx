@@ -7,7 +7,7 @@ import { WeeklyGrid } from "@/components/WeeklyGrid";
 
 export default async function FacultyCalendarPage() {
   const session = await getSession();
-  if (!session || !session.tenantId) redirect("/faculty-admin/login");
+  if (!session || !session.tenantId) redirect("/login");
 
   const faculty = await db.query.tenants.findFirst({
     where: eq(tenants.id, session.tenantId as string),

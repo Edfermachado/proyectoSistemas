@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 export default async function RequestsDashboardPage() {
   const session = await getSession();
   if (!session || session.role !== "tenant_admin") {
-    redirect("/faculty-admin/login");
+    redirect("/login");
   }
 
   // Fetch all requests and include the event data

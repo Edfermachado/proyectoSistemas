@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export default async function FacultyMetricsPage() {
   const session = await getSession();
-  if (!session || session.role !== "tenant_admin") redirect("/faculty-admin/login");
+  if (!session || session.role !== "tenant_admin") redirect("/login");
 
   const facultyId = session.tenantId as string;
 

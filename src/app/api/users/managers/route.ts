@@ -12,11 +12,14 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     
+    const allowedRoles = ["event_manager", "access_control"];
+    const role = allowedRoles.includes(body.role) ? body.role : "event_manager";
+
     // Create the manager securely associated with the admin's tenant
     const [newUser] = await db.insert(users).values({
       email: body.email,
       passwordHash: body.passwordHash, // Simplification for prototype
-      role: "event_manager",
+      role: role,
       tenantId: session.tenantId as string,
     }).returning();
 

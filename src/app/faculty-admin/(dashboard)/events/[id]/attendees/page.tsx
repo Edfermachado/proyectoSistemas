@@ -11,7 +11,7 @@ import { getSession } from "@/lib/auth";
 
 export default async function EventAttendeesPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
-  if (!session || !session.tenantId) redirect("/faculty-admin/login");
+  if (!session || !session.tenantId) redirect("/login");
 
   const { id } = await params;
 

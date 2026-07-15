@@ -14,8 +14,16 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const session = await getSession();
   const { viewTicket } = await searchParams;
 
-  if (!session || session.role !== "user") {
+  if (!session) {
     redirect("/login");
+  }
+
+  if (session.role === "superadmin") {
+    redirect("/admin");
+  }
+
+  if (["tenant_admin", "event_manager", "access_control"].includes(session.role as string)) {
+    redirect("/faculty-admin");
   }
 
   // Fetch registrations matching the session email

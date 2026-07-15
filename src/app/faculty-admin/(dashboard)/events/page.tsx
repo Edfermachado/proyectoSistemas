@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 
 export default async function FacultyEventsPage() {
   const session = await getSession();
-  if (!session || !session.tenantId) redirect("/faculty-admin/login");
+  if (!session || !session.tenantId) redirect("/login");
 
   const isAccessControl = session.role === 'access_control';
 

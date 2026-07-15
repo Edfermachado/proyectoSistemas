@@ -5,13 +5,15 @@ import { decrypt } from '@/lib/auth';
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Solo interceptamos y protegemos el portal de faculty-admin
-  if (path.startsWith('/faculty-admin') && !path.startsWith('/faculty-admin/login')) {
+  // Protegemos el portal de faculty-admin
+  if (path.startsWith('/faculty-admin')) {
     const sessionCookie = request.cookies.get('session')?.value;
     const session = await decrypt(sessionCookie);
 
-    if (!session || session.role !== 'tenant_admin') {
-      return NextResponse.redirect(new URL('/faculty-admin/login', request.url));
+    const allowedRoles = ['tenant_admin', 'event_manager', 'access_control'];
+
+    if (!session || !allowedRoles.includes(session.role as string)) {
+      return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 

@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { DeleteButton } from "@/components/ui/DeleteButton";
@@ -10,13 +10,13 @@ import { redirect } from "next/navigation";
 export default async function ManagersPage() {
   const session = await getSession();
   if (!session || session.role !== 'tenant_admin' || !session.tenantId) {
-    redirect('/faculty-admin/login');
+    redirect('/login');
   }
 
   const managers = await db.query.users.findMany({
     where: and(
       eq(users.tenantId, session.tenantId as string),
-      eq(users.role, 'event_manager')
+      inArray(users.role, ['event_manager', 'access_control'])
     ),
     orderBy: (u, { desc }) => [desc(u.createdAt)],
   });
@@ -53,7 +53,7 @@ export default async function ManagersPage() {
               <thead>
                 <tr className="bg-surface-container-lowest border-b border-outline-variant/50">
                   <th className="px-6 py-4 font-title-sm text-university-blue">Correo Electrónico</th>
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Nivel</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Rol Asignado</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Fecha de Registro</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
@@ -62,7 +62,9 @@ export default async function ManagersPage() {
                 {managers.map((m) => (
                   <tr key={m.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
                     <td className="px-6 py-4 font-bold text-university-blue">{m.email}</td>
-                    <td className="px-6 py-4 text-on-surface-variant uppercase text-xs tracking-wider">{m.organizerLevel || 'Básico'}</td>
+                    <td className="px-6 py-4 text-on-surface-variant uppercase text-xs tracking-wider font-bold">
+                      {m.role === 'access_control' ? 'Control de Acceso' : 'Administrador de Eventos'}
+                    </td>
                     <td className="px-6 py-4 text-on-surface-variant">{m.createdAt?.toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right">
                       <DeleteButton endpoint="users" id={m.id} />

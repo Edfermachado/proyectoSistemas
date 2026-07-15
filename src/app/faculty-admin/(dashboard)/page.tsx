@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default async function FacultyDashboardPage() {
   const session = await getSession();
-  if (!session || !session.tenantId) redirect("/faculty-admin/login");
+  if (!session || !session.tenantId) redirect("/login");
 
   if (session.role === "access_control") {
     redirect("/faculty-admin/scanner");
