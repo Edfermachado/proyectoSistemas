@@ -20,7 +20,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
 
   // Fetch registrations matching the session email
   const userRegistrations = await db.query.attendees.findMany({
-    where: eq(attendees.email, session.email),
+    where: eq(attendees.email, session.email as string),
     with: {
       event: {
         with: {
@@ -36,7 +36,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
     orderBy: (attendees, { desc }) => [desc(attendees.createdAt)]
   });
 
-  const email = session.email;
+  const email = session.email as string;
   const userName = email.split("@")[0];
   const avatarLetter = userName.charAt(0).toUpperCase();
 
@@ -53,7 +53,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       time: timeStr,
       location: ev.space?.name || "Ubicación por definir",
       image: ev.imageUrl || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600",
-      status: reg.status === "pending" ? "Pendiente" : "Confirmado",
+      status: reg.status === "pago_pendiente" ? "Pendiente" : "Confirmado",
       tenantName: ev.tenant?.name || "UniEvents",
       ticketToken: reg.ticketToken,
     };

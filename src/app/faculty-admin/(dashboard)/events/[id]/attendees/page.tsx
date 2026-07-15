@@ -25,8 +25,8 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
   const attendees = await AttendeesService.getAttendeesByEvent(id);
   const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
   
-  const confirmed = attendees.filter(a => a.status === 'confirmed').length;
-  const pending = attendees.filter(a => a.status === 'pending').length;
+  const confirmed = attendees.filter(a => a.status === 'confirmado').length;
+  const pending = attendees.filter(a => a.status === 'pago_pendiente').length;
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -118,7 +118,7 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
                       {new Date(attendee.createdAt!).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td className="px-6 py-4">
-                      {attendee.status === 'confirmed' ? (
+                      {attendee.status === 'confirmado' ? (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                           <span className="material-symbols-outlined text-xs">check_circle</span>
                           Confirmado
@@ -132,7 +132,7 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
                     </td>
                     {!isFree && (
                       <td className="px-6 py-4">
-                        {attendee.status !== 'confirmed' && (
+                        {attendee.status !== 'confirmado' && (
                           <ConfirmPaymentButton attendeeId={attendee.id} eventId={id} />
                         )}
                       </td>

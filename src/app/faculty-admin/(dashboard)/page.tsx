@@ -9,6 +9,10 @@ export default async function FacultyDashboardPage() {
   const session = await getSession();
   if (!session || !session.tenantId) redirect("/faculty-admin/login");
 
+  if (session.role === "access_control") {
+    redirect("/faculty-admin/scanner");
+  }
+
   const faculty = await db.query.tenants.findFirst({
     where: eq(tenants.id, session.tenantId as string),
   });

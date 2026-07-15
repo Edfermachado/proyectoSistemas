@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { loginUser, loginFacultyAdmin } from "@/app/actions/auth";
+import { unifiedLoginAction } from "@/app/actions/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
@@ -10,15 +10,7 @@ import Image from "next/image";
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<"comunidad" | "facultad">("comunidad");
   
-  // Create unified action state wrapper
-  const [state, formAction, pending] = useActionState(async (prevState: any, formData: FormData) => {
-    const roleType = formData.get("roleType");
-    if (roleType === "facultad") {
-      return await loginFacultyAdmin(prevState, formData);
-    } else {
-      return await loginUser(prevState, formData);
-    }
-  }, undefined);
+  const [state, formAction, pending] = useActionState(unifiedLoginAction, undefined);
 
   return (
     <div className="bg-surface-bright text-on-surface font-body-md min-h-screen flex flex-col pt-16">

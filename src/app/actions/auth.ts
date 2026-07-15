@@ -14,21 +14,14 @@ export async function loginFacultyAdmin(prevState: any, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
-  // Root access backdoor
-  if (email === "admin@gmail.com" && password === "admin") {
-    const rootUser = await db.query.users.findFirst({ where: eq(users.email, "admin@gmail.com") });
-    if (rootUser) {
-      await createSession(rootUser.id, "tenant_admin", rootUser.tenantId, rootUser.email);
-      redirect("/faculty-admin");
-    }
-  }
+
 
   // Find user (tenant_admin)
   const user = await db.query.users.findFirst({
     where: and(
       eq(users.email, email),
       eq(users.passwordHash, password), // Simple auth para este prototipo
-      or(eq(users.role, "tenant_admin"), eq(users.role, "event_manager"))
+      or(eq(users.role, "tenant_admin"), eq(users.role, "event_manager"), eq(users.role, "access_control"))
     ),
   });
 
@@ -42,7 +35,7 @@ export async function loginFacultyAdmin(prevState: any, formData: FormData) {
 
 export async function logoutFacultyAdmin() {
   await deleteSession();
-  redirect("/faculty-admin/login");
+  redirect("/login");
 }
 
 export async function loginUser(prevState: any, formData: FormData) {
@@ -53,14 +46,7 @@ export async function loginUser(prevState: any, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
-  // Root access backdoor
-  if (email === "admin@gmail.com" && password === "admin") {
-    const rootUser = await db.query.users.findFirst({ where: eq(users.email, "admin@gmail.com") });
-    if (rootUser) {
-      await createSession(rootUser.id, "user", null, rootUser.email);
-      redirect("/");
-    }
-  }
+
 
   // Find user (role: user)
   const user = await db.query.users.findFirst({
@@ -151,4 +137,13 @@ export async function logoutAdmin() {
 export async function logoutUser() {
   await deleteSession();
   redirect("/login");
+}
+
+export async function unifiedLoginAction(prevState: any, formData: FormData) {
+  const roleType = formData.get("roleType");
+  if (roleType === "facultad") {
+    return await loginFacultyAdmin(prevState, formData);
+  } else {
+    return await loginUser(prevState, formData);
+  }
 }

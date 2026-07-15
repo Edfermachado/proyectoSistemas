@@ -102,7 +102,7 @@ export default async function RegisterEventPage({ params, searchParams }: {
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
                     <input type="email" name="email" required
-                      value={session.email} readOnly
+                      value={session.email as string} readOnly
                       className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-on-surface-variant cursor-not-allowed outline-none transition-all"
                       placeholder="ejemplo@universidad.edu" />
                   </div>
