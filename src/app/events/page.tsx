@@ -112,13 +112,19 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
             {facultyId && <input type="hidden" name="faculty" value={facultyId} />}
             {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
             <div className="flex-1 flex items-center bg-white/10 rounded-xl px-4 py-3 border border-white/20 focus-within:border-academic-gold transition-colors">
-              <span className="material-symbols-outlined text-white/50 mr-3">search</span>
+              <button 
+                type="submit" 
+                className="flex items-center justify-center p-0 bg-transparent border-none text-white/50 hover:text-academic-gold transition-colors cursor-pointer mr-3"
+                title="Buscar"
+              >
+                <span className="material-symbols-outlined">search</span>
+              </button>
               <input 
                 type="text" 
                 name="q"
                 defaultValue={query || ""}
                 placeholder="Buscar por título de evento..."
-                className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-white/50 focus:outline-none"
+                className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-white/50 text-label-md focus:outline-none"
               />
             </div>
             <button type="submit" className="bg-academic-gold text-university-blue px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">

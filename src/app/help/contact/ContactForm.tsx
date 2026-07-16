@@ -1,71 +1,113 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { useState, useRef } from "react";
 
 export default function ContactForm({ supportEmail }: { supportEmail: string }) {
+  const [buttonState, setButtonState] = useState<"idle" | "sending" | "sent">("idle");
+  const formRef = useRef<HTMLFormElement>(null);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setButtonState("sending");
+
     const formData = new FormData(e.currentTarget);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const university = formData.get('university');
-    const subject = formData.get('subject');
-    const message = formData.get('message');
+    const name = formData.get('name')?.toString() || "";
+    const email = formData.get('email')?.toString() || "";
+    const subject = formData.get('subject')?.toString() || "support";
+    const message = formData.get('message')?.toString() || "";
 
-    const subjectText = subject === 'nueva_universidad' ? 'Registro de Nueva Universidad' :
-                        subject === 'nueva_facultad' ? 'Añadir una Facultad a Universidad Existente' :
-                        subject === 'soporte_admin' ? 'Soporte para Administradores de Facultad' : 'Consulta Empresarial';
+    const subjectText = subject === 'support' ? 'Soporte Técnico' :
+                        subject === 'sales' ? 'Ventas' :
+                        subject === 'organizers' ? 'Organizadores' : 'Otro';
 
-    const mailtoSubject = encodeURIComponent(`UniEvents Contacto: ${subjectText} - ${university}`);
-    const mailtoBody = encodeURIComponent(`Nombre: ${name}\nCorreo: ${email}\nInstitución: ${university}\n\nMensaje:\n${message}`);
-    
-    window.location.href = `mailto:${supportEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
+    setTimeout(() => {
+      setButtonState("sent");
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+
+      // Launch the default mail client
+      const mailtoSubject = encodeURIComponent(`UniEvents Contacto: ${subjectText}`);
+      const mailtoBody = encodeURIComponent(`Nombre: ${name}\nCorreo: ${email}\n\nMensaje:\n${message}`);
+      window.location.href = `mailto:${supportEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
+
+      setTimeout(() => {
+        setButtonState("idle");
+      }, 3000);
+    }, 1500);
   };
 
   return (
-    <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-xl p-8 lg:p-10">
-      <h2 className="font-headline-sm text-university-blue mb-6">Envíanos un Mensaje</h2>
-      
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <div>
-          <label className="block font-title-sm text-university-blue mb-2">Nombre Completo</label>
-          <input type="text" name="name" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest transition-all" placeholder="Ej. Dr. Juan Pérez" />
+    <div className="bg-surface-white rounded-2xl shadow-sm border border-outline-variant p-6 md:p-10">
+      <h2 className="font-headline-md text-2xl text-university-blue mb-6 font-bold">Send us a message</h2>
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="font-label-md text-sm font-bold text-on-surface-variant" htmlFor="name">
+              Nombre Completo
+            </label>
+            <input
+              required
+              name="name"
+              id="name"
+              placeholder="John Doe"
+              type="text"
+              className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-label-md text-sm font-bold text-on-surface-variant" htmlFor="email">
+              Correo Institucional
+            </label>
+            <input
+              required
+              name="email"
+              id="email"
+              placeholder="user@university.edu"
+              type="email"
+              className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
+            />
+          </div>
         </div>
-        
-        <div>
-          <label className="block font-title-sm text-university-blue mb-2">Correo Institucional</label>
-          <input type="email" name="email" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest transition-all" placeholder="juan.perez@universidad.edu" />
-        </div>
-
-        <div>
-          <label className="block font-title-sm text-university-blue mb-2">Institución / Universidad</label>
-          <input type="text" name="university" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest transition-all" placeholder="Nombre de tu universidad" />
-        </div>
-        
-        <div>
-          <label className="block font-title-sm text-university-blue mb-2">Asunto</label>
-          <select name="subject" required defaultValue="" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest transition-all appearance-none cursor-pointer">
-            <option value="" disabled>Selecciona una opción</option>
-            <option value="nueva_universidad">Registro de Nueva Universidad</option>
-            <option value="nueva_facultad">Añadir una Facultad a Universidad Existente</option>
-            <option value="soporte_admin">Soporte para Administradores de Facultad</option>
-            <option value="otro">Otras consultas empresariales</option>
+        <div className="flex flex-col gap-2">
+          <label className="font-label-md text-sm font-bold text-on-surface-variant" htmlFor="subject">
+            Asunto
+          </label>
+          <select
+            name="subject"
+            id="subject"
+            className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none appearance-none cursor-pointer text-sm"
+          >
+            <option value="support">Soporte Técnico</option>
+            <option value="sales">Ventas</option>
+            <option value="organizers">Organizadores</option>
+            <option value="other">Otro</option>
           </select>
         </div>
-
-        <div>
-          <label className="block font-title-sm text-university-blue mb-2">Mensaje Adicional</label>
-          <textarea name="message" rows={4} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest transition-all" placeholder="Cuéntanos brevemente sobre las necesidades de tu institución..." />
+        <div className="flex flex-col gap-2">
+          <label className="font-label-md text-sm font-bold text-on-surface-variant" htmlFor="message">
+            Mensaje
+          </label>
+          <textarea
+            required
+            name="message"
+            id="message"
+            placeholder="How can we assist you today?"
+            rows={5}
+            className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
+          />
         </div>
-
-        <div className="pt-4">
-          <Button type="submit" variant="primary" className="w-full justify-center py-4 text-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all">
-            Contactar al Administrador Principal
-          </Button>
-        </div>
-        <p className="text-center text-sm text-on-surface-variant mt-4">
-          O envíanos un correo directamente a: <a href={`mailto:${supportEmail}`} className="text-university-blue font-bold hover:underline">{supportEmail}</a>
-        </p>
+        <button
+          disabled={buttonState !== "idle"}
+          className={`w-full md:w-auto text-on-primary px-8 py-3.5 rounded-xl font-bold transition-all shadow-md active:scale-98 cursor-pointer disabled:cursor-not-allowed ${
+            buttonState === "sent"
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-university-blue hover:bg-primary-container"
+          }`}
+          type="submit"
+        >
+          {buttonState === "sending" ? "Enviando..." : buttonState === "sent" ? "¡Mensaje Enviado!" : "Enviar Mensaje"}
+        </button>
       </form>
     </div>
   );

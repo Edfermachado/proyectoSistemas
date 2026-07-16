@@ -11,13 +11,13 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (searchQuery.trim()) {
-        router.push(`/events?q=${encodeURIComponent(searchQuery.trim())}`);
-      } else {
-        router.push("/events");
-      }
+  // Form search submission handler
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/events?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/events");
     }
   };
 
@@ -92,17 +92,25 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-6">
-          <div className="hidden lg:flex items-center bg-white/10 rounded-full px-4 py-2 border border-white/20">
-            <span className="material-symbols-outlined text-surface-white text-lg mr-2">search</span>
+          <form 
+            onSubmit={handleSearchSubmit}
+            className="hidden lg:flex items-center bg-white/10 rounded-full px-4 py-2 border border-white/20"
+          >
+            <button 
+              type="submit" 
+              className="flex items-center justify-center p-0 bg-transparent border-none text-surface-white hover:text-academic-gold transition-colors cursor-pointer mr-2"
+              title="Buscar"
+            >
+              <span className="material-symbols-outlined text-lg">search</span>
+            </button>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
               placeholder="Buscar eventos..."
               className="bg-transparent border-none focus:ring-0 text-white placeholder-white/50 text-label-md w-48 focus:outline-none"
             />
-          </div>
+          </form>
           <div className="flex items-center gap-4 text-surface-white">
             <button className="hidden md:flex hover:bg-primary-container/50 p-2 rounded-full transition-all items-center justify-center">
               <span className="material-symbols-outlined">notifications</span>
@@ -124,10 +132,16 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-university-blue border-t border-white/10 shadow-lg py-4 px-6 flex flex-col gap-4">
           <form 
-            onSubmit={(e) => { e.preventDefault(); handleSearchKeyDown({ key: 'Enter' } as any); }}
+            onSubmit={handleSearchSubmit}
             className="flex items-center bg-white/10 rounded-full px-4 py-2 border border-white/20 mb-2"
           >
-            <span className="material-symbols-outlined text-surface-white text-lg mr-2">search</span>
+            <button 
+              type="submit" 
+              className="flex items-center justify-center p-0 bg-transparent border-none text-surface-white hover:text-academic-gold transition-colors cursor-pointer mr-2"
+              title="Buscar"
+            >
+              <span className="material-symbols-outlined text-lg">search</span>
+            </button>
             <input
               type="text"
               value={searchQuery}
