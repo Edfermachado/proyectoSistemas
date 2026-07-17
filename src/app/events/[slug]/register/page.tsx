@@ -162,6 +162,15 @@ export default async function RegisterEventPage({ params, searchParams }: {
                         Ingresa los últimos 6 dígitos del comprobante de tu pago móvil.
                       </p>
                     </div>
+
+                    <div className="mt-4 pt-2">
+                      <label className="block text-label-md font-bold text-university-blue mb-2">Capture de Pantalla (Opcional)</label>
+                      <input name="screenshot" type="file" accept="image/jpeg, image/png, image/webp" 
+                        className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-university-blue file:text-white hover:file:bg-innovation-purple cursor-pointer text-sm transition-all" />
+                      <p className="text-xs text-on-surface-variant mt-2">
+                        Sube una imagen del comprobante de transferencia para agilizar la verificación.
+                      </p>
+                    </div>
                   </div>
                 )}
 

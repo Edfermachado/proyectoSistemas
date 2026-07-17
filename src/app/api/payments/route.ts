@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       where: eq(attendees.id, attendeeId),
     });
 
-    if (!attendee || attendee.userId !== session.id) {
+    if (!attendee || attendee.userId !== session.userId) {
       return NextResponse.json({ error: "Not found or forbidden" }, { status: 404 });
     }
 

@@ -7,9 +7,9 @@ import { getSession } from "@/lib/auth";
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    // Only event_manager can verify (as requested by user)
-    if (!session || session.role !== "event_manager") {
-      return NextResponse.json({ error: "Unauthorized. Solo los gestores de evento pueden verificar pagos." }, { status: 401 });
+    // Any tenant_admin can verify for their tenant
+    if (!session || session.role !== "tenant_admin") {
+      return NextResponse.json({ error: "Unauthorized. Solo los administradores de facultad pueden verificar pagos." }, { status: 401 });
     }
 
     const body = await request.json();
@@ -32,15 +32,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Attendee not found" }, { status: 404 });
     }
 
-    if (attendee.event.managerId !== session.id) {
-      return NextResponse.json({ error: "Forbidden. No eres el gestor asignado a este evento." }, { status: 403 });
+    if (attendee.event.tenantId !== session.tenantId) {
+      return NextResponse.json({ error: "Forbidden. No tienes permisos para este evento." }, { status: 403 });
     }
 
     if (action === 'approve') {
       await db.update(attendees)
         .set({
           status: 'confirmado',
-          paymentVerifiedBy: session.id as string,
+          paymentVerifiedBy: session.userId as string,
           paymentVerifiedAt: new Date()
         })
         .where(eq(attendees.id, attendeeId));

@@ -4,6 +4,10 @@ import { AttendeesService } from "@/services/attendees.service";
 import { revalidatePath } from "next/cache";
 
 import { getSession } from "@/lib/auth";
+import { uploadPaymentScreenshot } from "@/lib/supabase";
+import sharp from "sharp";
+import { join } from "path";
+import { mkdirSync } from "fs";
 
 export async function registerForEvent(formData: FormData) {
   const eventId = formData.get("eventId") as string;
@@ -11,6 +15,7 @@ export async function registerForEvent(formData: FormData) {
   const phone = formData.get("phone") as string;
   const attendeeType = (formData.get("attendeeType") as "estudiante" | "foraneo") || "estudiante";
   const paymentReference = formData.get("paymentReference") as string | undefined;
+  const screenshot = formData.get("screenshot") as File | null;
 
   try {
     const session = await getSession();
@@ -22,7 +27,36 @@ export async function registerForEvent(formData: FormData) {
     const email = session.email as string;
     const userId = session.userId as string;
 
-    const newAttendee = await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType, paymentReference });
+    let screenshotUrl: string | null = null;
+    if (screenshot && screenshot.size > 0) {
+      try {
+        screenshotUrl = await uploadPaymentScreenshot(screenshot, "reg-" + Date.now());
+      } catch (e) {
+        console.error("Supabase error, falling back", e);
+      }
+
+      if (!screenshotUrl) {
+        const arrayBuffer = await screenshot.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const fileName = `payment_reg_${Date.now()}.webp`;
+        const uploadDir = join(process.cwd(), "public", "uploads", "payments");
+        
+        try {
+          mkdirSync(uploadDir, { recursive: true });
+        } catch (e) {}
+        
+        const filePath = join(uploadDir, fileName);
+        
+        await sharp(buffer)
+          .resize(800, null, { withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toFile(filePath);
+          
+        screenshotUrl = `/uploads/payments/${fileName}`;
+      }
+    }
+
+    const newAttendee = await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType, paymentReference, paymentScreenshotUrl: screenshotUrl });
     revalidatePath(`/events/[slug]`, "page");
     revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
     return { success: true, ticketToken: newAttendee.ticketToken };
