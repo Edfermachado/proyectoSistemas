@@ -3,7 +3,7 @@ import { attendees, events } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
 export class AttendeesService {
-  static async registerAttendee(data: { eventId: string; name: string; email: string; phone: string; status?: "registrado" | "confirmado" | "pago_pendiente", userId?: string, attendeeType?: "estudiante" | "foraneo" }) {
+  static async registerAttendee(data: { eventId: string; name: string; email: string; phone: string; status?: "registrado" | "confirmado" | "pago_pendiente", userId?: string, attendeeType?: "estudiante" | "foraneo", paymentReference?: string }) {
     // Check if event exists
     const event = await db.query.events.findFirst({ where: eq(events.id, data.eventId) });
     if (!event) throw new Error("Event not found");
@@ -23,6 +23,7 @@ export class AttendeesService {
       status: status,
       userId: data.userId,
       attendeeType: data.attendeeType || "estudiante",
+      paymentReference: data.paymentReference,
     }).returning();
 
     return newAttendee;
@@ -35,9 +36,13 @@ export class AttendeesService {
     });
   }
 
-  static async confirmPayment(attendeeId: string) {
+  static async confirmPayment(attendeeId: string, verifierId: string) {
     const [updated] = await db.update(attendees)
-      .set({ status: "confirmado" })
+      .set({ 
+        status: "confirmado",
+        paymentVerifiedBy: verifierId,
+        paymentVerifiedAt: new Date()
+      })
       .where(eq(attendees.id, attendeeId))
       .returning();
     return updated;

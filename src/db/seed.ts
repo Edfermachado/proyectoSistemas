@@ -88,6 +88,8 @@ async function main() {
         price: 'GRATIS',
         tenantId: tenant1.id,
         spaceId: space1.id,
+        imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800',
+        isFeatured: true,
       },
       {
         title: 'Hackathon de Inteligencia Artificial',
@@ -96,7 +98,8 @@ async function main() {
         date: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // En 10 días
         price: '10.00',
         tenantId: tenant2.id,
-        spaceId: space2.id, 
+        spaceId: space2.id,
+        imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800',
       },
       {
         title: 'Exposición de Arte Moderno',
@@ -106,6 +109,60 @@ async function main() {
         price: '5.00',
         tenantId: tenant3.id,
         spaceId: space3.id,
+        imageUrl: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&q=80&w=800',
+      },
+      {
+        title: 'Concierto Sinfónico Universitario',
+        slug: 'concierto-sinfonico-universitario',
+        description: 'La orquesta sinfónica de la facultad interpretará clásicos atemporales y bandas sonoras contemporáneas.',
+        date: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), // En 2 días
+        price: '15.00',
+        tenantId: tenant3.id,
+        spaceId: space3.id,
+        imageUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=800',
+        isFeatured: true,
+      },
+      {
+        title: 'Congreso Internacional de Ciberseguridad',
+        slug: 'congreso-internacional-de-ciberseguridad',
+        description: 'Expertos internacionales compartirán las últimas tendencias en protección de datos y hacking ético.',
+        date: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // En 7 días
+        price: '25.00',
+        tenantId: tenant2.id,
+        spaceId: space2.id,
+        imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
+        isFeatured: true,
+      },
+      {
+        title: 'Feria de Emprendimiento Tecnológico',
+        slug: 'feria-de-emprendimiento-tecnologico',
+        description: 'Descubre las startups creadas por nuestros estudiantes y conoce a los futuros líderes del mercado.',
+        date: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), // En 12 días
+        price: 'GRATIS',
+        tenantId: tenant1.id,
+        spaceId: space1.id,
+        imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=800',
+      },
+      {
+        title: 'Taller de Robótica para Principiantes',
+        slug: 'taller-de-robotica-para-principiantes',
+        description: 'Aprende los conceptos básicos de robótica construyendo tu propio brazo mecánico controlado por Arduino.',
+        date: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), // En 20 días
+        price: 'GRATIS',
+        tenantId: tenant1.id,
+        spaceId: space2.id,
+        imageUrl: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?auto=format&fit=crop&q=80&w=800',
+      },
+      {
+        title: 'Festival de Cine Estudiantil',
+        slug: 'festival-de-cine-estudiantil',
+        description: 'Proyección de cortometrajes dirigidos, producidos y actuados por estudiantes de la facultad.',
+        date: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // En 30 días
+        price: '8.00',
+        tenantId: tenant3.id,
+        spaceId: space3.id,
+        imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800',
+        isFeatured: true,
       }
     ]).returning();
 

@@ -96,7 +96,10 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
                   <th className="text-left px-6 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wide">Fecha Registro</th>
                   <th className="text-left px-6 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wide">Estado</th>
                   {!isFree && (
-                    <th className="text-left px-6 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wide">Acción</th>
+                    <>
+                      <th className="text-left px-6 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wide">Pago reportado</th>
+                      <th className="text-left px-6 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wide">Acción</th>
+                    </>
                   )}
                 </tr>
               </thead>
@@ -131,11 +134,31 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
                       )}
                     </td>
                     {!isFree && (
-                      <td className="px-6 py-4">
-                        {attendee.status !== 'confirmado' && (
-                          <ConfirmPaymentButton attendeeId={attendee.id} eventId={id} />
-                        )}
-                      </td>
+                      <>
+                        <td className="px-6 py-4">
+                          {attendee.paymentReference ? (
+                            <div className="flex flex-col gap-1 text-sm">
+                              <span className="font-mono bg-surface-container-low px-2 py-1 rounded text-university-blue">Ref: {attendee.paymentReference}</span>
+                              {attendee.paymentScreenshotUrl && (
+                                <a href={attendee.paymentScreenshotUrl} target="_blank" rel="noreferrer" className="text-academic-gold hover:underline flex items-center gap-1 text-xs">
+                                  <span className="material-symbols-outlined text-xs">image</span> Ver Capture
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-on-surface-variant italic">No reportado</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {attendee.status !== 'confirmado' && (
+                            <ConfirmPaymentButton 
+                              attendeeId={attendee.id} 
+                              eventId={id} 
+                              hasReport={!!attendee.paymentReference}
+                            />
+                          )}
+                        </td>
+                      </>
                     )}
                   </tr>
                 ))}

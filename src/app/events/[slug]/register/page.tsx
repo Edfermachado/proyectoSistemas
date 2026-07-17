@@ -138,6 +138,33 @@ export default async function RegisterEventPage({ params, searchParams }: {
                   </span>
                 </div>
 
+                {!isFree && (
+                  <div className="bg-surface-container-high p-6 rounded-xl border border-outline-variant/50 space-y-4 mt-6">
+                    <h3 className="font-title-md font-bold text-university-blue flex items-center gap-2">
+                      <span className="material-symbols-outlined">payments</span>
+                      Datos para el Pago Móvil
+                    </h3>
+                    <div className="text-sm text-on-surface-variant space-y-2 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant">
+                      <p><strong>Banco:</strong> {event.paymentBank || "No especificado"}</p>
+                      <p><strong>Teléfono:</strong> {event.paymentPhone || "No especificado"}</p>
+                      <p><strong>Cédula/RIF:</strong> {event.paymentId || "No especificado"}</p>
+                    </div>
+                    
+                    <div className="mt-4 pt-2">
+                      <label className="block text-label-md font-bold text-university-blue mb-2">Número de Referencia</label>
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">receipt</span>
+                        <input type="text" name="paymentReference" required={!isFree}
+                          className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-academic-gold focus:ring-2 focus:ring-academic-gold/20 outline-none transition-all"
+                          placeholder="Ej: 123456" />
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-2">
+                        Ingresa los últimos 6 dígitos del comprobante de tu pago móvil.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="pt-4">
                   <button type="submit"
                     className="w-full bg-academic-gold text-university-blue py-4 rounded-xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-md flex justify-center items-center gap-2">

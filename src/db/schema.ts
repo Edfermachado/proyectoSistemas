@@ -69,6 +69,10 @@ export const events = pgTable('events', {
   status: varchar('status', { length: 50 }).default('aprobado'), // roles: pendiente, aprobado, rechazado
   requiresIpProtection: boolean('requires_ip_protection').default(false),
   isFeatured: boolean('is_featured').default(false),
+  paymentPhone: varchar('payment_phone', { length: 50 }),
+  paymentId: varchar('payment_id', { length: 50 }),
+  paymentBank: varchar('payment_bank', { length: 100 }),
+  managerId: uuid('manager_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -83,6 +87,10 @@ export const attendees = pgTable('attendees', {
   userId: uuid('user_id').references(() => users.id),
   ticketToken: uuid('ticket_token').defaultRandom().unique(),
   scannedAt: timestamp('scanned_at'),
+  paymentReference: varchar('payment_reference', { length: 50 }),
+  paymentScreenshotUrl: varchar('payment_screenshot_url', { length: 500 }),
+  paymentVerifiedBy: uuid('payment_verified_by').references(() => users.id),
+  paymentVerifiedAt: timestamp('payment_verified_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -99,6 +107,14 @@ export const systemSettings = pgTable('system_settings', {
   value: text('value').notNull(),
   description: text('description'),
   updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const scanLogs = pgTable('scan_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  eventId: uuid('event_id').references(() => events.id).notNull(),
+  attendeeId: uuid('attendee_id').references(() => attendees.id).notNull(),
+  scannedBy: uuid('scanned_by').references(() => users.id).notNull(),
+  scannedAt: timestamp('scanned_at').defaultNow(),
 });
 
 // Configuración de Relaciones (Drizzle Relations)
@@ -130,6 +146,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     references: [tenants.id],
   }),
   attendees: many(attendees),
+  managedEvents: many(events),
+  scanLogs: many(scanLogs),
 }));
 
 export const spacesRelations = relations(spaces, ({ one, many }) => ({
@@ -149,17 +167,42 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     fields: [events.spaceId],
     references: [spaces.id],
   }),
+  manager: one(users, {
+    fields: [events.managerId],
+    references: [users.id],
+  }),
   attendees: many(attendees),
   requests: many(eventRequests),
+  scanLogs: many(scanLogs),
 }));
 
-export const attendeesRelations = relations(attendees, ({ one }) => ({
+export const attendeesRelations = relations(attendees, ({ one, many }) => ({
   event: one(events, {
     fields: [attendees.eventId],
     references: [events.id],
   }),
   user: one(users, {
     fields: [attendees.userId],
+    references: [users.id],
+  }),
+  verifier: one(users, {
+    fields: [attendees.paymentVerifiedBy],
+    references: [users.id],
+  }),
+  scanLogs: many(scanLogs),
+}));
+
+export const scanLogsRelations = relations(scanLogs, ({ one }) => ({
+  event: one(events, {
+    fields: [scanLogs.eventId],
+    references: [events.id],
+  }),
+  attendee: one(attendees, {
+    fields: [scanLogs.attendeeId],
+    references: [attendees.id],
+  }),
+  scanner: one(users, {
+    fields: [scanLogs.scannedBy],
     references: [users.id],
   }),
 }));

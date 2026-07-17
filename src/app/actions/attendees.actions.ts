@@ -10,6 +10,7 @@ export async function registerForEvent(formData: FormData) {
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string;
   const attendeeType = (formData.get("attendeeType") as "estudiante" | "foraneo") || "estudiante";
+  const paymentReference = formData.get("paymentReference") as string | undefined;
 
   try {
     const session = await getSession();
@@ -21,7 +22,7 @@ export async function registerForEvent(formData: FormData) {
     const email = session.email as string;
     const userId = session.userId as string;
 
-    const newAttendee = await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType });
+    const newAttendee = await AttendeesService.registerAttendee({ eventId, name, email, phone, userId, attendeeType, paymentReference });
     revalidatePath(`/events/[slug]`, "page");
     revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
     return { success: true, ticketToken: newAttendee.ticketToken };
@@ -32,7 +33,10 @@ export async function registerForEvent(formData: FormData) {
 
 export async function confirmPayment(attendeeId: string, eventId: string) {
   try {
-    await AttendeesService.confirmPayment(attendeeId);
+    const session = await getSession();
+    if (!session || !session.userId) throw new Error("Unauthorized");
+
+    await AttendeesService.confirmPayment(attendeeId, session.userId as string);
     revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
     return { success: true };
   } catch (error: any) {

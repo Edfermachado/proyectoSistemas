@@ -24,10 +24,10 @@ export default async function ContactHelpPage() {
         </div>
         <div className="max-w-container-max mx-auto px-margin-desktop relative z-10 text-on-primary">
           <h1 className="font-display-lg text-5xl mb-4 text-on-primary font-black leading-tight animate-fade-in">
-            Contact Us
+            Contáctanos
           </h1>
           <p className="font-body-lg text-lg max-w-2xl text-on-primary-container opacity-90 animate-fade-in" style={{ animationDelay: "100ms" }}>
-            We're here to help you make the most of your university experience. Get in touch with the team behind the campus events ecosystem.
+            Estamos aquí para ayudarte a aprovechar al máximo tu experiencia universitaria. Ponte en contacto con el equipo detrás del ecosistema de eventos del campus.
           </p>
         </div>
       </section>
@@ -100,13 +100,13 @@ export default async function ContactHelpPage() {
       <section className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-20 mb-10 animate-fade-in" style={{ animationDelay: "400ms" }}>
         <div className="text-center mb-12">
           <span className="bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-            Help Center
+            Centro de Ayuda
           </span>
           <h2 className="font-headline-lg text-3xl text-university-blue mt-4 font-bold">
-            Common Questions
+            Preguntas Frecuentes
           </h2>
           <p className="text-base text-on-surface-variant max-w-xl mx-auto mt-2 font-medium">
-            Find quick answers to the most frequent inquiries before reaching out to our team.
+            Encuentra respuestas rápidas a las consultas más frecuentes antes de comunicarte con nuestro equipo.
           </p>
         </div>
 

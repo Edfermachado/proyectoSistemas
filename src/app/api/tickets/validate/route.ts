@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { attendees } from '@/db/schema';
+import { attendees, scanLogs } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getSession } from '@/lib/auth';
 
@@ -41,6 +41,13 @@ export async function POST(req: Request) {
     await db.update(attendees)
       .set({ scannedAt: new Date() })
       .where(eq(attendees.id, registration.id));
+
+    // Register who scanned it in the logs
+    await db.insert(scanLogs).values({
+      eventId: registration.eventId,
+      attendeeId: registration.id,
+      scannedBy: session.id as string,
+    });
 
     return NextResponse.json({ 
       success: true, 

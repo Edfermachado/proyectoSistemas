@@ -9,6 +9,7 @@ import { attendees } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logoutUser } from "@/app/actions/auth";
 import TicketQR from "@/components/TicketQR";
+import { ReportPaymentButton } from "@/components/ReportPaymentButton";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ viewTicket?: string }> }) {
   const session = await getSession();
@@ -64,6 +65,12 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       status: reg.status === "pago_pendiente" ? "Pendiente" : "Confirmado",
       tenantName: ev.tenant?.name || "UniEvents",
       ticketToken: reg.ticketToken,
+      // Pass payment details if pending
+      needsPaymentInfo: reg.status === "pago_pendiente" && ev.price !== "GRATIS",
+      paymentBank: ev.paymentBank,
+      paymentPhone: ev.paymentPhone,
+      paymentId: ev.paymentId,
+      hasSubmittedPayment: !!reg.paymentReference,
     };
   });
 
@@ -191,6 +198,21 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
                             <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
                             Ver Entrada
                           </Link>
+                        ) : event.needsPaymentInfo ? (
+                           event.hasSubmittedPayment ? (
+                             <span className="text-xs text-academic-gold font-bold py-2 flex items-center gap-1">
+                               <span className="material-symbols-outlined text-sm">hourglass_empty</span>
+                               Pago en verificación
+                             </span>
+                           ) : (
+                             <ReportPaymentButton 
+                               attendeeId={event.id}
+                               eventTitle={event.title}
+                               paymentBank={event.paymentBank}
+                               paymentPhone={event.paymentPhone}
+                               paymentId={event.paymentId}
+                             />
+                           )
                         ) : (
                           <span className="text-xs text-on-surface-variant italic py-2">Pendiente de confirmación</span>
                         )}

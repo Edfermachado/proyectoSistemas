@@ -13,6 +13,7 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
   
   const [faculty, setFaculty] = useState<{id: string, name: string} | null>(null);
   const [spaces, setSpaces] = useState<{id: string, name: string, capacity: number}[]>([]);
+  const [managers, setManagers] = useState<{id: string, email: string}[]>([]);
   const [eventData, setEventData] = useState<any>(null);
 
   // 1. Fetch faculty
@@ -36,6 +37,13 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
         if (Array.isArray(data)) setSpaces(data);
       })
       .catch(() => setSpaces([]));
+      
+    fetch(`/api/users/managers?role=event_manager`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setManagers(data);
+      })
+      .catch(() => setManagers([]));
   }, [faculty]);
 
   // 3. Fetch event data
@@ -141,6 +149,57 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
                   <img src={eventData.imageUrl} alt="Current" className="w-32 h-auto rounded-lg border border-outline-variant" />
                 </div>
               )}
+            </div>
+          </div>
+          
+          <div className="pt-4 border-t border-outline-variant/50">
+            <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil & Encargado</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
+                <select name="managerId" defaultValue={eventData.managerId || ""} required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                  <option value="">-- Selecciona un Encargado --</option>
+                  {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
+                </select>
+                <p className="text-xs text-on-surface-variant mt-1">Será responsable de validar los pagos.</p>
+              </div>
+              <div>
+                <label className="block font-title-sm text-university-blue mb-2">Banco</label>
+                <select name="paymentBank" defaultValue={eventData.paymentBank || ""} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                  <option value="">-- Selecciona Banco --</option>
+                  <option value="0102 - Banco de Venezuela">0102 - Banco de Venezuela</option>
+                  <option value="0104 - Banco Venezolano de Crédito">0104 - Banco Venezolano de Crédito</option>
+                  <option value="0105 - Banco Mercantil">0105 - Banco Mercantil</option>
+                  <option value="0108 - Banco Provincial">0108 - Banco Provincial</option>
+                  <option value="0114 - Bancaribe">0114 - Bancaribe</option>
+                  <option value="0115 - Banco Exterior">0115 - Banco Exterior</option>
+                  <option value="0128 - Banco Caroní">0128 - Banco Caroní</option>
+                  <option value="0134 - Banesco">0134 - Banesco</option>
+                  <option value="0138 - Banco Plaza">0138 - Banco Plaza</option>
+                  <option value="0151 - BFC Banco Fondo Común">0151 - BFC Banco Fondo Común</option>
+                  <option value="0156 - 100% Banco">0156 - 100% Banco</option>
+                  <option value="0157 - Banco del Sur">0157 - Banco del Sur</option>
+                  <option value="0163 - Banco del Tesoro">0163 - Banco del Tesoro</option>
+                  <option value="0168 - Bancrecer">0168 - Bancrecer</option>
+                  <option value="0169 - Mi Banco">0169 - Mi Banco</option>
+                  <option value="0171 - Banco Activo">0171 - Banco Activo</option>
+                  <option value="0172 - Bancamiga">0172 - Bancamiga</option>
+                  <option value="0174 - Banplus">0174 - Banplus</option>
+                  <option value="0175 - Banco Bicentenario">0175 - Banco Bicentenario</option>
+                  <option value="0177 - Banfanb">0177 - Banfanb</option>
+                  <option value="0191 - BNC Nacional de Crédito">0191 - BNC Nacional de Crédito</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-title-sm text-university-blue mb-2">Teléfono de Pago Móvil</label>
+                <input name="paymentPhone" defaultValue={eventData.paymentPhone || ""} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. 0414-1234567" />
+              </div>
+              <div>
+                <label className="block font-title-sm text-university-blue mb-2">Cédula / RIF</label>
+                <input name="paymentId" defaultValue={eventData.paymentId || ""} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. V-12345678 o J-123456789" />
+              </div>
             </div>
           </div>
           

@@ -6,7 +6,7 @@ export default function ContactForm({ supportEmail }: { supportEmail: string }) 
   const [buttonState, setButtonState] = useState<"idle" | "sending" | "sent">("idle");
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setButtonState("sending");
 
@@ -20,26 +20,35 @@ export default function ContactForm({ supportEmail }: { supportEmail: string }) 
                         subject === 'sales' ? 'Ventas' :
                         subject === 'organizers' ? 'Organizadores' : 'Otro';
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, subject: subjectText, message, supportEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
       setButtonState("sent");
       if (formRef.current) {
         formRef.current.reset();
       }
 
-      // Launch the default mail client
-      const mailtoSubject = encodeURIComponent(`UniEvents Contacto: ${subjectText}`);
-      const mailtoBody = encodeURIComponent(`Nombre: ${name}\nCorreo: ${email}\n\nMensaje:\n${message}`);
-      window.location.href = `mailto:${supportEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
-
       setTimeout(() => {
         setButtonState("idle");
       }, 3000);
-    }, 1500);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setButtonState("idle");
+      alert("Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.");
+    }
   };
 
   return (
     <div className="bg-surface-white rounded-2xl shadow-sm border border-outline-variant p-6 md:p-10">
-      <h2 className="font-headline-md text-2xl text-university-blue mb-6 font-bold">Send us a message</h2>
+      <h2 className="font-headline-md text-2xl text-university-blue mb-6 font-bold">Envíanos un mensaje</h2>
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
@@ -50,7 +59,7 @@ export default function ContactForm({ supportEmail }: { supportEmail: string }) 
               required
               name="name"
               id="name"
-              placeholder="John Doe"
+              placeholder="Juan Pérez"
               type="text"
               className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
             />
@@ -63,7 +72,7 @@ export default function ContactForm({ supportEmail }: { supportEmail: string }) 
               required
               name="email"
               id="email"
-              placeholder="user@university.edu"
+              placeholder="usuario@universidad.edu"
               type="email"
               className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
             />
@@ -92,7 +101,7 @@ export default function ContactForm({ supportEmail }: { supportEmail: string }) 
             required
             name="message"
             id="message"
-            placeholder="How can we assist you today?"
+            placeholder="¿Cómo podemos ayudarte hoy?"
             rows={5}
             className="w-full border border-outline-variant rounded-xl px-4 py-3 focus:ring-2 focus:ring-university-blue focus:border-university-blue transition-all bg-surface-container-lowest outline-none text-sm"
           />

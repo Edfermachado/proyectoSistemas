@@ -12,6 +12,7 @@
     "cleanup-qrs": "tsx scripts/cleanup-qrs.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.3",
     "@types/qrcode.react": "^3.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

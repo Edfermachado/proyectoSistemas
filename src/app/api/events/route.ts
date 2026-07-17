@@ -40,6 +40,12 @@ export async function POST(request: Request) {
     const visibility = (formData.get("visibility") as "publico" | "privado") || "publico";
     const requiresIpProtection = formData.get("requiresIpProtection") === "true";
     const image = formData.get("image") as File | null;
+    
+    // Payment fields
+    const paymentPhone = formData.get("paymentPhone") as string;
+    const paymentId = formData.get("paymentId") as string;
+    const paymentBank = formData.get("paymentBank") as string;
+    const managerId = formData.get("managerId") as string;
 
     let imageUrl = null;
 
@@ -95,7 +101,11 @@ export async function POST(request: Request) {
       capacity,
       visibility,
       requiresIpProtection,
-      status
+      status,
+      paymentPhone,
+      paymentId,
+      paymentBank,
+      managerId
     });
 
     return NextResponse.json(newEvent, { status: 201 });

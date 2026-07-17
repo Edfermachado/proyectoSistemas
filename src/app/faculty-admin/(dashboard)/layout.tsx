@@ -48,10 +48,16 @@ export default async function FacultyAdminLayout({ children }: { children: React
                 Solicitudes
               </Link>
               {session.role === 'tenant_admin' && (
-                <Link href="/faculty-admin/managers" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                  <span className="material-symbols-outlined text-xl">manage_accounts</span>
-                  Gestores de Eventos
-                </Link>
+                <>
+                  <Link href="/faculty-admin/managers" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                    <span className="material-symbols-outlined text-xl">manage_accounts</span>
+                    Gestores de Eventos
+                  </Link>
+                  <Link href="/faculty-admin/audit" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
+                    <span className="material-symbols-outlined text-xl">history_toggle_off</span>
+                    Auditoría de QRs
+                  </Link>
+                </>
               )}
             </>
           )}
