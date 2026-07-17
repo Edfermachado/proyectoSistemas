@@ -11,26 +11,6 @@ export default function Footer() {
           <p className="text-surface-variant text-label-sm max-w-xs">
             La plataforma principal de venta de entradas para eventos construida exclusivamente para la comunidad universitaria. Empoderando la conexión estudiantil a través de experiencias.
           </p>
-          <div className="flex gap-4">
-            <Link
-              href="#"
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-academic-gold transition-colors text-white"
-            >
-              <span className="material-symbols-outlined">share</span>
-            </Link>
-            <Link
-              href="#"
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-academic-gold transition-colors text-white"
-            >
-              <span className="material-symbols-outlined">hub</span>
-            </Link>
-            <Link
-              href="#"
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-academic-gold transition-colors text-white"
-            >
-              <span className="material-symbols-outlined">alternate_email</span>
-            </Link>
-          </div>
         </div>
         <div>
           <h4 className="text-white font-bold mb-6 font-title-lg">Plataforma</h4>
@@ -103,9 +83,6 @@ export default function Footer() {
         <p className="text-surface-variant text-label-sm opacity-80">
           © 2024 UniEvents Ticketing. Todos los derechos reservados.
         </p>
-        <div className="flex gap-8 text-surface-variant text-label-sm font-semibold">
-          <Link href="/login" className="hover:text-white">Admin</Link>
-        </div>
       </div>
     </footer>
   );
