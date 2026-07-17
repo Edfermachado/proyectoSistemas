@@ -36,23 +36,23 @@ export default function Footer() {
           <h4 className="text-white font-bold mb-6 font-title-lg">Plataforma</h4>
           <ul className="space-y-4 font-label-sm text-label-sm">
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/events" className="text-surface-variant hover:text-academic-gold transition-all">
                 Explorar Eventos
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/universities" className="text-surface-variant hover:text-academic-gold transition-all">
                 Universidades Asociadas
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Verificación de Entradas
+              <Link href="/faculties" className="text-surface-variant hover:text-academic-gold transition-all">
+                Facultades
               </Link>
             </li>
             <li>
-              <Link href="/login" className="text-surface-variant hover:text-academic-gold transition-all">
-                Panel de Facultad
+              <Link href="/profile" className="text-surface-variant hover:text-academic-gold transition-all">
+                Mis Entradas
               </Link>
             </li>
           </ul>
