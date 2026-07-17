@@ -123,6 +123,28 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              {/* Terms Checkbox */}
+              <div className="flex items-start gap-3 mt-4">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  name="terms"
+                  required
+                  className="mt-0.5 h-4 w-4 rounded border-outline-variant text-university-blue focus:ring-university-blue cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-sm text-slate-500 leading-tight">
+                  He leído y acepto los{" "}
+                  <Link href="/help/terms" target="_blank" className="text-university-blue font-bold hover:underline">
+                    Términos y Condiciones
+                  </Link>
+                  {" "}y la{" "}
+                  <Link href="/help/terms" target="_blank" className="text-university-blue font-bold hover:underline">
+                    Política de Privacidad
+                  </Link>
+                  .
+                </label>
+              </div>
+
               {/* Submit */}
               <button
                 disabled={pending}
