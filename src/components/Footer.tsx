@@ -61,27 +61,22 @@ export default function Footer() {
           <h4 className="text-white font-bold mb-6 font-title-lg">Recursos</h4>
           <ul className="space-y-4 font-label-sm text-label-sm">
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/help" className="text-surface-variant hover:text-academic-gold transition-all">
                 Centro de Ayuda
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/help/rules" className="text-surface-variant hover:text-academic-gold transition-all">
                 Reglas de Eventos
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Política de Privacidad
+              <Link href="/help/terms" className="text-surface-variant hover:text-academic-gold transition-all">
+                Términos y Privacidad
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
-                Términos de Servicio
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="text-surface-variant hover:text-academic-gold transition-all">
+              <Link href="/help/contact" className="text-surface-variant hover:text-academic-gold transition-all">
                 Contáctanos
               </Link>
             </li>
@@ -109,9 +104,7 @@ export default function Footer() {
           © 2024 UniEvents Ticketing. Todos los derechos reservados.
         </p>
         <div className="flex gap-8 text-surface-variant text-label-sm font-semibold">
-          <Link href="#" className="hover:text-white">Socios</Link>
-          <Link href="#" className="hover:text-white">Acceso a la API</Link>
-          <Link href="#" className="hover:text-white">Patrocinios</Link>
+          <Link href="/login" className="hover:text-white">Admin</Link>
         </div>
       </div>
     </footer>
