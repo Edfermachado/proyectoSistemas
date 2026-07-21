@@ -10,8 +10,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const event = await EventsService.getEventById(id);
     if (!event) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(event);
-  } catch (error) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("GET /api/events/[id] Error:", error);
+    return NextResponse.json({ error: "Internal Server Error", details: error.message || String(error) }, { status: 500 });
   }
 }
 
