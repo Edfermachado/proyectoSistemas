@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 
 import { getSession } from "@/lib/auth";
 import { uploadPaymentScreenshot } from "@/lib/supabase";
-import sharp from "sharp";
 import { join } from "path";
 import { mkdirSync } from "fs";
 
@@ -47,6 +46,7 @@ export async function registerForEvent(formData: FormData) {
         
         const filePath = join(uploadDir, fileName);
         
+        const sharp = (await import("sharp")).default;
         await sharp(buffer)
           .resize(800, null, { withoutEnlargement: true })
           .webp({ quality: 80 })

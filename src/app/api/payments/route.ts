@@ -4,7 +4,6 @@ import { attendees, events } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { uploadPaymentScreenshot } from "@/lib/supabase";
-import sharp from "sharp";
 import { join } from "path";
 import { mkdirSync } from "fs";
 
@@ -56,6 +55,7 @@ export async function POST(request: Request) {
         
         const filePath = join(uploadDir, fileName);
         
+        const sharp = (await import("sharp")).default;
         await sharp(buffer)
           .resize(800, null, { withoutEnlargement: true }) // Reduce file size
           .webp({ quality: 80 })
