@@ -156,6 +156,24 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
               )}
             </div>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-outline-variant/50">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Visibilidad</label>
+              <select name="visibility" defaultValue={eventData.visibility || "publico"} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                <option value="publico">Público</option>
+                <option value="privado">Privado</option>
+              </select>
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Estado del Evento</label>
+              <select name="status" defaultValue={eventData.status || "aprobado"} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                <option value="aprobado">Aprobado / Activo</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="rechazado">Rechazado</option>
+                <option value="finalizado">Finalizado</option>
+              </select>
+            </div>
+          </div>
           
           <div className="pt-4 border-t border-outline-variant/50">
             <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil & Encargado</h3>

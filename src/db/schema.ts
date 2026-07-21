@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, integer, boolean, pgEnum, jsonb, decimal } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, integer, boolean, pgEnum, jsonb, decimal, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import type { EventRequestMetadata } from '@/validations/requests';
 
@@ -78,6 +78,13 @@ export const events = pgTable('events', {
   paymentBank: varchar('payment_bank', { length: 100 }),
   managerId: uuid('manager_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
+}, (table) => {
+  return {
+    tenantIdx: index('events_tenant_idx').on(table.tenantId),
+    visibilityIdx: index('events_visibility_idx').on(table.visibility),
+    statusIdx: index('events_status_idx').on(table.status),
+    dateIdx: index('events_date_idx').on(table.date),
+  }
 });
 
 export const attendees = pgTable('attendees', {

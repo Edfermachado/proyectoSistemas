@@ -52,6 +52,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <NavLink href="/admin/spaces" icon="location_city">
             Espacios
           </NavLink>
+          <NavLink href="/admin/cleanup" icon="cleaning_services">
+            Limpieza de Datos
+          </NavLink>
           <NavLink href="/admin/settings" icon="settings">
             Configuración
           </NavLink>

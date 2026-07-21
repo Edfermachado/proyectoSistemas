@@ -41,6 +41,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       body.paymentId = formData.get("paymentId");
       body.paymentBank = formData.get("paymentBank");
       body.managerId = formData.get("managerId");
+      
+      const visibility = formData.get("visibility");
+      if (visibility) body.visibility = visibility;
+      
+      const status = formData.get("status");
+      if (status) body.status = status;
 
       const image = formData.get("image") as File | null;
       if (image && image.size > 0) {
