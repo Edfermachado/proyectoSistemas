@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 import 'dotenv/config';
+import bcrypt from 'bcryptjs';
 
 const connectionString = process.env.DATABASE_URI;
 if (!connectionString) {
@@ -85,7 +86,7 @@ async function main() {
         slug: 'expo-de-ingenieria-2026',
         description: 'Muestra anual de proyectos de ingeniería y robótica presentados por los alumnos.',
         date: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // En 5 días
-        price: 'GRATIS',
+        price: '0',
         tenantId: tenant1.id,
         spaceId: space1.id,
         imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800',
@@ -138,7 +139,7 @@ async function main() {
         slug: 'feria-de-emprendimiento-tecnologico',
         description: 'Descubre las startups creadas por nuestros estudiantes y conoce a los futuros líderes del mercado.',
         date: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), // En 12 días
-        price: 'GRATIS',
+        price: '0',
         tenantId: tenant1.id,
         spaceId: space1.id,
         imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=800',
@@ -148,7 +149,7 @@ async function main() {
         slug: 'taller-de-robotica-para-principiantes',
         description: 'Aprende los conceptos básicos de robótica construyendo tu propio brazo mecánico controlado por Arduino.',
         date: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), // En 20 días
-        price: 'GRATIS',
+        price: '0',
         tenantId: tenant1.id,
         spaceId: space2.id,
         imageUrl: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?auto=format&fit=crop&q=80&w=800',
@@ -169,7 +170,7 @@ async function main() {
     console.log('Creando usuario root y roles de prueba...');
     const [superadmin] = await db.insert(schema.users).values({
       email: 'admin@gmail.com',
-      passwordHash: 'admin',
+      passwordHash: await bcrypt.hash('admin', 10),
       role: 'superadmin',
       tenantId: tenant1.id, // For faculty portal fallback
       organizerLevel: 'registrado'
@@ -177,7 +178,7 @@ async function main() {
 
     const [accessControl] = await db.insert(schema.users).values({
       email: 'portero@gmail.com',
-      passwordHash: 'portero123',
+      passwordHash: await bcrypt.hash('portero123', 10),
       role: 'access_control',
       tenantId: tenant1.id,
       organizerLevel: 'registrado'
@@ -185,7 +186,7 @@ async function main() {
 
     const [regularUser] = await db.insert(schema.users).values({
       email: 'estudiante@gmail.com',
-      passwordHash: '123456',
+      passwordHash: await bcrypt.hash('123456', 10),
       role: 'user',
       organizerLevel: 'registrado'
     }).returning();
