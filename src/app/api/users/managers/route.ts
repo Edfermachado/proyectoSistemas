@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { getSession } from "@/lib/auth";
+import bcrypt from "bcryptjs";
 
 import { eq, and } from "drizzle-orm";
 
@@ -50,10 +51,12 @@ export async function POST(req: Request) {
     const allowedRoles = ["event_manager", "access_control"];
     const role = allowedRoles.includes(body.role) ? body.role : "event_manager";
 
+    const hashedPassword = await bcrypt.hash(body.passwordHash, 10);
+
     // Create the manager securely associated with the admin's tenant
     const [newUser] = await db.insert(users).values({
       email: body.email,
-      passwordHash: body.passwordHash, // Simplification for prototype
+      passwordHash: hashedPassword,
       role: role,
       tenantId: session.tenantId as string,
     }).returning();
