@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
 import sharp from "sharp";
-import { join } from "path";
-import { mkdirSync } from "fs";
+import { uploadEventImage } from "@/lib/supabase";
+import { getSession } from "@/lib/auth";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,6 +17,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     
     const contentType = request.headers.get("content-type") || "";
@@ -49,23 +54,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
 
         const arrayBuffer = await image.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        let buffer = Buffer.from(arrayBuffer);
         
         const fileName = `event-${Date.now()}.webp`;
-        const uploadDir = join(process.cwd(), "public", "uploads");
         
-        try {
-          mkdirSync(uploadDir, { recursive: true });
-        } catch (e) {}
-        
-        const filePath = join(uploadDir, fileName);
-        
-        await sharp(buffer)
+        buffer = await sharp(buffer)
           .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
           .webp({ quality: 80 })
-          .toFile(filePath);
+          .toBuffer();
           
-        body.imageUrl = `/uploads/${fileName}`;
+        const uploadedUrl = await uploadEventImage(buffer, fileName);
+        if (uploadedUrl) {
+          body.imageUrl = uploadedUrl;
+        }
       }
       
       // Limpiar propiedades undefined o null que no fueron enviadas (excepto si el cliente quiere borrar algo, pero FormData devuelve string vacío o null si no se envió)
@@ -94,6 +95,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     await EventsService.deleteEvent(id);
     return new NextResponse(null, { status: 204 });

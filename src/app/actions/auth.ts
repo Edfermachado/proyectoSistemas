@@ -5,6 +5,7 @@ import { users } from "@/db/schema";
 import { eq, and, or } from "drizzle-orm";
 import { createSession, deleteSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
 
 export async function loginFacultyAdmin(prevState: any, formData: FormData) {
   const email = formData.get("email")?.toString();
@@ -20,12 +21,11 @@ export async function loginFacultyAdmin(prevState: any, formData: FormData) {
   const user = await db.query.users.findFirst({
     where: and(
       eq(users.email, email),
-      eq(users.passwordHash, password), // Simple auth para este prototipo
       or(eq(users.role, "tenant_admin"), eq(users.role, "event_manager"), eq(users.role, "access_control"))
     ),
   });
 
-  if (!user) {
+  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     return { error: "Credenciales incorrectas o tu cuenta no es de administrador de facultad." };
   }
 
@@ -52,12 +52,11 @@ export async function loginUser(prevState: any, formData: FormData) {
   const user = await db.query.users.findFirst({
     where: and(
       eq(users.email, email),
-      eq(users.passwordHash, password),
       eq(users.role, "user")
     ),
   });
 
-  if (!user) {
+  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     return { error: "Correo electrónico o contraseña incorrectos." };
   }
 
@@ -88,9 +87,10 @@ export async function registerUser(prevState: any, formData: FormData) {
   }
 
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const [newUser] = await db.insert(users).values({
       email,
-      passwordHash: password,
+      passwordHash: hashedPassword,
       role: "user",
       tenantId: null,
     }).returning();
@@ -116,12 +116,11 @@ export async function loginSuperAdmin(prevState: any, formData: FormData) {
   const user = await db.query.users.findFirst({
     where: and(
       eq(users.email, email),
-      eq(users.passwordHash, password),
       eq(users.role, "superadmin")
     ),
   });
 
-  if (!user) {
+  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     return { error: "Credenciales de administrador del sistema incorrectas." };
   }
 

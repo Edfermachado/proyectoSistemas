@@ -59,7 +59,7 @@ export const events = pgTable('events', {
   slug: varchar('slug', { length: 350 }).unique(),
   description: text('description'),
   date: timestamp('date').notNull(),
-  price: varchar('price', { length: 50 }), 
+  price: decimal('price', { precision: 10, scale: 2 }).default('0'), 
   imageUrl: varchar('image_url', { length: 500 }),
   duration: integer('duration').notNull().default(60),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),

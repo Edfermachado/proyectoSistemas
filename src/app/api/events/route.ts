@@ -2,8 +2,7 @@ import { getSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
 import sharp from "sharp";
-import { join } from "path";
-import { mkdirSync } from "fs";
+import { uploadEventImage } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   try {
@@ -25,6 +24,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Ya no usamos request.json() porque esperamos multipart/form-data
     const formData = await request.formData();
     
@@ -63,27 +67,21 @@ export async function POST(request: Request) {
       }
 
       const arrayBuffer = await image.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      let buffer = Buffer.from(arrayBuffer);
       
       const fileName = `event-${Date.now()}.webp`; // Forzamos formato WebP
-      const uploadDir = join(process.cwd(), "public", "uploads");
-      
-      try {
-        mkdirSync(uploadDir, { recursive: true });
-      } catch (e) {}
-      
-      const filePath = join(uploadDir, fileName);
       
       // 3. Compresión con Sharp
-      await sharp(buffer)
+      buffer = await sharp(buffer)
         .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
         .webp({ quality: 80 })
-        .toFile(filePath);
+        .toBuffer();
         
-      imageUrl = `/uploads/${fileName}`;
+      const uploadedUrl = await uploadEventImage(buffer, fileName);
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl;
+      }
     }
-
-    const session = await getSession();
     
     // Default to 'pendiente' if event_manager, 'aprobado' if tenant_admin
     const status = session?.role === "event_manager" ? "pendiente" : "aprobado";
@@ -93,7 +91,7 @@ export async function POST(request: Request) {
       title,
       date: new Date(date),
       duration,
-      price: price || 'FREE',
+      price: price || '0',
       tenantId,
       spaceId,
       description,

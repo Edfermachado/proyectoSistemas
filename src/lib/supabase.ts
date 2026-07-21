@@ -36,3 +36,31 @@ export async function uploadPaymentScreenshot(file: File, attendeeId: string): P
     throw err;
   }
 }
+
+export async function uploadEventImage(buffer: Buffer, fileName: string): Promise<string | null> {
+  if (!supabase) {
+    console.warn("Supabase not configured, falling back to local storage or returning null");
+    return null;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .storage
+      .from('events') // Make sure this bucket exists in Supabase
+      .upload(fileName, buffer, {
+        contentType: 'image/webp',
+        upsert: true
+      });
+
+    if (error) {
+      console.error("Supabase upload error:", error);
+      throw error;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('events').getPublicUrl(fileName);
+    return publicUrlData.publicUrl;
+  } catch (err) {
+    console.error("Error uploading event image to Supabase:", err);
+    throw err;
+  }
+}
