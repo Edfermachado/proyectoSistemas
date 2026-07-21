@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
-import sharp from "sharp";
 import { uploadEventImage } from "@/lib/supabase";
 import { getSession } from "@/lib/auth";
 
@@ -59,6 +58,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         
         const fileName = `event-${Date.now()}.webp`;
         
+        const sharp = (await import("sharp")).default;
         buffer = await sharp(buffer)
           .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
           .webp({ quality: 80 })

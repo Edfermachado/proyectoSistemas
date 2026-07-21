@@ -1,7 +1,6 @@
 import { getSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
-import sharp from "sharp";
 import { uploadEventImage } from "@/lib/supabase";
 
 export async function GET(request: Request) {
@@ -72,6 +71,7 @@ export async function POST(request: Request) {
       const fileName = `event-${Date.now()}.webp`; // Forzamos formato WebP
       
       // 3. Compresión con Sharp
+      const sharp = (await import("sharp")).default;
       buffer = await sharp(buffer)
         .resize(1200, 800, { fit: 'cover', withoutEnlargement: true })
         .webp({ quality: 80 })
