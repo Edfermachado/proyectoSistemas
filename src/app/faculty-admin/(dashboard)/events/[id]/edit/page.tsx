@@ -67,7 +67,12 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
     
     const formData = new FormData(e.currentTarget);
     formData.append("tenantId", faculty.id);
-    if (!formData.get("price")) formData.set("price", "FREE");
+    let priceVal = formData.get("price") as string;
+    if (!priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
+      formData.set("price", "0");
+    } else {
+      formData.set("price", priceVal.replace(",", "."));
+    }
 
     try {
       const res = await fetch(`/api/events/${id}`, {
@@ -128,7 +133,7 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
           
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
-            <input name="price" defaultValue={eventData.price} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" />
+            <input name="price" defaultValue={eventData.price} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="0 para gratis, o 10.50" />
           </div>
           
           <div className="grid grid-cols-2 gap-4">

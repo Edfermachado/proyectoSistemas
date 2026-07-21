@@ -172,7 +172,23 @@ async function main() {
       email: 'admin@gmail.com',
       passwordHash: await bcrypt.hash('admin', 10),
       role: 'superadmin',
-      tenantId: tenant1.id, // For faculty portal fallback
+      tenantId: null,
+      organizerLevel: 'registrado'
+    }).returning();
+
+    const [tenantAdmin] = await db.insert(schema.users).values({
+      email: 'decano@gmail.com',
+      passwordHash: await bcrypt.hash('decano', 10),
+      role: 'tenant_admin',
+      tenantId: tenant1.id,
+      organizerLevel: 'registrado'
+    }).returning();
+
+    const [eventManager] = await db.insert(schema.users).values({
+      email: 'gestor@gmail.com',
+      passwordHash: await bcrypt.hash('gestor', 10),
+      role: 'event_manager',
+      tenantId: tenant1.id,
       organizerLevel: 'registrado'
     }).returning();
 
@@ -215,11 +231,15 @@ async function main() {
       attendeeType: 'estudiante'
     }).returning();
 
+    console.log('\n--- DATOS PARA INICIO DE SESIÓN ---');
+    console.log(`👑 Superadmin (/admin): admin@gmail.com (admin)`);
+    console.log(`🏛️ Decano Facultad (/faculty-admin): decano@gmail.com (decano)`);
+    console.log(`📅 Gestor de Eventos (/faculty-admin): gestor@gmail.com (gestor)`);
+    console.log(`💂 Control de Acceso (/faculty-admin): portero@gmail.com (portero123)`);
+    console.log(`👤 Usuario regular (/): estudiante@gmail.com (123456)`);
     console.log('\n--- DATOS PARA PRUEBA DE ESCÁNER QR ---');
     console.log(`🔑 QR Válido (Evento Gratis): ${attendeeFree.ticketToken}`);
     console.log(`⏳ QR Pendiente (Evento Pago): ${attendeePaid.ticketToken}`);
-    console.log(`👤 Usuario de prueba: estudiante@gmail.com (123456)`);
-    console.log(`💂 Control de Acceso: portero@gmail.com (portero123)`);
     console.log('----------------------------------------\n');
 
     console.log('✅ Seeder completado con éxito!');

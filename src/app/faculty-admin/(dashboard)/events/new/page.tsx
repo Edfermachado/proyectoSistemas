@@ -56,7 +56,12 @@ export default function FacultyNewEventPage() {
     
     const formData = new FormData(e.currentTarget);
     formData.append("tenantId", faculty.id); // Agregamos la facultad asignada
-    if (!formData.get("price")) formData.set("price", "FREE");
+    let priceVal = formData.get("price") as string;
+    if (!priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
+      formData.set("price", "0");
+    } else {
+      formData.set("price", priceVal.replace(",", "."));
+    }
 
     try {
       const res = await fetch("/api/events", {
@@ -107,7 +112,7 @@ export default function FacultyNewEventPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
-              <input name="price" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="FREE, 10.50, etc." defaultValue="FREE" />
+              <input name="price" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="0 para gratis, o 10.50" defaultValue="0" />
             </div>
             <div>
               <label className="block font-title-sm text-university-blue mb-2">Capacidad Especial (Opcional)</label>
