@@ -22,6 +22,20 @@ async function main() {
     await db.delete(schema.users);
     await db.delete(schema.tenants);
     await db.delete(schema.universities);
+    await db.delete(schema.categories);
+
+    console.log('Creando categorías...');
+    const [cat1] = await db.insert(schema.categories).values({
+      name: 'Tecnología e Innovación',
+      slug: 'tecnologia',
+      icon: 'computer',
+    }).returning();
+
+    const [cat2] = await db.insert(schema.categories).values({
+      name: 'Arte y Cultura',
+      slug: 'arte',
+      icon: 'palette',
+    }).returning();
 
     console.log('Creando universidades...');
     const [uni1] = await db.insert(schema.universities).values({
@@ -42,6 +56,7 @@ async function main() {
       slug: 'facultad-de-ingenieria',
       description: 'Dedicada a la ingeniería, robótica y desarrollo de software moderno.',
       universityId: uni1.id,
+      categoryId: cat1.id,
     }).returning();
     
     const [tenant2] = await db.insert(schema.tenants).values({
@@ -49,6 +64,7 @@ async function main() {
       slug: 'facultad-de-ciencias-de-la-computacion',
       description: 'Innovación en inteligencia artificial, ciberseguridad y ciencia de datos.',
       universityId: uni1.id,
+      categoryId: cat1.id,
     }).returning();
     
     const [tenant3] = await db.insert(schema.tenants).values({
@@ -56,6 +72,7 @@ async function main() {
       slug: 'facultad-de-bellas-artes',
       description: 'Desarrollo de habilidades en pintura, escultura, cine y medios visuales.',
       universityId: uni2.id,
+      categoryId: cat2.id,
     }).returning();
 
     console.log('Creando espacios...');
@@ -90,7 +107,6 @@ async function main() {
         tenantId: tenant1.id,
         spaceId: space1.id,
         imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800',
-        isFeatured: true,
       },
       {
         title: 'Hackathon de Inteligencia Artificial',
@@ -121,7 +137,6 @@ async function main() {
         tenantId: tenant3.id,
         spaceId: space3.id,
         imageUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=800',
-        isFeatured: true,
       },
       {
         title: 'Congreso Internacional de Ciberseguridad',
@@ -132,7 +147,6 @@ async function main() {
         tenantId: tenant2.id,
         spaceId: space2.id,
         imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
-        isFeatured: true,
       },
       {
         title: 'Feria de Emprendimiento Tecnológico',
@@ -163,7 +177,6 @@ async function main() {
         tenantId: tenant3.id,
         spaceId: space3.id,
         imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800',
-        isFeatured: true,
       }
     ]).returning();
 

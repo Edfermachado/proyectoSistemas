@@ -1,10 +1,13 @@
-export default function TrendingUniversities() {
-  const unis = [
-    { icon: "account_balance", name: "Imperial College" },
-    { icon: "school", name: "Stanford Institute" },
-    { icon: "architecture", name: "Tech University" },
-    { icon: "auto_stories", name: "Arts Academy" },
-  ];
+import { db } from "@/db";
+
+export default async function TrendingUniversities() {
+  const unis = await db.query.universities.findMany({
+    limit: 4,
+    orderBy: (u, { desc }) => [desc(u.createdAt)],
+  });
+
+  if (unis.length === 0) return null;
+
 
   return (
     <section className="py-20 bg-university-blue text-surface-white overflow-hidden relative">
@@ -18,12 +21,16 @@ export default function TrendingUniversities() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center opacity-80">
           {unis.map((u, i) => (
             <div key={i} className="flex flex-col items-center gap-4">
-              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all cursor-pointer">
-                <span className="material-symbols-outlined text-4xl text-academic-gold">
-                  {u.icon}
-                </span>
+              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all cursor-pointer overflow-hidden relative">
+                {u.logoUrl ? (
+                  <img src={u.logoUrl} alt={u.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-4xl text-academic-gold">
+                    account_balance
+                  </span>
+                )}
               </div>
-              <p className="font-label-md text-label-md">{u.name}</p>
+              <p className="font-label-md text-label-md text-center">{u.name}</p>
             </div>
           ))}
         </div>
