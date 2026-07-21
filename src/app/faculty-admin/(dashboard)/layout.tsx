@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { NavLink } from '@/components/ui/NavLink';
 import { getSession } from '@/lib/auth';
 import { logoutFacultyAdmin } from '@/app/actions/auth';
 import { redirect } from 'next/navigation';
@@ -27,50 +28,41 @@ export default async function FacultyAdminLayout({ children }: { children: React
         <nav className="flex-1 p-6 space-y-3 overflow-y-auto scrollbar-hide">
           {session.role !== 'access_control' && (
             <>
-              <Link href="/faculty-admin" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                <span className="material-symbols-outlined text-xl">dashboard</span>
+              <NavLink href="/faculty-admin" icon="dashboard" exact>
                 Dashboard
-              </Link>
-              <Link href="/faculty-admin/metrics" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                <span className="material-symbols-outlined text-xl">bar_chart</span>
+              </NavLink>
+              <NavLink href="/faculty-admin/metrics" icon="bar_chart">
                 Métricas Estratégicas
-              </Link>
-              <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                <span className="material-symbols-outlined text-xl">local_activity</span>
+              </NavLink>
+              <NavLink href="/faculty-admin/events" icon="local_activity">
                 Mis Eventos
-              </Link>
-              <Link href="/faculty-admin/calendar" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                <span className="material-symbols-outlined text-xl">calendar_month</span>
+              </NavLink>
+              <NavLink href="/faculty-admin/calendar" icon="calendar_month">
                 Calendario
-              </Link>
-              <Link href="/faculty-admin/requests" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                <span className="material-symbols-outlined text-xl">assignment</span>
+              </NavLink>
+              <NavLink href="/faculty-admin/requests" icon="assignment">
                 Solicitudes
-              </Link>
+              </NavLink>
               {session.role === 'tenant_admin' && (
                 <>
-                  <Link href="/faculty-admin/managers" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                    <span className="material-symbols-outlined text-xl">manage_accounts</span>
+                  <NavLink href="/faculty-admin/managers" icon="manage_accounts">
                     Gestores de Eventos
-                  </Link>
-                  <Link href="/faculty-admin/audit" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-                    <span className="material-symbols-outlined text-xl">history_toggle_off</span>
+                  </NavLink>
+                  <NavLink href="/faculty-admin/audit" icon="history_toggle_off">
                     Auditoría de QRs
-                  </Link>
+                  </NavLink>
                 </>
               )}
             </>
           )}
           {session.role === 'access_control' && (
-            <Link href="/faculty-admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-              <span className="material-symbols-outlined text-xl">group</span>
+            <NavLink href="/faculty-admin/events" icon="group">
               Eventos y Asistentes
-            </Link>
+            </NavLink>
           )}
-          <Link href="/faculty-admin/scanner" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">qr_code_scanner</span>
+          <NavLink href="/faculty-admin/scanner" icon="qr_code_scanner">
             Escáner QR
-          </Link>
+          </NavLink>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
           <form action={logoutFacultyAdmin}>

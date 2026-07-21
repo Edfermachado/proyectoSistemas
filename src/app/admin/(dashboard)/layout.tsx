@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { NavLink } from '@/components/ui/NavLink';
 import { getSession } from '@/lib/auth';
 import { logoutAdmin } from '@/app/actions/auth';
 import { redirect } from 'next/navigation';
@@ -24,46 +25,36 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Backoffice Portal</p>
         </div>
         <nav className="flex-1 p-6 space-y-3 overflow-y-auto scrollbar-hide">
-          <Link href="/admin" className="flex items-center gap-4 px-5 py-4 text-university-blue bg-primary-fixed rounded-2xl shadow-sm border border-primary-fixed-dim font-bold transition-all hover:shadow-md">
-            <span className="material-symbols-outlined text-xl">dashboard</span>
+          <NavLink href="/admin" icon="dashboard" exact>
             Dashboard
-          </Link>
-          <Link href="/admin/metrics" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">bar_chart</span>
+          </NavLink>
+          <NavLink href="/admin/metrics" icon="bar_chart">
             Métricas
-          </Link>
-          <Link href="/admin/universities" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">domain</span>
+          </NavLink>
+          <NavLink href="/admin/universities" icon="domain">
             Universidades
-          </Link>
-          <Link href="/admin/tenants" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">account_balance</span>
+          </NavLink>
+          <NavLink href="/admin/tenants" icon="account_balance">
             Facultades
-          </Link>
-          <Link href="/admin/categories" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">category</span>
+          </NavLink>
+          <NavLink href="/admin/categories" icon="category">
             Categorías
-          </Link>
-          <Link href="/admin/users" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">shield_person</span>
+          </NavLink>
+          <NavLink href="/admin/users" icon="shield_person">
             Administradores
-          </Link>
-          <Link href="/admin/events" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">local_activity</span>
+          </NavLink>
+          <NavLink href="/admin/events" icon="local_activity">
             Eventos
-          </Link>
-          <Link href="/admin/scanner" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">qr_code_scanner</span>
+          </NavLink>
+          <NavLink href="/admin/scanner" icon="qr_code_scanner">
             Escáner QR
-          </Link>
-          <Link href="/admin/spaces" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">location_city</span>
+          </NavLink>
+          <NavLink href="/admin/spaces" icon="location_city">
             Espacios
-          </Link>
-          <Link href="/admin/settings" className="flex items-center gap-4 px-5 py-4 text-on-surface-variant hover:text-university-blue rounded-2xl transition-colors hover:bg-surface-container-high font-medium">
-            <span className="material-symbols-outlined text-xl">settings</span>
+          </NavLink>
+          <NavLink href="/admin/settings" icon="settings">
             Configuración
-          </Link>
+          </NavLink>
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
           <form action={logoutAdmin}>
