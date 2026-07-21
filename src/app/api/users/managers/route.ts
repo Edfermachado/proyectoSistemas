@@ -29,6 +29,10 @@ export async function GET(req: Request) {
         id: true,
         email: true,
         role: true,
+        name: true,
+        lastName: true,
+        documentId: true,
+        phone: true,
       }
     });
 
@@ -58,6 +62,10 @@ export async function POST(req: Request) {
       email: body.email,
       passwordHash: hashedPassword,
       role: role,
+      name: body.name,
+      lastName: body.lastName,
+      documentId: body.documentId,
+      phone: body.phone,
       tenantId: session.tenantId as string,
     }).returning();
 

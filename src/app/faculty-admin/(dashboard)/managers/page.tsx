@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 
 export default async function ManagersPage() {
   const session = await getSession();
-  if (!session || session.role !== 'tenant_admin' || !session.tenantId) {
+  if (!session || (session.role !== 'tenant_admin' && session.role !== 'superadmin') || !session.tenantId) {
     redirect('/login');
   }
 
@@ -52,20 +52,26 @@ export default async function ManagersPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-surface-container-lowest border-b border-outline-variant/50">
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Correo Electrónico</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Gestor</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Identificación</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Rol Asignado</th>
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Fecha de Registro</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {managers.map((m) => (
                   <tr key={m.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
-                    <td className="px-6 py-4 font-bold text-university-blue">{m.email}</td>
-                    <td className="px-6 py-4 text-on-surface-variant uppercase text-xs tracking-wider font-bold">
-                      {m.role === 'access_control' ? 'Control de Acceso' : 'Administrador de Eventos'}
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-university-blue">{m.name && m.lastName ? `${m.name} ${m.lastName}` : "Sin Nombre"}</p>
+                      <p className="text-xs text-on-surface-variant">{m.email}</p>
+                      {m.phone && <p className="text-xs text-on-surface-variant mt-1">📞 {m.phone}</p>}
                     </td>
-                    <td className="px-6 py-4 text-on-surface-variant">{m.createdAt?.toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-on-surface-variant font-medium">
+                      {m.documentId || "No registrada"}
+                    </td>
+                    <td className="px-6 py-4 text-on-surface-variant uppercase text-xs tracking-wider font-bold">
+                      {m.role === 'access_control' ? 'Control de Acceso' : 'Gestor de Eventos'}
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <DeleteButton endpoint="users" id={m.id} />
                     </td>

@@ -22,6 +22,10 @@ export async function registerForEvent(formData: FormData) {
       throw new Error("Debes iniciar sesión para registrarte en el evento.");
     }
     
+    if (session.role !== "user") {
+      throw new Error("Solo los asistentes regulares pueden registrarse en los eventos. Tu cuenta tiene rol administrativo.");
+    }
+    
     // Usamos el email seguro de la sesión en lugar del formulario
     const email = session.email as string;
     const userId = session.userId as string;

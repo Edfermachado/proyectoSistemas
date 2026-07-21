@@ -39,6 +39,10 @@ export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }),
+  lastName: varchar('last_name', { length: 255 }),
+  documentId: varchar('document_id', { length: 50 }),
+  phone: varchar('phone', { length: 50 }),
   role: varchar('role', { length: 50 }).notNull().default('user'), // roles: superadmin, tenant_admin, user
   tenantId: uuid('tenant_id').references(() => tenants.id), // Puede ser null para el superadmin global
   organizerLevel: organizerLevelEnum('organizer_level').default('academico'),

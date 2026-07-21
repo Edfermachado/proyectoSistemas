@@ -15,9 +15,12 @@ export default function NewManagerPage() {
     const formData = new FormData(e.currentTarget);
     const data = {
       email: formData.get("email"),
-      passwordHash: formData.get("password"), // In a real app this would be properly hashed
+      passwordHash: formData.get("password"),
       role: "event_manager",
-      // We pass a special flag or rely on the backend to know this is a tenant operation,
+      name: formData.get("name"),
+      lastName: formData.get("lastName"),
+      documentId: formData.get("documentId"),
+      phone: formData.get("phone"),
       // but the API `POST /api/users` requires tenantId if not superadmin.
       // Alternatively, we can let the API extract tenantId from session.
       // Wait, let's create a dedicated action or endpoint if `POST /api/users` doesn't handle it well.
@@ -51,6 +54,28 @@ export default function NewManagerPage() {
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm p-8">
         <form onSubmit={onSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Nombre</label>
+              <input name="name" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. Juan" />
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Apellido</label>
+              <input name="lastName" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. Pérez" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Cédula de Identidad</label>
+              <input name="documentId" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. V-12345678" />
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Teléfono</label>
+              <input name="phone" required type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. 0414-1234567" />
+            </div>
+          </div>
+
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Correo Electrónico</label>
             <input name="email" required type="email" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="gestor@facultad.edu" />
