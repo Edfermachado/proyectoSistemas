@@ -17,7 +17,7 @@ export class UsersService {
     });
   }
 
-  static async createUser(data: { email: string; passwordHash: string; role?: string; tenantId?: string | null }) {
+  static async createUser(data: { email: string; passwordHash: string; role?: string; tenantId?: string | null; name?: string; lastName?: string; documentId?: string; phone?: string; }) {
     if (data.passwordHash) {
       data.passwordHash = await bcrypt.hash(data.passwordHash, 10);
     }

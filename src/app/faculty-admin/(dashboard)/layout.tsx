@@ -18,13 +18,13 @@ export default async function FacultyAdminLayout({ children }: { children: React
 
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 transform -translate-x-full peer-checked:translate-x-0 md:relative md:translate-x-0 transition-transform duration-300 w-72 bg-surface-container-lowest border-r border-outline-variant flex flex-col shadow-sm z-40">
-        <div className="p-8 border-b border-outline-variant/50">
+        <Link href="/faculty-admin" className="block p-8 border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
           <h1 className="font-headline-lg text-2xl text-university-blue font-bold tracking-tighter flex items-center gap-3">
             <span className="material-symbols-outlined text-academic-gold text-3xl">school</span>
             UniEvents
           </h1>
           <p className="text-label-sm text-on-surface-variant mt-2 font-bold uppercase tracking-widest">Faculty Portal</p>
-        </div>
+        </Link>
         <nav className="flex-1 p-6 space-y-3 overflow-y-auto scrollbar-hide">
           {session.role !== 'access_control' && (
             <>
