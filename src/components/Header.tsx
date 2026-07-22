@@ -10,6 +10,9 @@ export default function Header() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [hasFetchedNotifications, setHasFetchedNotifications] = useState(false);
 
   // Form search submission handler
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -31,7 +34,41 @@ export default function Header() {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setShowNotifications(false);
   }, [pathname]);
+
+  const toggleNotifications = async () => {
+    const newState = !showNotifications;
+    setShowNotifications(newState);
+    
+    if (newState && !hasFetchedNotifications) {
+      try {
+        const res = await fetch("/api/users/notifications");
+        if (res.ok) {
+          const data = await res.json();
+          setNotifications(data.notifications || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch notifications");
+      }
+      setHasFetchedNotifications(true);
+    }
+  };
+
+  const unreadCount = notifications.length; // For simplicity, we just show total count or a red dot if there are any notifications, but wait, we only fetch when clicked. 
+  // Let's actually fetch on mount so we can show a badge.
+  
+  useEffect(() => {
+    fetch("/api/users/notifications")
+      .then(res => res.json())
+      .then(data => {
+        if (data.notifications) {
+          setNotifications(data.notifications);
+        }
+        setHasFetchedNotifications(true);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <header
@@ -111,10 +148,48 @@ export default function Header() {
               className="bg-transparent border-none focus:ring-0 text-white placeholder-white/50 text-label-md w-48 focus:outline-none"
             />
           </form>
-          <div className="flex items-center gap-4 text-surface-white">
-            <button className="hidden md:flex hover:bg-primary-container/50 p-2 rounded-full transition-all items-center justify-center">
+          <div className="flex items-center gap-4 text-surface-white relative">
+            <button 
+              onClick={toggleNotifications}
+              className="hidden md:flex hover:bg-primary-container/50 p-2 rounded-full transition-all items-center justify-center relative"
+            >
               <span className="material-symbols-outlined">notifications</span>
+              {notifications.length > 0 && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full"></span>
+              )}
             </button>
+            
+            {showNotifications && (
+              <div className="absolute top-full mt-2 right-12 w-80 bg-surface-white rounded-2xl shadow-xl border border-outline-variant/30 overflow-hidden z-50 text-on-surface">
+                <div className="p-4 border-b border-outline-variant/30 bg-surface-container-lowest">
+                  <h3 className="font-bold text-university-blue text-sm">Notificaciones</h3>
+                </div>
+                <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-on-surface-variant text-sm">
+                      <span className="material-symbols-outlined text-3xl mb-2 text-outline">notifications_off</span>
+                      <p>No tienes notificaciones nuevas.</p>
+                    </div>
+                  ) : (
+                    notifications.map((notif: any) => (
+                      <Link href={notif.link} key={notif.id} className="block p-4 border-b border-outline-variant/30 hover:bg-surface-container-lowest transition-colors">
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${notif.type === 'success' ? 'bg-green-500' : notif.type === 'warning' ? 'bg-academic-gold' : 'bg-university-blue'}`}></div>
+                          <div>
+                            <p className="font-bold text-sm text-university-blue mb-1">{notif.title}</p>
+                            <p className="text-xs text-on-surface-variant line-clamp-2">{notif.message}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+                <div className="p-2 border-t border-outline-variant/30 text-center bg-surface-container-lowest">
+                  <Link href="/profile" className="text-xs font-bold text-academic-gold hover:underline">Ver mi perfil</Link>
+                </div>
+              </div>
+            )}
+
             <Link href="/profile" className="hidden md:flex hover:bg-primary-container/50 p-2 rounded-full transition-all items-center justify-center">
               <span className="material-symbols-outlined">account_circle</span>
             </Link>

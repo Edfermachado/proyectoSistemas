@@ -6,6 +6,8 @@ import TrendingUniversities from "@/components/TrendingUniversities";
 import AppPromo from "@/components/AppPromo";
 import Footer from "@/components/Footer";
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   return (
     <main>
