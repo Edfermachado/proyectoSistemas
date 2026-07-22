@@ -12,13 +12,13 @@ export default async function FacultyAdminLayout({ children }: { children: React
     <div className="flex h-screen bg-background text-on-surface font-body-md overflow-hidden relative">
       {/* Mobile Sidebar Toggle */}
       <input type="checkbox" id="mobile-sidebar-toggle" className="peer hidden" />
-      
+
       {/* Overlay */}
       <label htmlFor="mobile-sidebar-toggle" className="md:hidden fixed inset-0 bg-black/50 z-30 hidden peer-checked:block"></label>
 
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 transform -translate-x-full peer-checked:translate-x-0 md:relative md:translate-x-0 transition-transform duration-300 w-72 bg-surface-container-lowest border-r border-outline-variant flex flex-col shadow-sm z-40">
-        <Link href="/faculty-admin" className="block p-8 border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
+        <Link href="/" className="block p-8 border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
           <h1 className="font-headline-lg text-2xl text-university-blue font-bold tracking-tighter flex items-center gap-3">
             <span className="material-symbols-outlined text-academic-gold text-3xl">school</span>
             UniEvents
@@ -73,7 +73,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
           </form>
         </div>
       </aside>
-      
+
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-surface scrollbar-hide relative">
         <header className="glass-header sticky top-0 z-10 px-4 md:px-10 py-5 border-b border-outline-variant/30 flex justify-between md:justify-end items-center text-white shadow-sm">
