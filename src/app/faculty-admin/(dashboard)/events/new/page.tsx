@@ -9,6 +9,7 @@ export default function FacultyNewEventPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isFree, setIsFree] = useState(false);
   
   // We need to fetch the admin's faculty and its available spaces
   const [faculty, setFaculty] = useState<{id: string, name: string} | null>(null);
@@ -57,7 +58,8 @@ export default function FacultyNewEventPage() {
     const formData = new FormData(e.currentTarget);
     formData.append("tenantId", faculty.id); // Agregamos la facultad asignada
     let priceVal = formData.get("price") as string;
-    if (!priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
+    
+    if (isFree || !priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
       formData.set("price", "0");
     } else {
       formData.set("price", priceVal.replace(",", "."));
@@ -111,8 +113,14 @@ export default function FacultyNewEventPage() {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-title-sm text-university-blue mb-2">Precio de Entrada</label>
-              <input name="price" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="0 para gratis, o 10.50" defaultValue="0" />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block font-title-sm text-university-blue">Precio de Entrada</label>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" id="isFree" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} className="w-4 h-4 accent-university-blue cursor-pointer" />
+                  <label htmlFor="isFree" className="text-xs font-bold text-university-blue cursor-pointer">Es Gratis</label>
+                </div>
+              </div>
+              <input name="price" type="text" disabled={isFree} value={isFree ? "GRATIS" : undefined} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest disabled:opacity-50 disabled:bg-surface-container" placeholder="0 para gratis, o 10.50" defaultValue="0" />
             </div>
             <div>
               <label className="block font-title-sm text-university-blue mb-2">Capacidad Especial (Opcional)</label>
@@ -149,56 +157,58 @@ export default function FacultyNewEventPage() {
             </div>
           </div>
           
-          <div className="pt-4 border-t border-outline-variant/50">
-            <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil & Encargado</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
-                <select name="managerId" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
-                  <option value="">-- Selecciona un Encargado --</option>
-                  {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
-                </select>
-                <p className="text-xs text-on-surface-variant mt-1">Será responsable de validar los pagos.</p>
+          {!isFree && (
+            <div className="pt-4 border-t border-outline-variant/50">
+              <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil & Encargado</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
+                  <select name="managerId" required={!isFree} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                    <option value="">-- Selecciona un Encargado --</option>
+                    {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
+                  </select>
+                  <p className="text-xs text-on-surface-variant mt-1">Será responsable de validar los pagos.</p>
+                </div>
+                <div>
+                  <label className="block font-title-sm text-university-blue mb-2">Banco</label>
+                  <select name="paymentBank" required={!isFree} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                    <option value="">-- Selecciona Banco --</option>
+                    <option value="0102 - Banco de Venezuela">0102 - Banco de Venezuela</option>
+                    <option value="0104 - Banco Venezolano de Crédito">0104 - Banco Venezolano de Crédito</option>
+                    <option value="0105 - Banco Mercantil">0105 - Banco Mercantil</option>
+                    <option value="0108 - Banco Provincial">0108 - Banco Provincial</option>
+                    <option value="0114 - Bancaribe">0114 - Bancaribe</option>
+                    <option value="0115 - Banco Exterior">0115 - Banco Exterior</option>
+                    <option value="0128 - Banco Caroní">0128 - Banco Caroní</option>
+                    <option value="0134 - Banesco">0134 - Banesco</option>
+                    <option value="0138 - Banco Plaza">0138 - Banco Plaza</option>
+                    <option value="0151 - BFC Banco Fondo Común">0151 - BFC Banco Fondo Común</option>
+                    <option value="0156 - 100% Banco">0156 - 100% Banco</option>
+                    <option value="0157 - Banco del Sur">0157 - Banco del Sur</option>
+                    <option value="0163 - Banco del Tesoro">0163 - Banco del Tesoro</option>
+                    <option value="0168 - Bancrecer">0168 - Bancrecer</option>
+                    <option value="0169 - Mi Banco">0169 - Mi Banco</option>
+                    <option value="0171 - Banco Activo">0171 - Banco Activo</option>
+                    <option value="0172 - Bancamiga">0172 - Bancamiga</option>
+                    <option value="0174 - Banplus">0174 - Banplus</option>
+                    <option value="0175 - Banco Bicentenario">0175 - Banco Bicentenario</option>
+                    <option value="0177 - Banfanb">0177 - Banfanb</option>
+                    <option value="0191 - BNC Nacional de Crédito">0191 - BNC Nacional de Crédito</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block font-title-sm text-university-blue mb-2">Banco</label>
-                <select name="paymentBank" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
-                  <option value="">-- Selecciona Banco --</option>
-                  <option value="0102 - Banco de Venezuela">0102 - Banco de Venezuela</option>
-                  <option value="0104 - Banco Venezolano de Crédito">0104 - Banco Venezolano de Crédito</option>
-                  <option value="0105 - Banco Mercantil">0105 - Banco Mercantil</option>
-                  <option value="0108 - Banco Provincial">0108 - Banco Provincial</option>
-                  <option value="0114 - Bancaribe">0114 - Bancaribe</option>
-                  <option value="0115 - Banco Exterior">0115 - Banco Exterior</option>
-                  <option value="0128 - Banco Caroní">0128 - Banco Caroní</option>
-                  <option value="0134 - Banesco">0134 - Banesco</option>
-                  <option value="0138 - Banco Plaza">0138 - Banco Plaza</option>
-                  <option value="0151 - BFC Banco Fondo Común">0151 - BFC Banco Fondo Común</option>
-                  <option value="0156 - 100% Banco">0156 - 100% Banco</option>
-                  <option value="0157 - Banco del Sur">0157 - Banco del Sur</option>
-                  <option value="0163 - Banco del Tesoro">0163 - Banco del Tesoro</option>
-                  <option value="0168 - Bancrecer">0168 - Bancrecer</option>
-                  <option value="0169 - Mi Banco">0169 - Mi Banco</option>
-                  <option value="0171 - Banco Activo">0171 - Banco Activo</option>
-                  <option value="0172 - Bancamiga">0172 - Bancamiga</option>
-                  <option value="0174 - Banplus">0174 - Banplus</option>
-                  <option value="0175 - Banco Bicentenario">0175 - Banco Bicentenario</option>
-                  <option value="0177 - Banfanb">0177 - Banfanb</option>
-                  <option value="0191 - BNC Nacional de Crédito">0191 - BNC Nacional de Crédito</option>
-                </select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-title-sm text-university-blue mb-2">Teléfono de Pago Móvil</label>
+                  <input name="paymentPhone" required={!isFree} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. 0414-1234567" />
+                </div>
+                <div>
+                  <label className="block font-title-sm text-university-blue mb-2">Cédula / RIF</label>
+                  <input name="paymentId" required={!isFree} type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. V-12345678 o J-123456789" />
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-title-sm text-university-blue mb-2">Teléfono de Pago Móvil</label>
-                <input name="paymentPhone" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. 0414-1234567" />
-              </div>
-              <div>
-                <label className="block font-title-sm text-university-blue mb-2">Cédula / RIF</label>
-                <input name="paymentId" type="text" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="Ej. V-12345678 o J-123456789" />
-              </div>
-            </div>
-          </div>
+          )}
           
           <div>
             <label className="block font-title-sm text-university-blue mb-2">Descripción (Opcional)</label>
