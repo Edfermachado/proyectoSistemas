@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { attendees, events } from "@/db/schema";
-import { eq, asc, and, sql } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export class AttendeesService {
   static async registerAttendee(data: { eventId: string; name: string; email: string; phone: string; status?: "registrado" | "confirmado" | "pago_pendiente", userId?: string, attendeeType?: "estudiante" | "foraneo", paymentReference?: string, paymentScreenshotUrl?: string | null }) {

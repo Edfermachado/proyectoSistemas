@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { scanLogs, attendees, events, users, tenants } from "@/db/schema";
+import { scanLogs, events } from "@/db/schema";
 import { eq, desc, inArray } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";

@@ -181,7 +181,7 @@ async function main() {
     ]).returning();
 
     console.log('Creando usuario root y roles de prueba...');
-    const [superadmin] = await db.insert(schema.users).values({
+    await db.insert(schema.users).values({
       email: 'admin@gmail.com',
       passwordHash: await bcrypt.hash('admin', 10),
       role: 'superadmin',
@@ -189,7 +189,7 @@ async function main() {
       organizerLevel: 'registrado'
     }).returning();
 
-    const [tenantAdmin] = await db.insert(schema.users).values({
+    await db.insert(schema.users).values({
       email: 'decano@gmail.com',
       passwordHash: await bcrypt.hash('decano', 10),
       role: 'tenant_admin',
@@ -197,7 +197,7 @@ async function main() {
       organizerLevel: 'registrado'
     }).returning();
 
-    const [eventManager] = await db.insert(schema.users).values({
+    await db.insert(schema.users).values({
       email: 'gestor@gmail.com',
       passwordHash: await bcrypt.hash('gestor', 10),
       role: 'event_manager',
@@ -205,7 +205,7 @@ async function main() {
       organizerLevel: 'registrado'
     }).returning();
 
-    const [accessControl] = await db.insert(schema.users).values({
+    await db.insert(schema.users).values({
       email: 'portero@gmail.com',
       passwordHash: await bcrypt.hash('portero123', 10),
       role: 'access_control',

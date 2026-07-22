@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { EventsService } from "@/services/events.service";
 import { uploadEventImage } from "@/lib/supabase";
+import { EventCreateSchema } from "@/validations";
 
 export async function GET(request: Request) {
   try {
@@ -41,6 +42,15 @@ export async function POST(request: Request) {
     const capacityStr = formData.get("capacity") as string;
     const capacity = capacityStr ? parseInt(capacityStr) : undefined;
     const visibility = (formData.get("visibility") as "publico" | "privado") || "publico";
+    
+    // Zod Validation
+    const parsedPayload = EventCreateSchema.safeParse({
+      title, description, date, price, tenantId, spaceId
+    });
+    
+    if (!parsedPayload.success) {
+      return NextResponse.json({ error: parsedPayload.error.errors[0].message }, { status: 400 });
+    }
     const requiresIpProtection = formData.get("requiresIpProtection") === "true";
     const image = formData.get("image") as File | null;
     
@@ -111,9 +121,9 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(newEvent, { status: 201 });
-  } catch (error: any) {
-    if (error.message?.includes("CONF_001")) {
-      return NextResponse.json({ error: error.message }, { status: 409 }); // Conflict
+  } catch (error: unknown) {
+    if ((error instanceof Error ? error.message : "Error desconocido")?.includes("CONF_001")) {
+      return NextResponse.json({ error: (error instanceof Error ? error.message : "Error desconocido") }, { status: 409 }); // Conflict
     }
     
     console.error("[POST /api/events]", error);

@@ -62,7 +62,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ notifications });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Notifications fetch error:", error);
     return NextResponse.json({ notifications: [] });
   }

@@ -56,9 +56,9 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       }
       router.push("/admin/events");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setErrorMsg(err.message);
+      setErrorMsg((err instanceof Error ? err.message : "Error desconocido"));
     } finally {
       setLoading(false);
     }

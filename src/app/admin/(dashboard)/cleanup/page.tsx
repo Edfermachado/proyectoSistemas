@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 
 export default function CleanupDatabasePage() {
@@ -33,8 +32,8 @@ export default function CleanupDatabasePage() {
 
       setMessage("Limpieza ejecutada exitosamente.");
       setConfirmText("");
-    } catch (e: any) {
-      setMessage(e.message || "Error desconocido.");
+    } catch (e: unknown) {
+      setMessage((e instanceof Error ? e.message : "Error desconocido") || "Error desconocido.");
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,7 @@ import { createSession, deleteSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
-export async function loginFacultyAdmin(prevState: any, formData: FormData) {
+export async function loginFacultyAdmin(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
 
@@ -38,7 +38,7 @@ export async function logoutFacultyAdmin() {
   redirect("/login");
 }
 
-export async function loginUser(prevState: any, formData: FormData) {
+export async function loginUser(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
 
@@ -64,7 +64,7 @@ export async function loginUser(prevState: any, formData: FormData) {
   redirect("/");
 }
 
-export async function registerUser(prevState: any, formData: FormData) {
+export async function registerUser(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const confirmPassword = formData.get("confirmPassword")?.toString();
@@ -104,7 +104,7 @@ export async function registerUser(prevState: any, formData: FormData) {
   redirect("/");
 }
 
-export async function loginSuperAdmin(prevState: any, formData: FormData) {
+export async function loginSuperAdmin(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
 
@@ -138,7 +138,7 @@ export async function logoutUser() {
   redirect("/login");
 }
 
-export async function unifiedLoginAction(prevState: any, formData: FormData) {
+export async function unifiedLoginAction(prevState: unknown, formData: FormData) {
   const roleType = formData.get("roleType");
   if (roleType === "facultad") {
     return await loginFacultyAdmin(prevState, formData);

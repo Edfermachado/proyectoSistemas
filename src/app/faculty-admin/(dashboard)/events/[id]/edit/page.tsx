@@ -89,9 +89,9 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
       
       router.push("/faculty-admin/events");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      setErrorMsg(error.message);
+      setErrorMsg((error instanceof Error ? error.message : "Error desconocido"));
     } finally {
       setLoading(false);
     }

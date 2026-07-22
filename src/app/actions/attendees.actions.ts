@@ -64,8 +64,8 @@ export async function registerForEvent(formData: FormData) {
     revalidatePath(`/events/[slug]`, "page");
     revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
     return { success: true, ticketToken: newAttendee.ticketToken };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    return { error: (error instanceof Error ? error.message : "Error desconocido") };
   }
 }
 
@@ -77,8 +77,8 @@ export async function confirmPayment(attendeeId: string, eventId: string) {
     await AttendeesService.confirmPayment(attendeeId, session.userId as string);
     revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    return { error: (error instanceof Error ? error.message : "Error desconocido") };
   }
 }
 
@@ -97,7 +97,7 @@ export async function manualRegisterByAdmin(formData: FormData) {
     await AttendeesService.registerAttendee({ eventId, name, email, phone, status, attendeeType });
     revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    return { error: (error instanceof Error ? error.message : "Error desconocido") };
   }
 }

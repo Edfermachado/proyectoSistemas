@@ -37,9 +37,9 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json(managers);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[GET /api/users/managers]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error instanceof Error ? error.message : "Error desconocido") }, { status: 500 });
   }
 }
 
@@ -70,8 +70,8 @@ export async function POST(req: Request) {
     }).returning();
 
     return NextResponse.json(newUser, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[POST /api/users/managers]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error instanceof Error ? error.message : "Error desconocido") }, { status: 500 });
   }
 }

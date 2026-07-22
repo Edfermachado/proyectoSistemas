@@ -7,7 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { findTenantBySlugOrId, findCategoryBySlugOrId } from "@/lib/slug-helpers";
-import { categories as categoriesSchema } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Explorar Eventos — UniEvents",

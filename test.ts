@@ -9,7 +9,7 @@ async function main() {
       orderBy: (users, { desc }) => [desc(users.createdAt)],
     });
     console.log("Success:", result.length);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("RAW ERROR:", err);
   }
   process.exit(0);

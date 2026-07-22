@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { attendees, events } from "@/db/schema";
+import { attendees } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { uploadPaymentScreenshot } from "@/lib/supabase";
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[POST /api/payments]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

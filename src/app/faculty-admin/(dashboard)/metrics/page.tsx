@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { events, spaces, attendees, eventRequests } from "@/db/schema";
+import { events, spaces } from "@/db/schema";
 import { count, eq, sql } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";

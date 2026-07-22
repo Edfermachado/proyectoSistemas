@@ -50,7 +50,7 @@ export default function FacultyEditSpacePage({ params }: { params: Promise<{ id:
       if (!res.ok) throw new Error("Error actualizando el espacio");
       router.push("/faculty-admin/spaces");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setErrorMsg("Ocurrió un error al intentar actualizar el espacio.");
     } finally {

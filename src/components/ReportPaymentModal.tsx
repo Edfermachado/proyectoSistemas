@@ -39,9 +39,9 @@ export function ReportPaymentModal({ attendeeId, eventTitle, paymentBank, paymen
 
       router.refresh();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setErrorMsg(err.message);
+      setErrorMsg((err instanceof Error ? err.message : "Error desconocido"));
     } finally {
       setLoading(false);
     }

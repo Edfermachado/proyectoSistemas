@@ -18,9 +18,9 @@ export function DeleteButton({ endpoint, id }: { endpoint: string; id: string })
         throw new Error(data.error || "Error eliminando registro");
       }
       router.refresh();
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      alert(e.message || "Error eliminando el registro.");
+      alert((e instanceof Error ? e.message : "Error desconocido") || "Error eliminando el registro.");
     } finally {
       setLoading(false);
     }

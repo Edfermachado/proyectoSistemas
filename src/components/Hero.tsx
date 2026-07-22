@@ -2,7 +2,7 @@ import Image from "next/image";
 import HeroCarousel from "./HeroCarousel";
 import { db } from "@/db";
 import { count } from "drizzle-orm";
-import { attendees, events } from "@/db/schema";
+import { attendees } from "@/db/schema";
 
 export default async function Hero() {
   // Get dynamic attendee count

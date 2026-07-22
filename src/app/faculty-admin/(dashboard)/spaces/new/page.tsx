@@ -52,7 +52,7 @@ export default function FacultyNewSpacePage() {
       if (!res.ok) throw new Error("Error creando el espacio");
       router.push("/faculty-admin/spaces");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       setErrorMsg("Ocurrió un error al intentar crear el espacio. Revisa los datos.");
     } finally {

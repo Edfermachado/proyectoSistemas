@@ -16,7 +16,7 @@ export async function uploadPaymentScreenshot(file: File, attendeeId: string): P
     const buffer = Buffer.from(arrayBuffer);
     const fileName = `payment_${attendeeId}_${Date.now()}.webp`;
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .storage
       .from('payments') // Make sure this bucket exists in Supabase
       .upload(fileName, buffer, {
@@ -44,7 +44,7 @@ export async function uploadEventImage(buffer: Buffer, fileName: string): Promis
   }
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .storage
       .from('events') // Make sure this bucket exists in Supabase
       .upload(fileName, buffer, {

@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import Image from "next/image";
 
 export default async function TrendingUniversities() {
   const unis = await db.query.universities.findMany({
@@ -23,7 +24,7 @@ export default async function TrendingUniversities() {
             <div key={i} className="flex flex-col items-center gap-4">
               <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all cursor-pointer overflow-hidden relative">
                 {u.logoUrl ? (
-                  <img src={u.logoUrl} alt={u.name} className="w-full h-full object-cover" />
+                  <Image fill src={u.logoUrl} alt={u.name} className="w-full h-full object-cover" />
                 ) : (
                   <span className="material-symbols-outlined text-4xl text-academic-gold">
                     account_balance

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { confirmPayment } from "@/app/actions/attendees.actions";
 
 import { useRouter } from "next/navigation";
 
@@ -29,8 +28,8 @@ export function ConfirmPaymentButton({ attendeeId, eventId, hasReport }: { atten
       
       if (action === 'approve') setDone(true);
       router.refresh();
-    } catch (err: any) {
-      setErrorMsg(err.message);
+    } catch (err: unknown) {
+      setErrorMsg((err instanceof Error ? err.message : "Error desconocido"));
     } finally {
       setLoading(false);
     }

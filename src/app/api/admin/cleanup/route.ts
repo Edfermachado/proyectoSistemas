@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, message: "Limpieza ejecutada" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Cleanup Error:", error);
     return NextResponse.json({ error: "Error interno al limpiar base de datos" }, { status: 500 });
   }

@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+interface NotificationItem {
+  id: string;
+  link: string;
+  type: 'success' | 'warning' | 'info';
+  title: string;
+  message: string;
+}
+
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasFetchedNotifications, setHasFetchedNotifications] = useState(false);
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -175,7 +183,7 @@ export default function Header() {
                       <p>No tienes notificaciones nuevas.</p>
                     </div>
                   ) : (
-                    notifications.map((notif: any) => (
+                    notifications.map((notif: NotificationItem) => (
                       <Link href={notif.link} key={notif.id} className="block p-4 border-b border-outline-variant/30 hover:bg-surface-container-lowest transition-colors">
                         <div className="flex items-start gap-3">
                           <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${notif.type === 'success' ? 'bg-green-500' : notif.type === 'warning' ? 'bg-academic-gold' : 'bg-university-blue'}`}></div>

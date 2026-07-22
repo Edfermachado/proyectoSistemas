@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 const HeroSection = () => (
   <section className="hero-gradient text-white py-20 px-4" data-purpose="hero-section" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' }}>
@@ -55,7 +56,7 @@ const UniversityCard = ({ name, handle, faculties, tier, logoUrl, gradientClass 
   <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden card-hover" data-purpose="university-card" style={{ transition: 'all 0.3s ease' }}>
     <div className={`h-28 ${gradientClass} relative`}>
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-white rounded-full border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
-        <img alt={`${name} Logo`} className="w-full h-full object-cover" src={logoUrl} />
+        <Image fill alt={`${name} Logo`} className="w-full h-full object-cover" src={logoUrl} />
       </div>
     </div>
     <div className="pt-14 pb-6 px-6 text-center">

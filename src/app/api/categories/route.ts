@@ -9,8 +9,8 @@ export async function GET() {
       orderBy: (categories, { desc }) => [desc(categories.createdAt)],
     });
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error instanceof Error ? error.message : "Error desconocido") }, { status: 500 });
   }
 }
 
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       slug,
     }).returning();
     return NextResponse.json(newCategory);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error instanceof Error ? error.message : "Error desconocido") }, { status: 500 });
   }
 }
