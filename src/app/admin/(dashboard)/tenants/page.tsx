@@ -19,11 +19,13 @@ export default async function TenantsPage({ searchParams }: { searchParams: Prom
           <h1 className="font-headline-lg text-university-blue mb-2 text-3xl">Gestión de Facultades</h1>
           <p className="text-on-surface-variant text-body-md">Administra las organizaciones y departamentos universitarios.</p>
         </div>
-        <Link href="/admin/tenants/new">
-          <Button variant="primary" icon="add">
-            Nueva Facultad
-          </Button>
-        </Link>
+        {tenants.length > 0 && (
+          <Link href="/admin/tenants/new">
+            <Button variant="primary" icon="add">
+              Nueva Facultad
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -38,7 +40,9 @@ export default async function TenantsPage({ searchParams }: { searchParams: Prom
             <p className="text-on-surface-variant text-label-md max-w-sm mb-6">
               Comienza agregando la primera facultad para habilitar la creación de espacios y eventos.
             </p>
-            <Button variant="secondary" icon="add">Agregar Facultad</Button>
+            <Link href="/admin/tenants/new">
+              <Button variant="primary" icon="add">Agregar Facultad</Button>
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">

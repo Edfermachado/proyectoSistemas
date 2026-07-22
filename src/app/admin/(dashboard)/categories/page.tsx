@@ -15,11 +15,13 @@ export default async function CategoriesPage() {
           <h1 className="font-headline-lg text-university-blue mb-2 text-3xl">Gestión de Categorías</h1>
           <p className="text-on-surface-variant text-body-md">Administra las categorías para agrupar facultades.</p>
         </div>
-        <Link href="/admin/categories/new">
-          <Button variant="primary" icon="add">
-            Nueva Categoría
-          </Button>
-        </Link>
+        {categories.length > 0 && (
+          <Link href="/admin/categories/new">
+            <Button variant="primary" icon="add">
+              Nueva Categoría
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -33,7 +35,7 @@ export default async function CategoriesPage() {
               Crea categorías como "Ingeniería", "Medicina" o "Artes" para agrupar mejor a las facultades.
             </p>
             <Link href="/admin/categories/new">
-              <Button variant="secondary" icon="add">Crear Categoría</Button>
+              <Button variant="primary" icon="add">Crear Categoría</Button>
             </Link>
           </div>
         ) : (

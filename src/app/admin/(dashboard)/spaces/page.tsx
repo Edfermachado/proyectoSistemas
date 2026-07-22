@@ -25,11 +25,13 @@ export default async function SpacesPage({ searchParams }: { searchParams: Promi
           <h1 className="font-headline-lg text-university-blue mb-2 text-3xl">Infraestructura y Espacios</h1>
           <p className="text-on-surface-variant text-body-md">Gestión de auditorios, laboratorios y recintos deportivos.</p>
         </div>
-        <Link href="/admin/spaces/new">
-          <Button variant="primary" icon="location_city">
-            Nuevo Espacio
-          </Button>
-        </Link>
+        {spaces.length > 0 && (
+          <Link href="/admin/spaces/new">
+            <Button variant="primary" icon="location_city">
+              Nuevo Espacio
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -44,6 +46,11 @@ export default async function SpacesPage({ searchParams }: { searchParams: Promi
             <p className="text-on-surface-variant text-label-md max-w-sm">
               Aquí se mostrarán las infraestructuras disponibles para los eventos.
             </p>
+            <div className="mt-6">
+              <Link href="/admin/spaces/new">
+                <Button variant="primary" icon="location_city">Agregar Espacio</Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">

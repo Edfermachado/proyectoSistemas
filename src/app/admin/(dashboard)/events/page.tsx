@@ -26,11 +26,13 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
           <h1 className="font-headline-lg text-university-blue mb-2 text-3xl">Auditoría de Eventos</h1>
           <p className="text-on-surface-variant text-body-md">Supervisión y control de todas las actividades programadas.</p>
         </div>
-        <Link href="/admin/events/new">
-          <Button variant="primary" icon="event">
-            Programar Evento
-          </Button>
-        </Link>
+        {events.length > 0 && (
+          <Link href="/admin/events/new">
+            <Button variant="primary" icon="event">
+              Programar Evento
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -45,6 +47,11 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
             <p className="text-on-surface-variant text-label-md max-w-sm">
               Aún no se han programado eventos en ninguna facultad.
             </p>
+            <div className="mt-6">
+              <Link href="/admin/events/new">
+                <Button variant="primary" icon="event">Programar Evento</Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">

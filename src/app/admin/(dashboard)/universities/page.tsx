@@ -21,11 +21,13 @@ export default async function UniversitiesPage({ searchParams }: { searchParams:
           <h1 className="font-headline-lg text-university-blue mb-2 text-3xl">Gestión de Universidades</h1>
           <p className="text-on-surface-variant text-body-md">Administra las instituciones principales (Multi-Universidad).</p>
         </div>
-        <Link href="/admin/universities/new">
-          <Button variant="primary" icon="account_balance">
-            Nueva Universidad
-          </Button>
-        </Link>
+        {universitiesList.length > 0 && (
+          <Link href="/admin/universities/new">
+            <Button variant="primary" icon="account_balance">
+              Nueva Universidad
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
@@ -40,6 +42,11 @@ export default async function UniversitiesPage({ searchParams }: { searchParams:
             <p className="text-on-surface-variant text-label-md max-w-sm">
               Agrega una universidad central para poder asignarle facultades.
             </p>
+            <div className="mt-6">
+              <Link href="/admin/universities/new">
+                <Button variant="primary" icon="account_balance">Agregar Universidad</Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
