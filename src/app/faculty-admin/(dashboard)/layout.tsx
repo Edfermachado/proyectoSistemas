@@ -48,6 +48,9 @@ export default async function FacultyAdminLayout({ children }: { children: React
                   <NavLink href="/faculty-admin/managers" icon="manage_accounts">
                     Gestores de Eventos
                   </NavLink>
+                  <NavLink href="/faculty-admin/spaces" icon="location_city">
+                    Espacios
+                  </NavLink>
                   <NavLink href="/faculty-admin/audit" icon="history_toggle_off">
                     Auditoría de QRs
                   </NavLink>
