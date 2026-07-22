@@ -81,7 +81,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-primary-container max-w-container-max mx-auto px-margin-desktop py-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-surface-variant text-label-sm opacity-80">
-          © 2024 UniEvents Ticketing. Todos los derechos reservados.
+          © {new Date().getFullYear()} UniEvents Ticketing. Todos los derechos reservados.
         </p>
       </div>
     </footer>

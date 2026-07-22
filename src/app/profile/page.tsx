@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { attendees } from "@/db/schema";
+import { attendees, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logoutUser } from "@/app/actions/auth";
 import TicketQR from "@/components/TicketQR";
@@ -48,6 +48,12 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const email = session.email as string;
   const userName = email.split("@")[0];
   const avatarLetter = userName.charAt(0).toUpperCase();
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, session.userId as string),
+    columns: { createdAt: true }
+  });
+  const memberSince = user?.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear();
 
   const registeredEvents = userRegistrations.map((reg) => {
     const ev = reg.event;
@@ -127,7 +133,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
                </div>
                <div className="bg-surface-container-low p-4 rounded-2xl">
                  <p className="text-label-sm text-outline uppercase tracking-wider mb-1">Miembro Desde</p>
-                 <p className="font-title-lg text-on-surface">2026</p>
+                 <p className="font-title-lg text-on-surface">{memberSince}</p>
                </div>
              </div>
            </div>

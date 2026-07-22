@@ -9,7 +9,7 @@ export default function CleanupDatabasePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmText, setConfirmText] = useState("");
-  const [targetType, setTargetType] = useState<"all" | "events" | "attendees">("all");
+  const [targetType, setTargetType] = useState<"all" | "events" | "attendees" | "seed">("all");
 
   const handleCleanup = async () => {
     if (confirmText !== "LIMPIAR") {
@@ -72,7 +72,8 @@ export default function CleanupDatabasePage() {
             >
               <option value="attendees">Solo Asistentes y Logs (Mantener Eventos)</option>
               <option value="events">Eventos, Asistentes y Solicitudes</option>
-              <option value="all">Limpieza Total (Borra TODO, excepto Universidades y Facultades principales)</option>
+              <option value="all">Limpieza Parcial (Borra todo, excepto Universidades, Categorías y Facultades)</option>
+              <option value="seed">Limpieza Total / Seed (Borra TODO en la BD excepto superadmin)</option>
             </select>
           </div>
 
