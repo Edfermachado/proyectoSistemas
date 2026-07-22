@@ -69,7 +69,7 @@ export default async function FacultyAdminLayout({ children }: { children: React
         </nav>
         <div className="p-6 border-t border-outline-variant/50 bg-surface-container-low">
           <form action={logoutFacultyAdmin}>
-            <button type="submit" className="flex items-center justify-center gap-3 px-4 py-3 w-full text-error bg-error-container hover:bg-error/90 hover:text-white rounded-xl transition-colors font-bold shadow-sm border border-error/20">
+            <button type="submit" className="flex items-center justify-center gap-3 px-4 py-3 w-full text-error bg-error-container hover:bg-error/90 hover:text-white rounded-xl transition-colors font-bold shadow-sm border border-error/20 cursor-pointer">
               <span className="material-symbols-outlined">logout</span>
               Cerrar Sesión
             </button>
