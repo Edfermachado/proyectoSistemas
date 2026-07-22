@@ -21,7 +21,6 @@ export default function NewEventPage() {
 
   useEffect(() => {
     if (!selectedTenant) {
-      setSpaces([]);
       return;
     }
     fetch(`/api/spaces?tenantId=${selectedTenant}`)
@@ -79,9 +78,13 @@ export default function NewEventPage() {
       
       router.push("/admin/events");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      setErrorMsg(error.message);
+      if (error instanceof Error) {
+        setErrorMsg(error.message);
+      } else {
+        setErrorMsg("Error desconocido");
+      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +119,11 @@ export default function NewEventPage() {
                 name="tenantId" 
                 required 
                 value={selectedTenant}
-                onChange={e => setSelectedTenant(e.target.value)}
+                onChange={e => {
+                  setSelectedTenant(e.target.value);
+                  setSpaces([]);
+                  setManagers([]);
+                }}
                 className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest"
               >
                 <option value="">-- Seleccionar --</option>

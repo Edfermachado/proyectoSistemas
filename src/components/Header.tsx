@@ -13,6 +13,13 @@ export default function Header() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasFetchedNotifications, setHasFetchedNotifications] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+    setShowNotifications(false);
+  }
 
   // Form search submission handler
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -32,10 +39,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-    setShowNotifications(false);
-  }, [pathname]);
+
 
   const toggleNotifications = async () => {
     const newState = !showNotifications;

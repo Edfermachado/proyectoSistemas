@@ -57,7 +57,7 @@ export default function FacultyNewEventPage() {
     
     const formData = new FormData(e.currentTarget);
     formData.append("tenantId", faculty.id); // Agregamos la facultad asignada
-    let priceVal = formData.get("price") as string;
+    const priceVal = formData.get("price") as string;
     
     // Validaciones extra
     const duration = parseInt(formData.get("duration") as string, 10);

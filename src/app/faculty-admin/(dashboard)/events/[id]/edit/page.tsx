@@ -67,7 +67,7 @@ export default function FacultyEditEventPage({ params }: { params: Promise<{ id:
     
     const formData = new FormData(e.currentTarget);
     formData.append("tenantId", faculty.id);
-    let priceVal = formData.get("price") as string;
+    const priceVal = formData.get("price") as string;
     if (!priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
       formData.set("price", "0");
     } else {
