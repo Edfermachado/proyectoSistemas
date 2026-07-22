@@ -20,6 +20,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    
+    if (body.role === "tenant_admin") {
+      if (!body.name || !body.lastName || !body.documentId || !body.phone) {
+        return NextResponse.json({ error: "Personal information (name, lastName, documentId, phone) is required for tenant administrators." }, { status: 400 });
+      }
+    }
+    
     const newUser = await UsersService.createUser(body);
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {

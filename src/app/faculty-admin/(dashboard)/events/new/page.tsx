@@ -178,24 +178,25 @@ export default function FacultyNewEventPage() {
               </select>
             </div>
             <div>
-              <label className="block font-title-sm text-university-blue mb-2">Foto / Banner (Opcional)</label>
-              <input name="image" type="file" accept="image/jpeg, image/png, image/webp" className="w-full px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-university-blue file:text-white hover:file:bg-innovation-purple cursor-pointer text-sm" />
-              <p className="text-xs text-on-surface-variant mt-1">Máximo 5MB (JPG, PNG, WEBP)</p>
+              <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
+              <select name="managerId" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+                <option value="">-- Selecciona un Encargado --</option>
+                {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block font-title-sm text-university-blue mb-2">Foto / Banner (Opcional)</label>
+            <input name="image" type="file" accept="image/jpeg, image/png, image/webp" className="w-full px-4 py-2 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-university-blue file:text-white hover:file:bg-innovation-purple cursor-pointer text-sm" />
+            <p className="text-xs text-on-surface-variant mt-1">Máximo 5MB (JPG, PNG, WEBP)</p>
           </div>
           
           {!isFree && (
             <div className="pt-4 border-t border-outline-variant/50">
-              <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil & Encargado</h3>
+              <h3 className="font-title-lg text-university-blue mb-4">Datos de Pago Móvil</h3>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
-                  <select name="managerId" required={!isFree} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
-                    <option value="">-- Selecciona un Encargado --</option>
-                    {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
-                  </select>
-                  <p className="text-xs text-on-surface-variant mt-1">Será responsable de validar los pagos.</p>
-                </div>
                 <div>
                   <label className="block font-title-sm text-university-blue mb-2">Banco</label>
                   <select name="paymentBank" required={!isFree} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">

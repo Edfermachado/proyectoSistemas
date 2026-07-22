@@ -12,6 +12,7 @@ export default function NewEventPage() {
   
   const [tenants, setTenants] = useState<{id: string, name: string}[]>([]);
   const [spaces, setSpaces] = useState<{id: string, name: string, tenantId: string}[]>([]);
+  const [managers, setManagers] = useState<{id: string, email: string}[]>([]);
   const [selectedTenant, setSelectedTenant] = useState("");
 
   useEffect(() => {
@@ -31,6 +32,14 @@ export default function NewEventPage() {
         else setSpaces([]);
       })
       .catch(() => setSpaces([]));
+
+    fetch(`/api/users/managers?role=event_manager&tenantId=${selectedTenant}`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setManagers(data);
+        else setManagers([]);
+      })
+      .catch(() => setManagers([]));
   }, [selectedTenant]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -119,6 +128,13 @@ export default function NewEventPage() {
               <select name="spaceId" required disabled={!selectedTenant || spaces.length === 0} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest disabled:opacity-50">
                 <option value="">{spaces.length === 0 && selectedTenant ? "-- Sin Espacios --" : "-- Seleccionar --"}</option>
                 {spaces.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-title-sm text-university-blue mb-2">Encargado del Evento</label>
+              <select name="managerId" required disabled={!selectedTenant || managers.length === 0} className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest disabled:opacity-50">
+                <option value="">{managers.length === 0 && selectedTenant ? "-- Sin Gestores --" : "-- Seleccionar --"}</option>
+                {managers.map(m => <option key={m.id} value={m.id}>{m.email}</option>)}
               </select>
             </div>
           </div>

@@ -49,6 +49,10 @@ export async function POST(request: Request) {
     const paymentId = formData.get("paymentId") as string;
     const paymentBank = formData.get("paymentBank") as string;
     const managerId = formData.get("managerId") as string;
+    
+    if (!managerId) {
+      return NextResponse.json({ error: "El Encargado del Evento es obligatorio." }, { status: 400 });
+    }
 
     let imageUrl = null;
 
