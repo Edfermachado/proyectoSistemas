@@ -5,7 +5,7 @@ export const EventCreateSchema = z.object({
   title: z.string().min(3, "El título es muy corto"),
   slug: z.string().min(2, "Slug inválido").optional(),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  date: z.coerce.date({ invalid_type_error: "Fecha inválida" }),
+  date: z.coerce.date({ message: "Fecha inválida" }),
   price: z.string().min(1, "El precio es obligatorio"),
   tenantId: z.string().uuid("Facultad inválida"),
   spaceId: z.string().uuid("Espacio inválido"),

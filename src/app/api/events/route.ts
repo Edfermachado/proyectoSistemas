@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     });
     
     if (!parsedPayload.success) {
-      return NextResponse.json({ error: parsedPayload.error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ error: parsedPayload.error.issues[0].message }, { status: 400 });
     }
     const requiresIpProtection = formData.get("requiresIpProtection") === "true";
     const image = formData.get("image") as File | null;
