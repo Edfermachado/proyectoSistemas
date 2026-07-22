@@ -41,6 +41,22 @@ export default function NewEventPage() {
     const formData = new FormData(e.currentTarget);
     if (!formData.get("price")) formData.set("price", "FREE");
 
+    // Validaciones extra
+    const duration = parseInt(formData.get("duration") as string, 10);
+    if (isNaN(duration) || duration <= 0 || duration > 1440) {
+      setErrorMsg("La duración del evento debe estar entre 1 minuto y 24 horas.");
+      setLoading(false);
+      return;
+    }
+
+    const date = new Date(formData.get("date") as string);
+    const now = new Date();
+    if (date.getTime() < now.getTime() - 10 * 60000) {
+      setErrorMsg("La fecha de inicio del evento no puede ser en el pasado.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/events", {
         method: "POST",

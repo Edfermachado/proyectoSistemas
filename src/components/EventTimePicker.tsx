@@ -11,6 +11,13 @@ export function EventTimePicker({
   const [date, setDate] = useState(initialDate);
   const [hours, setHours] = useState(Math.floor(initialDuration / 60));
   const [minutes, setMinutes] = useState(initialDuration % 60);
+  const [minDate, setMinDate] = useState("");
+
+  useEffect(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    setMinDate(now.toISOString().slice(0, 16));
+  }, []);
 
   const durationInMinutes = (hours * 60) + minutes;
 
@@ -35,6 +42,7 @@ export function EventTimePicker({
             name="date" 
             required 
             type="datetime-local" 
+            min={minDate}
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" 
@@ -46,9 +54,10 @@ export function EventTimePicker({
             <div className="flex-1 flex items-center bg-surface-container-lowest border border-outline-variant rounded-xl px-2 focus-within:ring-2 focus-within:ring-academic-gold">
               <input 
                 type="number" 
-                min="0" 
+                min="0"
+                max="24"
                 value={hours}
-                onChange={(e) => setHours(parseInt(e.target.value) || 0)}
+                onChange={(e) => setHours(Math.min(24, Math.max(0, parseInt(e.target.value) || 0)))}
                 className="w-full py-3 bg-transparent text-center focus:outline-none" 
               />
               <span className="text-on-surface-variant text-sm pr-2">hrs</span>
@@ -59,7 +68,7 @@ export function EventTimePicker({
                 min="0" 
                 max="59"
                 value={minutes}
-                onChange={(e) => setMinutes(parseInt(e.target.value) || 0)}
+                onChange={(e) => setMinutes(Math.min(59, Math.max(0, parseInt(e.target.value) || 0)))}
                 className="w-full py-3 bg-transparent text-center focus:outline-none" 
               />
               <span className="text-on-surface-variant text-sm pr-2">min</span>

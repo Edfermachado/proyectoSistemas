@@ -59,6 +59,33 @@ export default function FacultyNewEventPage() {
     formData.append("tenantId", faculty.id); // Agregamos la facultad asignada
     let priceVal = formData.get("price") as string;
     
+    // Validaciones extra
+    const duration = parseInt(formData.get("duration") as string, 10);
+    if (isNaN(duration) || duration <= 0 || duration > 1440) {
+      setErrorMsg("La duración del evento debe estar entre 1 minuto y 24 horas.");
+      setLoading(false);
+      return;
+    }
+
+    const date = new Date(formData.get("date") as string);
+    const now = new Date();
+    // Allow up to 10 minutes in the past just to account for slow typing, but not significantly in the past
+    if (date.getTime() < now.getTime() - 10 * 60000) {
+      setErrorMsg("La fecha de inicio del evento no puede ser en el pasado.");
+      setLoading(false);
+      return;
+    }
+
+    const capacityStr = formData.get("capacity") as string;
+    if (capacityStr) {
+      const capacity = parseInt(capacityStr, 10);
+      if (isNaN(capacity) || capacity <= 0 || capacity > 100000) {
+        setErrorMsg("La capacidad debe ser un número válido mayor a 0.");
+        setLoading(false);
+        return;
+      }
+    }
+
     if (isFree || !priceVal || priceVal.toUpperCase() === "FREE" || priceVal.toUpperCase() === "GRATIS") {
       formData.set("price", "0");
     } else {
