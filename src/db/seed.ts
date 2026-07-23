@@ -79,19 +79,19 @@ async function main() {
     const [space1] = await db.insert(schema.spaces).values({
       name: 'Auditorio Principal Tech',
       capacity: 500,
-      tenantId: tenant1.id,
+      universityId: uni1.id,
     }).returning();
     
     const [space2] = await db.insert(schema.spaces).values({
       name: 'Laboratorio de IA y Robótica',
       capacity: 50,
-      tenantId: tenant2.id,
+      universityId: uni1.id,
     }).returning();
     
     const [space3] = await db.insert(schema.spaces).values({
       name: 'Galería de Arte Central',
       capacity: 200,
-      tenantId: tenant3.id,
+      universityId: uni2.id,
     }).returning();
 
     console.log('Creando eventos...');

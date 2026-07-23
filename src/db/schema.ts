@@ -53,7 +53,7 @@ export const spaces = pgTable('spaces', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
   capacity: integer('capacity').notNull(),
-  tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
+  universityId: uuid('university_id').references(() => universities.id).notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -131,6 +131,7 @@ export const scanLogs = pgTable('scan_logs', {
 // Configuración de Relaciones (Drizzle Relations)
 export const universitiesRelations = relations(universities, ({ many }) => ({
   tenants: many(tenants),
+  spaces: many(spaces),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -147,7 +148,6 @@ export const tenantsRelations = relations(tenants, ({ one, many }) => ({
     references: [categories.id],
   }),
   users: many(users),
-  spaces: many(spaces),
   events: many(events),
 }));
 
@@ -162,9 +162,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 }));
 
 export const spacesRelations = relations(spaces, ({ one, many }) => ({
-  tenant: one(tenants, {
-    fields: [spaces.tenantId],
-    references: [tenants.id],
+  university: one(universities, {
+    fields: [spaces.universityId],
+    references: [universities.id],
   }),
   events: many(events),
 }));

@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/Button";
 export default function NewSpacePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [tenants, setTenants] = useState<{id: string, name: string}[]>([]);
+  const [universities, setUniversities] = useState<{id: string, name: string}[]>([]);
 
   useEffect(() => {
-    fetch('/api/tenants').then(r => r.json()).then(setTenants);
+    fetch('/api/universities').then(r => r.json()).then(setUniversities);
   }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -21,7 +21,7 @@ export default function NewSpacePage() {
     const data = {
       name: formData.get("name"),
       capacity: parseInt(formData.get("capacity") as string, 10),
-      tenantId: formData.get("tenantId"),
+      universityId: formData.get("universityId"),
     };
 
     try {
@@ -59,10 +59,10 @@ export default function NewSpacePage() {
             <input name="capacity" required type="number" min="1" className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest" placeholder="100" />
           </div>
           <div>
-            <label className="block font-title-sm text-university-blue mb-2">Facultad Perteneciente</label>
-            <select name="tenantId" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
-              <option value="">-- Selecciona una Facultad --</option>
-              {tenants.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+            <label className="block font-title-sm text-university-blue mb-2">Universidad</label>
+            <select name="universityId" required className="w-full px-4 py-3 border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-academic-gold bg-surface-container-lowest">
+              <option value="">-- Selecciona una Universidad --</option>
+              {universities.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
           </div>
           <div className="flex justify-end gap-4 pt-4 border-t border-outline-variant/50">

@@ -2,10 +2,26 @@ import { db } from "@/db";
 import { spaces } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+import { tenants } from "@/db/schema";
+
 export class SpacesService {
   static async getSpacesByTenant(tenantId: string) {
+    const tenant = await db.query.tenants.findFirst({
+      where: eq(tenants.id, tenantId),
+      columns: { universityId: true }
+    });
+
+    if (!tenant?.universityId) return [];
+
     return await db.query.spaces.findMany({
-      where: eq(spaces.tenantId, tenantId),
+      where: eq(spaces.universityId, tenant.universityId),
+      orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
+    });
+  }
+
+  static async getSpacesByUniversity(universityId: string) {
+    return await db.query.spaces.findMany({
+      where: eq(spaces.universityId, universityId),
       orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
     });
   }
@@ -16,7 +32,7 @@ export class SpacesService {
     });
   }
 
-  static async createSpace(data: { name: string; capacity: number; tenantId: string }) {
+  static async createSpace(data: { name: string; capacity: number; universityId: string }) {
     const [newSpace] = await db.insert(spaces).values(data).returning();
     return newSpace;
   }
