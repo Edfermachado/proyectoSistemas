@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { events, spaces } from "@/db/schema";
 import { count, eq, sql } from "drizzle-orm";
+import { tenants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -11,7 +12,16 @@ export default async function FacultyMetricsPage() {
   const facultyId = session.tenantId as string;
 
   const [totalEvents] = await db.select({ value: count() }).from(events).where(eq(events.tenantId, facultyId));
-  const [totalSpaces] = await db.select({ value: count() }).from(spaces).where(eq(spaces.tenantId, facultyId));
+  
+  const faculty = await db.query.tenants.findFirst({
+    where: eq(tenants.id, facultyId),
+    columns: { universityId: true }
+  });
+  
+  const totalSpacesResult = faculty?.universityId 
+    ? await db.select({ value: count() }).from(spaces).where(eq(spaces.universityId, faculty.universityId))
+    : [{ value: 0 }];
+  const totalSpaces = totalSpacesResult[0] || { value: 0 };
   
   const attendeesResult = await db.execute(sql`
     SELECT 

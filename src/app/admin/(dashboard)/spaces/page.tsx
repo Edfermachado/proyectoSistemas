@@ -7,14 +7,14 @@ import { SearchBar } from "@/components/ui/SearchBar";
 export default async function SpacesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q?.toLowerCase();
   let spaces = await db.query.spaces.findMany({
-    with: { tenant: true },
+    with: { university: true },
     orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
   });
 
   if (q) {
     spaces = spaces.filter(s => 
       s.name.toLowerCase().includes(q) || 
-      (s.tenant?.name || "").toLowerCase().includes(q)
+      (s.university?.name || "").toLowerCase().includes(q)
     );
   }
 
@@ -35,7 +35,7 @@ export default async function SpacesPage({ searchParams }: { searchParams: Promi
       </div>
 
       <div className="bg-surface-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden">
-        <SearchBar placeholder="Buscar por nombre o facultad..." />
+        <SearchBar placeholder="Buscar por nombre o universidad..." />
         
         {spaces.length === 0 ? (
           <div className="p-12 flex flex-col items-center justify-center text-center">
@@ -59,7 +59,7 @@ export default async function SpacesPage({ searchParams }: { searchParams: Promi
                 <tr className="bg-surface-container-lowest border-b border-outline-variant/50">
                   <th className="px-6 py-4 font-title-sm text-university-blue">Nombre del Espacio</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Capacidad</th>
-                  <th className="px-6 py-4 font-title-sm text-university-blue">Facultad</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Universidad</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
               </thead>
@@ -68,7 +68,7 @@ export default async function SpacesPage({ searchParams }: { searchParams: Promi
                   <tr key={s.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-university-blue">{s.name}</td>
                     <td className="px-6 py-4 text-on-surface-variant">{s.capacity} pers.</td>
-                    <td className="px-6 py-4 text-on-surface-variant">{s.tenant?.name || "-"}</td>
+                    <td className="px-6 py-4 text-on-surface-variant">{s.university?.name || "-"}</td>
                     <td className="px-6 py-4 text-right">
                       <Link href={`/admin/spaces/${s.id}/edit`} className="text-university-blue hover:text-innovation-purple p-2 transition-colors">
                         <span className="material-symbols-outlined text-sm">edit</span>

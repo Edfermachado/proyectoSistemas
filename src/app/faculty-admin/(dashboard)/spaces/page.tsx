@@ -20,8 +20,8 @@ export default async function FacultySpacesPage({ searchParams }: { searchParams
 
   const q = (await searchParams).q?.toLowerCase();
   
-  let spacesList = faculty ? await db.query.spaces.findMany({
-    where: eq(spacesSchema.tenantId, faculty.id),
+  let spacesList = faculty?.universityId ? await db.query.spaces.findMany({
+    where: eq(spacesSchema.universityId, faculty.universityId),
     orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
   }) : [];
 
