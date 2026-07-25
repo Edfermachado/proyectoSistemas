@@ -56,6 +56,11 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   });
   const memberSince = user?.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear();
 
+  const attendedRegistrations = userRegistrations.filter(
+    (reg) => reg.status === "confirmado" || reg.scannedAt !== null
+  );
+  const totalPoints = attendedRegistrations.length * 10;
+
   const registeredEvents = userRegistrations.map((reg) => {
     const ev = reg.event;
     const dateObj = new Date(ev.date);
@@ -263,14 +268,14 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
                       <p className="text-on-surface-variant text-sm">Nivel Bronce</p>
                     </div>
                   </div>
-                  <span className="font-display-lg text-headline-md text-university-blue">{userRegistrations.length * 10}</span>
+                  <span className="font-display-lg text-headline-md text-university-blue">{totalPoints}</span>
                 </div>
               </div>
 
               <div className="mt-8 p-4 bg-gradient-to-r from-innovation-purple/10 to-university-blue/10 rounded-2xl border border-innovation-purple/20">
                 <p className="text-sm text-on-surface-variant mb-2">¡Sigue participando para alcanzar el <strong className="text-innovation-purple">Nivel Plata</strong>!</p>
                 <div className="w-full bg-surface-variant rounded-full h-2">
-                  <div className="bg-innovation-purple h-2 rounded-full" style={{ width: `${Math.min((userRegistrations.length * 10) / 100 * 100, 100)}%` }}></div>
+                  <div className="bg-innovation-purple h-2 rounded-full" style={{ width: `${Math.min((totalPoints / 100) * 100, 100)}%` }}></div>
                 </div>
               </div>
             </div>

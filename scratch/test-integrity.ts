@@ -123,12 +123,16 @@ async function runIntegrityTests() {
       console.log(`   [${idx + 1}] Acción: ${l.action} (${l.previousStatus} -> ${l.newStatus}) | Motivo: ${l.reason}`);
     });
 
-    // Limpieza de prueba (o Soft Delete de evento)
-    console.log("\n🧹 5. Probando Soft Delete de evento...");
-    const deleted = await EventsService.deleteEvent(validEvent.id);
-    console.log(`✅ Evento archivado con Soft Delete -> isArchived: ${deleted.isArchived}, deletedAt: ${deleted.deletedAt}`);
+    // Limpieza de prueba (o Soft Delete de evento y espacio)
+    console.log("\n🧹 5. Probando Soft Delete de evento y espacio...");
+    const deletedEvent = await EventsService.deleteEvent(validEvent.id);
+    console.log(`✅ Evento archivado con Soft Delete -> isArchived: ${deletedEvent.isArchived}, deletedAt: ${deletedEvent.deletedAt}`);
 
-    console.log("\n✨ ¡TODAS LAS PRUEBAS DE INTEGRIDAD FUERON EXITOSAS! ✨");
+    const { SpacesService } = await import("@/services/spaces.service");
+    const deletedSpace = await SpacesService.deleteSpace(space.id);
+    console.log(`✅ Espacio archivado con Soft Delete -> isArchived: ${deletedSpace.isArchived}, deletedAt: ${deletedSpace.deletedAt}`);
+
+    console.log("\n✨ ¡TODAS LAS PRUEBAS DE INTEGRIDAD Y AUDITORÍA FUERON EXITOSAS! ✨");
     process.exit(0);
   } catch (error) {
     console.error("\n❌ Error en ejecución de pruebas:", error);

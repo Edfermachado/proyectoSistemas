@@ -1,8 +1,6 @@
 import { db } from "@/db";
-import { spaces } from "@/db/schema";
-import { eq } from "drizzle-orm";
-
-import { tenants } from "@/db/schema";
+import { spaces, tenants } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export class SpacesService {
   static async getSpacesByTenant(tenantId: string) {
@@ -14,14 +12,14 @@ export class SpacesService {
     if (!tenant?.universityId) return [];
 
     return await db.query.spaces.findMany({
-      where: eq(spaces.universityId, tenant.universityId),
+      where: and(eq(spaces.universityId, tenant.universityId), eq(spaces.isArchived, false)),
       orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
     });
   }
 
   static async getSpacesByUniversity(universityId: string) {
     return await db.query.spaces.findMany({
-      where: eq(spaces.universityId, universityId),
+      where: and(eq(spaces.universityId, universityId), eq(spaces.isArchived, false)),
       orderBy: (spaces, { desc }) => [desc(spaces.createdAt)],
     });
   }
@@ -46,9 +44,11 @@ export class SpacesService {
   }
 
   static async deleteSpace(id: string) {
-    const [deletedSpace] = await db.delete(spaces)
+    const [deletedSpace] = await db.update(spaces)
+      .set({ isArchived: true, deletedAt: new Date() })
       .where(eq(spaces.id, id))
       .returning();
     return deletedSpace;
   }
 }
+

@@ -30,6 +30,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Entrada no encontrada (404)' }, { status: 404 });
     }
 
+    // Multi-tenant check: Non-superadmins can only scan tickets for their assigned tenant/faculty
+    if (session.role !== 'superadmin' && session.tenantId && registration.event?.tenantId !== session.tenantId) {
+      return NextResponse.json({ error: 'No tienes permiso para escanear entradas de otra facultad (403)' }, { status: 403 });
+    }
+
+    // Check if event is archived/deleted
+    if (registration.event?.isArchived) {
+      return NextResponse.json({ error: 'El evento ha sido archivado o cancelado' }, { status: 400 });
+    }
+
+    // Check if attendee payment/registration status is confirmed
+    if (registration.status !== 'confirmado') {
+      return NextResponse.json({ 
+        error: 'Entrada no confirmada (El pago no ha sido verificado por la facultad)', 
+        status: registration.status 
+      }, { status: 400 });
+    }
+
     if (registration.scannedAt) {
       return NextResponse.json({ 
         error: 'Entrada ya utilizada (409)', 
@@ -64,3 +82,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
+

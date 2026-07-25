@@ -85,7 +85,10 @@ export async function registerForEvent(formData: FormData) {
 export async function confirmPayment(attendeeId: string, eventId: string) {
   try {
     const session = await getSession();
-    if (!session || !session.userId) throw new Error("Unauthorized");
+    const allowedRoles = ["superadmin", "tenant_admin", "event_manager"];
+    if (!session || !session.userId || !allowedRoles.includes(session.role as string)) {
+      throw new Error("No tienes permisos administrativos para confirmar pagos.");
+    }
 
     await AttendeesService.confirmPayment(attendeeId, session.userId as string);
     revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
@@ -107,6 +110,12 @@ export async function manualRegisterByAdmin(formData: FormData) {
   const status = statusRaw || "confirmado";
 
   try {
+    const session = await getSession();
+    const allowedRoles = ["superadmin", "tenant_admin", "event_manager"];
+    if (!session || !allowedRoles.includes(session.role as string)) {
+      throw new Error("No tienes permisos administrativos para registrar asistentes manualmente.");
+    }
+
     await AttendeesService.registerAttendee({ eventId, name, email, phone, status, attendeeType });
     revalidatePath(`/faculty-admin/events/${eventId}/attendees`);
     return { success: true };
@@ -114,3 +123,4 @@ export async function manualRegisterByAdmin(formData: FormData) {
     return { error: (error instanceof Error ? error.message : "Error desconocido") };
   }
 }
+
