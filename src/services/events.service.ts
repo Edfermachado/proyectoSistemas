@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { events } from "@/db/schema";
+import { events, spaces } from "@/db/schema";
 import { eq, and, lte, gte } from "drizzle-orm";
 import { generateUniqueSlug } from "@/lib/slug-helpers";
 import { spaceMutex } from "@/lib/mutex";
@@ -14,9 +14,9 @@ export class EventsService {
    */
   static async getEventsByTenant(tenantId: string) {
     return await db.query.events.findMany({
-      where: eq(events.tenantId, tenantId),
+      where: and(eq(events.tenantId, tenantId), eq(events.isArchived, false)),
       with: {
-        space: true, // Incluir información del espacio mediante la relación definida
+        space: true,
       },
       orderBy: (events, { desc }) => [desc(events.createdAt)],
     });
@@ -76,6 +76,14 @@ export class EventsService {
   static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean; status?: string; paymentPhone?: string; paymentId?: string; paymentBank?: string; managerId?: string }) {
     return await spaceMutex.runExclusive(data.spaceId, async () => {
       return await db.transaction(async (tx) => {
+        const space = await tx.query.spaces.findFirst({
+          where: eq(spaces.id, data.spaceId),
+        });
+        if (!space) throw new Error("Space not found");
+        if (data.capacity && data.capacity > space.capacity) {
+          throw new Error(`El aforo del evento (${data.capacity}) no puede exceder la capacidad máxima física del espacio "${space.name}" (${space.capacity} personas).`);
+        }
+
         const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date, data.duration, undefined, tx);
         
         if (hasConflict) {
@@ -102,6 +110,16 @@ export class EventsService {
 
     return await spaceMutex.runExclusive(spaceId, async () => {
       return await db.transaction(async (tx) => {
+        const targetCapacity = data.capacity !== undefined ? data.capacity : currentEvent.capacity;
+        if (targetCapacity) {
+          const space = await tx.query.spaces.findFirst({
+            where: eq(spaces.id, spaceId),
+          });
+          if (space && targetCapacity > space.capacity) {
+            throw new Error(`El aforo del evento (${targetCapacity}) no puede exceder la capacidad máxima física del espacio "${space.name}" (${space.capacity} personas).`);
+          }
+        }
+
         if (data.spaceId || data.date || data.duration) {
           const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, duration, id, tx);
           
@@ -126,7 +144,8 @@ export class EventsService {
    * Elimina un evento.
    */
   static async deleteEvent(id: string) {
-    const [deletedEvent] = await db.delete(events)
+    const [deletedEvent] = await db.update(events)
+      .set({ deletedAt: new Date(), isArchived: true })
       .where(eq(events.id, id))
       .returning();
     return deletedEvent;

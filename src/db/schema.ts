@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, integer, boolean, pgEnum, jsonb, decimal, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, integer, boolean, pgEnum, jsonb, decimal, index, uniqueIndex } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import type { EventRequestMetadata } from '@/validations/requests';
 
@@ -54,6 +54,8 @@ export const spaces = pgTable('spaces', {
   name: varchar('name', { length: 255 }).notNull(),
   capacity: integer('capacity').notNull(),
   universityId: uuid('university_id').references(() => universities.id).notNull(),
+  deletedAt: timestamp('deleted_at'),
+  isArchived: boolean('is_archived').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -77,6 +79,8 @@ export const events = pgTable('events', {
   paymentId: varchar('payment_id', { length: 50 }),
   paymentBank: varchar('payment_bank', { length: 100 }),
   managerId: uuid('manager_id').references(() => users.id),
+  deletedAt: timestamp('deleted_at'),
+  isArchived: boolean('is_archived').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 }, (table) => {
   return {
@@ -89,7 +93,7 @@ export const events = pgTable('events', {
 
 export const attendees = pgTable('attendees', {
   id: uuid('id').primaryKey().defaultRandom(),
-  eventId: uuid('event_id').references(() => events.id).notNull(),
+  eventId: uuid('event_id').references(() => events.id, { onDelete: 'restrict' }).notNull(),
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 50 }).notNull(),
@@ -100,8 +104,27 @@ export const attendees = pgTable('attendees', {
   scannedAt: timestamp('scanned_at'),
   paymentReference: varchar('payment_reference', { length: 50 }),
   paymentScreenshotUrl: varchar('payment_screenshot_url', { length: 500 }),
+  paymentAmountBs: decimal('payment_amount_bs', { precision: 12, scale: 2 }),
+  exchangeRateBcv: decimal('exchange_rate_bcv', { precision: 10, scale: 4 }),
+  paymentBankOrigin: varchar('payment_bank_origin', { length: 100 }),
+  paymentDate: timestamp('payment_date'),
   paymentVerifiedBy: uuid('payment_verified_by').references(() => users.id),
   paymentVerifiedAt: timestamp('payment_verified_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => {
+  return {
+    uniqueAttendeeEvent: uniqueIndex('attendees_event_email_unique').on(table.eventId, table.email),
+  }
+});
+
+export const paymentAuditLogs = pgTable('payment_audit_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  attendeeId: uuid('attendee_id').references(() => attendees.id, { onDelete: 'restrict' }).notNull(),
+  action: varchar('action', { length: 50 }).notNull(),
+  previousStatus: varchar('previous_status', { length: 50 }),
+  newStatus: varchar('new_status', { length: 50 }).notNull(),
+  performedBy: uuid('performed_by').references(() => users.id, { onDelete: 'restrict' }).notNull(),
+  reason: text('reason'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -122,9 +145,9 @@ export const systemSettings = pgTable('system_settings', {
 
 export const scanLogs = pgTable('scan_logs', {
   id: uuid('id').primaryKey().defaultRandom(),
-  eventId: uuid('event_id').references(() => events.id).notNull(),
-  attendeeId: uuid('attendee_id').references(() => attendees.id).notNull(),
-  scannedBy: uuid('scanned_by').references(() => users.id).notNull(),
+  eventId: uuid('event_id').references(() => events.id, { onDelete: 'restrict' }).notNull(),
+  attendeeId: uuid('attendee_id').references(() => attendees.id, { onDelete: 'restrict' }).notNull(),
+  scannedBy: uuid('scanned_by').references(() => users.id, { onDelete: 'restrict' }).notNull(),
   scannedAt: timestamp('scanned_at').defaultNow(),
 });
 
@@ -159,6 +182,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   attendees: many(attendees),
   managedEvents: many(events),
   scanLogs: many(scanLogs),
+  performedAuditLogs: many(paymentAuditLogs),
 }));
 
 export const spacesRelations = relations(spaces, ({ one, many }) => ({
@@ -201,6 +225,18 @@ export const attendeesRelations = relations(attendees, ({ one, many }) => ({
     references: [users.id],
   }),
   scanLogs: many(scanLogs),
+  auditLogs: many(paymentAuditLogs),
+}));
+
+export const paymentAuditLogsRelations = relations(paymentAuditLogs, ({ one }) => ({
+  attendee: one(attendees, {
+    fields: [paymentAuditLogs.attendeeId],
+    references: [attendees.id],
+  }),
+  performedBy: one(users, {
+    fields: [paymentAuditLogs.performedBy],
+    references: [users.id],
+  }),
 }));
 
 export const scanLogsRelations = relations(scanLogs, ({ one }) => ({
