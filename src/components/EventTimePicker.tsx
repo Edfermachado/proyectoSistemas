@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { formatTimeCaracas, getCaracasDateTimeLocalString } from '@/lib/date-utils';
 
 export function EventTimePicker({ 
   initialDate = "", 
@@ -14,9 +15,7 @@ export function EventTimePicker({
   const [minDate, setMinDate] = useState("");
 
   useEffect(() => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    setMinDate(now.toISOString().slice(0, 16));
+    setMinDate(getCaracasDateTimeLocalString());
   }, []);
 
   const durationInMinutes = (hours * 60) + minutes;
@@ -26,7 +25,7 @@ export function EventTimePicker({
     const start = new Date(date);
     if (!isNaN(start.getTime())) {
       const end = new Date(start.getTime() + durationInMinutes * 60000);
-      const formatTime = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const formatTime = (d: Date) => formatTimeCaracas(d);
       timeRange = `${formatTime(start)} - ${formatTime(end)}`;
     }
   }

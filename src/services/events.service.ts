@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { events } from "@/db/schema";
 import { eq, and, lte, gte } from "drizzle-orm";
 import { generateUniqueSlug } from "@/lib/slug-helpers";
+import { spaceMutex } from "@/lib/mutex";
 
 /**
  * Service Layer (Clean Architecture)
@@ -36,7 +37,7 @@ export class EventsService {
   /**
    * Lógica de Negocio: Validar colisiones de horarios considerando la duración.
    */
-  static async checkSpaceConflict(spaceId: string, eventDate: Date, durationMinutes: number, excludeEventId?: string): Promise<boolean> {
+  static async checkSpaceConflict(spaceId: string, eventDate: Date, durationMinutes: number, excludeEventId?: string, executor: any = db): Promise<boolean> {
     // Calculamos el inicio y fin del nuevo evento
     const newStart = eventDate.getTime();
     const newEnd = newStart + durationMinutes * 60 * 1000;
@@ -46,7 +47,7 @@ export class EventsService {
     const lowerBound = new Date(newStart - oneDay);
     const upperBound = new Date(newEnd + oneDay);
 
-    const overlappingEvents = await db.query.events.findMany({
+    const overlappingEvents = await executor.query.events.findMany({
       where: and(
         eq(events.spaceId, spaceId),
         gte(events.date, lowerBound),
@@ -73,44 +74,52 @@ export class EventsService {
    * Crea un evento validando las reglas de negocio.
    */
   static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean; status?: string; paymentPhone?: string; paymentId?: string; paymentBank?: string; managerId?: string }) {
-    const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date, data.duration);
-    
-    if (hasConflict) {
-      throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
-    }
+    return await spaceMutex.runExclusive(data.spaceId, async () => {
+      return await db.transaction(async (tx) => {
+        const hasConflict = await this.checkSpaceConflict(data.spaceId, data.date, data.duration, undefined, tx);
+        
+        if (hasConflict) {
+          throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
+        }
 
-    const slug = await generateUniqueSlug("events", data.title);
-    const [newEvent] = await db.insert(events).values({ ...data, slug }).returning();
-    return newEvent;
+        const slug = await generateUniqueSlug("events", data.title);
+        const [newEvent] = await tx.insert(events).values({ ...data, slug }).returning();
+        return newEvent;
+      });
+    });
   }
 
   /**
    * Actualiza un evento validando las reglas de negocio.
    */
   static async updateEvent(id: string, data: Partial<{ title: string; date: Date; duration: number; price: string; spaceId: string; description: string; imageUrl: string | null; capacity: number; visibility: "publico" | "privado"; requiresIpProtection: boolean; status: string; paymentPhone: string; paymentId: string; paymentBank: string; managerId: string }>) {
-    if (data.spaceId || data.date || data.duration) {
-      const currentEvent = await this.getEventById(id);
-      if (!currentEvent) throw new Error("Event not found");
+    const currentEvent = await this.getEventById(id);
+    if (!currentEvent) throw new Error("Event not found");
 
-      const spaceId = data.spaceId || currentEvent.spaceId;
-      const eventDate = data.date || currentEvent.date;
-      const duration = data.duration || currentEvent.duration;
+    const spaceId = data.spaceId || currentEvent.spaceId;
+    const eventDate = data.date || currentEvent.date;
+    const duration = data.duration || currentEvent.duration;
 
-      const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, duration, id);
-      
-      if (hasConflict) {
-        throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
-      }
-    }
+    return await spaceMutex.runExclusive(spaceId, async () => {
+      return await db.transaction(async (tx) => {
+        if (data.spaceId || data.date || data.duration) {
+          const hasConflict = await this.checkSpaceConflict(spaceId, eventDate, duration, id, tx);
+          
+          if (hasConflict) {
+            throw new Error("CONF_001: El espacio ya está reservado para esa fecha y hora.");
+          }
+        }
 
-    // Regenerate slug if title changed
-    const slugUpdate = data.title ? { slug: await generateUniqueSlug("events", data.title, id) } : {};
+        // Regenerate slug if title changed
+        const slugUpdate = data.title ? { slug: await generateUniqueSlug("events", data.title, id) } : {};
 
-    const [updatedEvent] = await db.update(events)
-      .set({ ...data, ...slugUpdate })
-      .where(eq(events.id, id))
-      .returning();
-    return updatedEvent;
+        const [updatedEvent] = await tx.update(events)
+          .set({ ...data, ...slugUpdate })
+          .where(eq(events.id, id))
+          .returning();
+        return updatedEvent;
+      });
+    });
   }
 
   /**

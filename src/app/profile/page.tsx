@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { logoutUser } from "@/app/actions/auth";
 import TicketQR from "@/components/TicketQR";
 import { ReportPaymentButton } from "@/components/ReportPaymentButton";
+import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ viewTicket?: string }> }) {
   const session = await getSession();
@@ -58,8 +59,8 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const registeredEvents = userRegistrations.map((reg) => {
     const ev = reg.event;
     const dateObj = new Date(ev.date);
-    const dateStr = dateObj.toLocaleDateString("es-ES", { day: '2-digit', month: 'short', year: 'numeric' });
-    const timeStr = dateObj.toLocaleTimeString("es-ES", { hour: '2-digit', minute: '2-digit' });
+    const dateStr = dateObj.toLocaleDateString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = formatTimeCaracas(dateObj);
 
     return {
       id: reg.id,

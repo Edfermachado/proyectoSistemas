@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { eq } from "drizzle-orm";
 import { events } from "@/db/schema";
 import Link from "next/link";
+import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
 
 export default async function FeaturedEvents() {
   const featuredEvents = await db.query.events.findMany({
@@ -49,9 +50,9 @@ export default async function FeaturedEvents() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredEvents.map((evt) => {
-              const month = evt.date.toLocaleString('es', { month: 'short' }).toUpperCase();
-              const day = evt.date.toLocaleString('es', { day: '2-digit' });
-              const time = evt.date.toLocaleString('es', { hour: '2-digit', minute: '2-digit' });
+              const month = evt.date.toLocaleString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, month: 'short' }).toUpperCase();
+              const day = evt.date.toLocaleString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, day: '2-digit' });
+              const time = formatTimeCaracas(evt.date);
               const isFree = Number(evt.price) === 0;
 
               return (

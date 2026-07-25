@@ -6,6 +6,7 @@ import { eq, and, or } from "drizzle-orm";
 import { createSession, deleteSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
+import { authRateLimiter } from "@/lib/rate-limit";
 
 export async function loginFacultyAdmin(prevState: unknown, formData: FormData) {
   const email = formData.get("email")?.toString();
@@ -15,7 +16,10 @@ export async function loginFacultyAdmin(prevState: unknown, formData: FormData) 
     return { error: "Faltan credenciales" };
   }
 
-
+  const rateLimitResult = authRateLimiter.check(`login:${email}`, 5, 15 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return { error: `Demasiados intentos de inicio de sesión. Por favor, espera ${Math.ceil(rateLimitResult.resetInSeconds / 60)} minutos antes de volver a intentarlo.` };
+  }
 
   // Find user (tenant_admin)
   const user = await db.query.users.findFirst({
@@ -29,6 +33,7 @@ export async function loginFacultyAdmin(prevState: unknown, formData: FormData) 
     return { error: "Credenciales incorrectas o tu cuenta no es de administrador de facultad." };
   }
 
+  authRateLimiter.reset(`login:${email}`);
   await createSession(user.id, user.role, user.tenantId, user.email);
   redirect("/faculty-admin");
 }
@@ -46,7 +51,10 @@ export async function loginUser(prevState: unknown, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
-
+  const rateLimitResult = authRateLimiter.check(`login:${email}`, 5, 15 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return { error: `Demasiados intentos de inicio de sesión. Por favor, espera ${Math.ceil(rateLimitResult.resetInSeconds / 60)} minutos antes de volver a intentarlo.` };
+  }
 
   // Find user (role: user)
   const user = await db.query.users.findFirst({
@@ -60,6 +68,7 @@ export async function loginUser(prevState: unknown, formData: FormData) {
     return { error: "Correo electrónico o contraseña incorrectos." };
   }
 
+  authRateLimiter.reset(`login:${email}`);
   await createSession(user.id, user.role, user.tenantId, user.email);
   redirect("/");
 }
@@ -75,6 +84,11 @@ export async function registerUser(prevState: unknown, formData: FormData) {
 
   if (password !== confirmPassword) {
     return { error: "Las contraseñas no coinciden." };
+  }
+
+  const rateLimitResult = authRateLimiter.check(`reg:${email}`, 5, 15 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return { error: `Demasiados intentos de registro. Por favor, espera unos minutos antes de volver a intentarlo.` };
   }
 
   // Check if user already exists
@@ -95,6 +109,7 @@ export async function registerUser(prevState: unknown, formData: FormData) {
       tenantId: null,
     }).returning();
 
+    authRateLimiter.reset(`reg:${email}`);
     await createSession(newUser.id, newUser.role, newUser.tenantId, newUser.email);
   } catch (error) {
     console.error("Error registering user:", error);
@@ -112,6 +127,11 @@ export async function loginSuperAdmin(prevState: unknown, formData: FormData) {
     return { error: "Faltan credenciales" };
   }
 
+  const rateLimitResult = authRateLimiter.check(`login_admin:${email}`, 5, 15 * 60 * 1000);
+  if (!rateLimitResult.success) {
+    return { error: `Demasiados intentos de acceso al panel de administración. Por favor, espera unos minutos.` };
+  }
+
   // Find user (role: superadmin)
   const user = await db.query.users.findFirst({
     where: and(
@@ -124,6 +144,7 @@ export async function loginSuperAdmin(prevState: unknown, formData: FormData) {
     return { error: "Credenciales de administrador del sistema incorrectas." };
   }
 
+  authRateLimiter.reset(`login_admin:${email}`);
   await createSession(user.id, user.role, user.tenantId, user.email);
   redirect("/admin");
 }

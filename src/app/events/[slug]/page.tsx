@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { findEventBySlugOrId } from "@/lib/slug-helpers";
 import { getSession } from "@/lib/auth";
 import type { Metadata } from "next";
+import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const eDate = new Date(event.date);
   return {
     title: `${event.title} — UniEvents`,
-    description: event.description ?? `Asiste a ${event.title} el ${eDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}.`,
+    description: event.description ?? `Asiste a ${event.title} el ${eDate.toLocaleDateString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, day: 'numeric', month: 'long', year: 'numeric' })}.`,
     openGraph: {
       title: `${event.title} — UniEvents`,
       description: event.description ?? `Evento organizado por ${event.tenant?.name}.`,
@@ -34,8 +35,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
   const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
   
   const endFormat = new Date(eDate.getTime() + event.duration * 60000);
-  const timeStr = `${eDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${endFormat.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-  const dateStr = eDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = `${formatTimeCaracas(eDate)} - ${formatTimeCaracas(endFormat)}`;
+  const dateStr = eDate.toLocaleDateString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   
   // Use slug for the register URL if available
   const eventSlugOrId = event.slug || event.id;

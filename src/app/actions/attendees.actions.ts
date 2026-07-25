@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth";
 import { uploadPaymentScreenshot } from "@/lib/supabase";
 import { join } from "path";
 import { mkdirSync } from "fs";
+import { regRateLimiter } from "@/lib/rate-limit";
 
 export async function registerForEvent(formData: FormData) {
   const eventId = formData.get("eventId") as string;
@@ -30,15 +31,23 @@ export async function registerForEvent(formData: FormData) {
     const email = session.email as string;
     const userId = session.userId as string;
 
+    const rateLimitResult = regRateLimiter.check(`reg:${email}`, 10, 15 * 60 * 1000);
+    if (!rateLimitResult.success) {
+      throw new Error("Demasiados intentos de registro. Por favor, espera unos minutos antes de volver a intentarlo.");
+    }
+
     let screenshotUrl: string | null = null;
     if (screenshot && screenshot.size > 0) {
       try {
         screenshotUrl = await uploadPaymentScreenshot(screenshot, "reg-" + Date.now());
       } catch (e) {
-        console.error("Supabase error, falling back", e);
+        console.error("Supabase error:", e);
       }
 
       if (!screenshotUrl) {
+        if (process.env.NODE_ENV === "production") {
+          throw new Error("No se pudo subir el comprobante de pago a la nube. Por favor, verifica tu imagen o intenta nuevamente.");
+        }
         const arrayBuffer = await screenshot.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const fileName = `payment_reg_${Date.now()}.webp`;
@@ -65,7 +74,11 @@ export async function registerForEvent(formData: FormData) {
     revalidatePath(`/faculty-admin/events/[id]/attendees`, "page");
     return { success: true, ticketToken: newAttendee.ticketToken };
   } catch (error: unknown) {
-    return { error: (error instanceof Error ? error.message : "Error desconocido") };
+    const msg = error instanceof Error ? error.message : "Error desconocido al procesar el registro.";
+    if (msg.includes("drizzle") || msg.includes("postgres") || msg.includes("syntax") || msg.includes("relation")) {
+      return { error: "Ocurrió un error en el servidor al procesar la inscripción." };
+    }
+    return { error: msg };
   }
 }
 
