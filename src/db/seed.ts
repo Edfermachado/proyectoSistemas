@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
+import { sql } from 'drizzle-orm';
 import postgres from 'postgres';
 import * as schema from './schema';
 import 'dotenv/config';
@@ -9,256 +10,268 @@ if (!connectionString) {
   throw new Error('❌ Falta la variable de entorno DATABASE_URI en .env');
 }
 
-const client = postgres(connectionString, { max: 1 });
+const client = postgres(connectionString, { max: 1, prepare: false });
 const db = drizzle(client, { schema });
 
 async function main() {
-  console.log('🌱 Iniciando seeder...');
+  console.log('🌱 Iniciando seeder con jerarquía UC -> FACYT -> DEPARTAMENTOS...');
   try {
-    console.log('Limpiando base de datos (borrando datos anteriores)...');
+    console.log('🛠️ 0. Aplicando esquema DDL (Creando tabla departments y columnas si no existen)...');
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "departments" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        "name" varchar(255) NOT NULL,
+        "slug" varchar(300) UNIQUE,
+        "description" text,
+        "tenant_id" uuid NOT NULL REFERENCES "tenants"("id"),
+        "created_at" timestamp DEFAULT now()
+      );
+      ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "department_id" uuid REFERENCES "departments"("id");
+      ALTER TABLE "events" ADD COLUMN IF NOT EXISTS "department_id" uuid REFERENCES "departments"("id");
+    `);
+
+    console.log('🧹 Limpiando base de datos (borrando registros previos)...');
+    await db.delete(schema.scanLogs);
+    await db.delete(schema.paymentAuditLogs);
+    await db.delete(schema.eventRequests);
     await db.delete(schema.attendees);
     await db.delete(schema.events);
-    await db.delete(schema.spaces);
     await db.delete(schema.users);
+    await db.delete(schema.departments);
+    await db.delete(schema.spaces);
     await db.delete(schema.tenants);
     await db.delete(schema.universities);
     await db.delete(schema.categories);
 
-    console.log('Creando categorías...');
+    console.log('🏷️ 1. Creando Categoría Principal...');
     const [cat1] = await db.insert(schema.categories).values({
-      name: 'Tecnología e Innovación',
-      slug: 'tecnologia',
-      icon: 'computer',
+      name: 'Ciencia y Tecnología',
+      slug: 'ciencia-y-tecnologia',
+      icon: 'cpu',
     }).returning();
 
-    const [cat2] = await db.insert(schema.categories).values({
-      name: 'Arte y Cultura',
-      slug: 'arte',
-      icon: 'palette',
+    console.log('🏫 2. Creando Universidad de Carabobo...');
+    const [uni] = await db.insert(schema.universities).values({
+      name: 'Universidad de Carabobo (UC)',
+      slug: 'universidad-de-carabobo',
+      description: 'Alma Mater del estado Carabobo, centro de excelencia académica, ciencia e innovación en Bárbula.',
     }).returning();
 
-    console.log('Creando universidades...');
-    const [uni1] = await db.insert(schema.universities).values({
-      name: 'Universidad Central de Tecnología',
-      slug: 'universidad-central-de-tecnologia',
-      description: 'Una universidad enfocada en tecnología e innovación. Cuenta con los laboratorios más avanzados de la región.',
-    }).returning();
-    
-    const [uni2] = await db.insert(schema.universities).values({
-      name: 'Universidad Nacional de Artes',
-      slug: 'universidad-nacional-de-artes',
-      description: 'Cuna de la creatividad y la expresión artística, donde convergen las ideas clásicas y contemporáneas.',
-    }).returning();
-
-    console.log('Creando facultades (tenants)...');
-    const [tenant1] = await db.insert(schema.tenants).values({
-      name: 'Facultad de Ingeniería',
-      slug: 'facultad-de-ingenieria',
-      description: 'Dedicada a la ingeniería, robótica y desarrollo de software moderno.',
-      universityId: uni1.id,
+    console.log('🏢 3. Creando Facultad FACYT (Tenant)...');
+    const [tenant] = await db.insert(schema.tenants).values({
+      name: 'Facultad Experimental de Ciencias y Tecnología (FACYT)',
+      slug: 'facyt-uc',
+      description: 'Facultad dedicada a la formación de investigadores en computación, química, biología, física y matemática.',
+      universityId: uni.id,
       categoryId: cat1.id,
     }).returning();
-    
-    const [tenant2] = await db.insert(schema.tenants).values({
-      name: 'Facultad de Ciencias de la Computación',
-      slug: 'facultad-de-ciencias-de-la-computacion',
-      description: 'Innovación en inteligencia artificial, ciberseguridad y ciencia de datos.',
-      universityId: uni1.id,
-      categoryId: cat1.id,
-    }).returning();
-    
-    const [tenant3] = await db.insert(schema.tenants).values({
-      name: 'Facultad de Bellas Artes',
-      slug: 'facultad-de-bellas-artes',
-      description: 'Desarrollo de habilidades en pintura, escultura, cine y medios visuales.',
-      universityId: uni2.id,
-      categoryId: cat2.id,
+
+    console.log('🧪 4. Creando Departamentos Académicos de FACYT...');
+    const [deptComp] = await db.insert(schema.departments).values({
+      name: 'Departamento de Computación',
+      slug: 'departamento-de-computacion-facyt',
+      description: 'Departamento de desarrollo de software, inteligencia artificial y arquitectura de sistemas.',
+      tenantId: tenant.id,
     }).returning();
 
-    console.log('Creando espacios...');
-    const [space1] = await db.insert(schema.spaces).values({
-      name: 'Auditorio Principal Tech',
-      capacity: 500,
-      universityId: uni1.id,
-    }).returning();
-    
-    const [space2] = await db.insert(schema.spaces).values({
-      name: 'Laboratorio de IA y Robótica',
-      capacity: 50,
-      universityId: uni1.id,
-    }).returning();
-    
-    const [space3] = await db.insert(schema.spaces).values({
-      name: 'Galería de Arte Central',
-      capacity: 200,
-      universityId: uni2.id,
+    const [deptQuim] = await db.insert(schema.departments).values({
+      name: 'Departamento de Química',
+      slug: 'departamento-de-quimica-facyt',
+      description: 'Investigación en química orgánica, bioanálisis y nanotecnología.',
+      tenantId: tenant.id,
     }).returning();
 
-    console.log('Creando eventos...');
-    const now = new Date();
-    
-    const eventsInserted = await db.insert(schema.events).values([
-      {
-        title: 'Expo de Ingeniería 2026',
-        slug: 'expo-de-ingenieria-2026',
-        description: 'Muestra anual de proyectos de ingeniería y robótica presentados por los alumnos.',
-        date: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000), // En 5 días
-        price: '0',
-        tenantId: tenant1.id,
-        spaceId: space1.id,
-        imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Hackathon de Inteligencia Artificial',
-        slug: 'hackathon-de-inteligencia-artificial',
-        description: 'Desafío de 48 horas construyendo soluciones innovadoras usando IA y Machine Learning.',
-        date: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // En 10 días
-        price: '10.00',
-        tenantId: tenant2.id,
-        spaceId: space2.id,
-        imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Exposición de Arte Moderno',
-        slug: 'exposicion-de-arte-moderno',
-        description: 'Exposición de los mejores trabajos de escultura y pintura de los alumnos de último año.',
-        date: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // En 15 días
-        price: '5.00',
-        tenantId: tenant3.id,
-        spaceId: space3.id,
-        imageUrl: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Concierto Sinfónico Universitario',
-        slug: 'concierto-sinfonico-universitario',
-        description: 'La orquesta sinfónica de la facultad interpretará clásicos atemporales y bandas sonoras contemporáneas.',
-        date: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), // En 2 días
-        price: '15.00',
-        tenantId: tenant3.id,
-        spaceId: space3.id,
-        imageUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Congreso Internacional de Ciberseguridad',
-        slug: 'congreso-internacional-de-ciberseguridad',
-        description: 'Expertos internacionales compartirán las últimas tendencias en protección de datos y hacking ético.',
-        date: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // En 7 días
-        price: '25.00',
-        tenantId: tenant2.id,
-        spaceId: space2.id,
-        imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Feria de Emprendimiento Tecnológico',
-        slug: 'feria-de-emprendimiento-tecnologico',
-        description: 'Descubre las startups creadas por nuestros estudiantes y conoce a los futuros líderes del mercado.',
-        date: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000), // En 12 días
-        price: '0',
-        tenantId: tenant1.id,
-        spaceId: space1.id,
-        imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Taller de Robótica para Principiantes',
-        slug: 'taller-de-robotica-para-principiantes',
-        description: 'Aprende los conceptos básicos de robótica construyendo tu propio brazo mecánico controlado por Arduino.',
-        date: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), // En 20 días
-        price: '0',
-        tenantId: tenant1.id,
-        spaceId: space2.id,
-        imageUrl: 'https://images.unsplash.com/photo-1561557944-6e7860d1a7eb?auto=format&fit=crop&q=80&w=800',
-      },
-      {
-        title: 'Festival de Cine Estudiantil',
-        slug: 'festival-de-cine-estudiantil',
-        description: 'Proyección de cortometrajes dirigidos, producidos y actuados por estudiantes de la facultad.',
-        date: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // En 30 días
-        price: '8.00',
-        tenantId: tenant3.id,
-        spaceId: space3.id,
-        imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800',
-      }
-    ]).returning();
+    console.log('🏟️ 5. Creando Espacio Físico...');
+    const [space] = await db.insert(schema.spaces).values({
+      name: 'Auditorio de FACYT - Campus Bárbula',
+      capacity: 350,
+      universityId: uni.id,
+    }).returning();
 
-    console.log('Creando usuario root y roles de prueba...');
-    await db.insert(schema.users).values({
+    console.log('👥 6. Creando Usuarios por Rol y Jerarquía...');
+    const [superadminUser] = await db.insert(schema.users).values({
+      name: 'Super Administrador Central',
       email: 'admin@gmail.com',
       passwordHash: await bcrypt.hash('admin', 10),
       role: 'superadmin',
       tenantId: null,
+      departmentId: null,
       organizerLevel: 'registrado'
     }).returning();
 
-    await db.insert(schema.users).values({
+    const [decanoUser] = await db.insert(schema.users).values({
+      name: 'Decano de FACYT',
       email: 'decano@gmail.com',
       passwordHash: await bcrypt.hash('decano', 10),
       role: 'tenant_admin',
-      tenantId: tenant1.id,
+      tenantId: tenant.id,
+      departmentId: null,
       organizerLevel: 'registrado'
     }).returning();
 
-    await db.insert(schema.users).values({
+    const [gestorUser] = await db.insert(schema.users).values({
+      name: 'Jefe / Gestor de Computación',
       email: 'gestor@gmail.com',
       passwordHash: await bcrypt.hash('gestor', 10),
       role: 'event_manager',
-      tenantId: tenant1.id,
+      tenantId: tenant.id,
+      departmentId: deptComp.id,
       organizerLevel: 'registrado'
     }).returning();
 
-    await db.insert(schema.users).values({
+    const [porteroUser] = await db.insert(schema.users).values({
+      name: 'Portero / Control de Acceso',
       email: 'portero@gmail.com',
       passwordHash: await bcrypt.hash('portero123', 10),
       role: 'access_control',
-      tenantId: tenant1.id,
+      tenantId: tenant.id,
+      departmentId: deptComp.id,
       organizerLevel: 'registrado'
     }).returning();
 
-    const [regularUser] = await db.insert(schema.users).values({
+    const [studentUser] = await db.insert(schema.users).values({
+      name: 'Estudiante Prueba UC',
       email: 'estudiante@gmail.com',
       passwordHash: await bcrypt.hash('123456', 10),
       role: 'user',
       organizerLevel: 'registrado'
     }).returning();
 
-    console.log('Inscribiendo estudiante en eventos (Generando QRs)...');
-    
-    // Inscribir en evento GRATIS (status: confirmado automático)
-    const [attendeeFree] = await db.insert(schema.attendees).values({
-      eventId: eventsInserted[0].id,
-      userId: regularUser.id,
-      name: 'Estudiante Prueba',
-      email: regularUser.email,
-      phone: '+58 412 0000000',
+    console.log('📅 7. Creando Eventos Propuestos por Departamentos...');
+    const now = new Date();
+
+    // Evento 1: Aprobado (Depto Computación)
+    const [eventApproved] = await db.insert(schema.events).values({
+      title: 'Expo de Proyectos de Software FACYT 2026',
+      slug: 'expo-proyectos-software-facyt-2026',
+      description: 'Muestra anual de sistemas y prototipos creados por estudiantes de Computación.',
+      date: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+      duration: 120,
+      price: '0',
+      tenantId: tenant.id,
+      departmentId: deptComp.id,
+      spaceId: space.id,
+      capacity: 300,
+      status: 'aprobado',
+      managerId: gestorUser.id,
+      imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800',
+    }).returning();
+
+    // Evento 2: PENDIENTE DE APROBACIÓN POR EL DECANO (Depto Computación)
+    const [eventPending] = await db.insert(schema.events).values({
+      title: 'Simposio Internacional de Inteligencia Artificial',
+      slug: 'simposio-inteligencia-artificial-facyt',
+      description: 'Propuesta de simposio sobre IA generativa. Pendiente de aprobación por el Decanato.',
+      date: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+      duration: 240,
+      price: '15.00',
+      tenantId: tenant.id,
+      departmentId: deptComp.id,
+      spaceId: space.id,
+      capacity: 250,
+      status: 'pendiente_aprobacion',
+      managerId: gestorUser.id,
+      paymentPhone: '04121234567',
+      paymentId: '29876543',
+      paymentBank: 'Banco de Venezuela',
+      imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800',
+    }).returning();
+
+    // Evento 3: Aprobado (Depto Química)
+    const [eventQuim] = await db.insert(schema.events).values({
+      title: 'Jornadas de Investigación en Química Aplicada',
+      slug: 'jornadas-investigacion-quimica-aplicada',
+      description: 'Conferencias sobre análisis químico y nanotecnología.',
+      date: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
+      duration: 180,
+      price: '10.00',
+      tenantId: tenant.id,
+      departmentId: deptQuim.id,
+      spaceId: space.id,
+      capacity: 100,
+      status: 'aprobado',
+      managerId: gestorUser.id,
+      paymentPhone: '04121234567',
+      paymentId: '29876543',
+      paymentBank: 'Mercantil',
+      imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
+    }).returning();
+
+    console.log('🎟️ 8. Inscribiendo Estudiante y Generando Entradas QR...');
+
+    // Ticket 1: Confirmado (Listo para prueba de escáner en puerta por el Portero)
+    const [ticketFree] = await db.insert(schema.attendees).values({
+      eventId: eventApproved.id,
+      userId: studentUser.id,
+      name: 'Estudiante Prueba UC',
+      email: studentUser.email,
+      phone: '+58 412 1112233',
       status: 'confirmado',
-      attendeeType: 'estudiante'
+      attendeeType: 'estudiante',
+      paymentAmountBs: '0.00',
+      exchangeRateBcv: '60.1000'
     }).returning();
 
-    // Inscribir en evento PAGO (status: pago_pendiente)
-    const [attendeePaid] = await db.insert(schema.attendees).values({
-      eventId: eventsInserted[1].id,
-      userId: regularUser.id,
-      name: 'Estudiante Prueba',
-      email: regularUser.email,
-      phone: '+58 412 0000000',
+    // Ticket 2: Pago Pendiente (Listo para comprobación por el Gestor de Computación)
+    const [ticketPaidPending] = await db.insert(schema.attendees).values({
+      eventId: eventQuim.id,
+      userId: studentUser.id,
+      name: 'Estudiante Prueba UC',
+      email: studentUser.email,
+      phone: '+58 412 1112233',
       status: 'pago_pendiente',
+      paymentReference: 'PM-99887766',
+      paymentScreenshotUrl: 'https://placehold.co/600x400/png?text=Comprobante+Pago+Movil',
+      paymentAmountBs: '601.00',
+      exchangeRateBcv: '60.1000',
       attendeeType: 'estudiante'
     }).returning();
 
-    console.log('\n--- DATOS PARA INICIO DE SESIÓN ---');
-    console.log(`👑 Superadmin (/admin): admin@gmail.com (admin)`);
-    console.log(`🏛️ Decano Facultad (/faculty-admin): decano@gmail.com (decano)`);
-    console.log(`📅 Gestor de Eventos (/faculty-admin): gestor@gmail.com (gestor)`);
-    console.log(`💂 Control de Acceso (/faculty-admin): portero@gmail.com (portero123)`);
-    console.log(`👤 Usuario regular (/): estudiante@gmail.com (123456)`);
-    console.log('\n--- DATOS PARA PRUEBA DE ESCÁNER QR ---');
-    console.log(`🔑 QR Válido (Evento Gratis): ${attendeeFree.ticketToken}`);
-    console.log(`⏳ QR Pendiente (Evento Pago): ${attendeePaid.ticketToken}`);
-    console.log('----------------------------------------\n');
+    // Ticket 3: Confirmado y Ya Escaneado (En Evento 1 - Expo)
+    const [ticketScanned] = await db.insert(schema.attendees).values({
+      eventId: eventApproved.id,
+      userId: studentUser.id,
+      name: 'Estudiante Escaneado',
+      email: 'estudiante_escaneado@gmail.com',
+      phone: '+58 412 1112244',
+      status: 'confirmado',
+      scannedAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
+      paymentAmountBs: '0.00',
+      exchangeRateBcv: '60.1000',
+      attendeeType: 'estudiante'
+    }).returning();
 
-    console.log('✅ Seeder completado con éxito!');
+    await db.insert(schema.scanLogs).values({
+      eventId: eventQuim.id,
+      attendeeId: ticketScanned.id,
+      scannedBy: porteroUser.id,
+      scannedAt: ticketScanned.scannedAt
+    });
+
+    console.log('\n======================================================');
+    console.log('🚀 SEEDER JERÁRQUICO COMPLETADO CON ÉXITO');
+    console.log('======================================================');
+    console.log(`🏫 Universidad: ${uni.name}`);
+    console.log(`🏢 Facultad:    ${tenant.name}`);
+    console.log(`🧪 Departamentos: 1) ${deptComp.name} | 2) ${deptQuim.name}`);
+    console.log('------------------------------------------------------');
+    console.log('🔐 CREDENCIALES DE ACCESO POR ROL:');
+    console.log(`👑 1. Superadmin:      admin@gmail.com      | Clave: admin`);
+    console.log(`🏛️ 2. Decano FACYT:    decano@gmail.com     | Clave: decano (Aprueba eventos de depto en /faculty-admin/requests)`);
+    console.log(`📅 3. Gestor Depto:    gestor@gmail.com     | Clave: gestor (Propone eventos y aprueba pagos)`);
+    console.log(`💂 4. Portero Puerta:  portero@gmail.com    | Clave: portero123 (Escanea entradas en /faculty-admin/scanner)`);
+    console.log(`👤 5. Usuario Alumno:  estudiante@gmail.com  | Clave: 123456`);
+    console.log('------------------------------------------------------');
+    console.log('🎟️ TOKENS DE ENTRADAS QR PARA PRUEBAS:');
+    console.log(`✅ Ticket Válido (Confirmado):    ${ticketFree.ticketToken}`);
+    console.log(`⏳ Ticket Pago Pendiente:         ${ticketPaidPending.ticketToken}`);
+    console.log(`⚡ Ticket Ya Escaneado (Puntos):  ${ticketScanned.ticketToken}`);
+    console.log('======================================================\n');
+
   } catch (error) {
-    console.error('❌ Error durante el seeder:', error);
+    console.error('❌ Error ejecutando seeder:', error);
   } finally {
+    await client.end();
     process.exit(0);
   }
 }

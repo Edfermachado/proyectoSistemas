@@ -35,6 +35,15 @@ export const tenants = pgTable('tenants', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+export const departments = pgTable('departments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 300 }).unique(),
+  description: text('description'),
+  tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
@@ -45,6 +54,7 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 50 }),
   role: varchar('role', { length: 50 }).notNull().default('user'), // roles: superadmin, tenant_admin, user
   tenantId: uuid('tenant_id').references(() => tenants.id), // Puede ser null para el superadmin global
+  departmentId: uuid('department_id').references(() => departments.id),
   organizerLevel: organizerLevelEnum('organizer_level').default('academico'),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -69,10 +79,11 @@ export const events = pgTable('events', {
   imageUrl: varchar('image_url', { length: 500 }),
   duration: integer('duration').notNull().default(60),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
+  departmentId: uuid('department_id').references(() => departments.id),
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
   capacity: integer('capacity'),
   visibility: visibilityEnum('visibility').default('publico'),
-  status: varchar('status', { length: 50 }).default('aprobado'), // roles: pendiente, aprobado, rechazado
+  status: varchar('status', { length: 50 }).default('pendiente_aprobacion'), // roles: pendiente_aprobacion, aprobado, rechazado
   requiresIpProtection: boolean('requires_ip_protection').default(false),
   isFeatured: boolean('is_featured').default(false),
   paymentPhone: varchar('payment_phone', { length: 50 }),
@@ -170,6 +181,16 @@ export const tenantsRelations = relations(tenants, ({ one, many }) => ({
     fields: [tenants.categoryId],
     references: [categories.id],
   }),
+  departments: many(departments),
+  users: many(users),
+  events: many(events),
+}));
+
+export const departmentsRelations = relations(departments, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [departments.tenantId],
+    references: [tenants.id],
+  }),
   users: many(users),
   events: many(events),
 }));
@@ -178,6 +199,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   tenant: one(tenants, {
     fields: [users.tenantId],
     references: [tenants.id],
+  }),
+  department: one(departments, {
+    fields: [users.departmentId],
+    references: [departments.id],
   }),
   attendees: many(attendees),
   managedEvents: many(events),
@@ -197,6 +222,10 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   tenant: one(tenants, {
     fields: [events.tenantId],
     references: [tenants.id],
+  }),
+  department: one(departments, {
+    fields: [events.departmentId],
+    references: [departments.id],
   }),
   space: one(spaces, {
     fields: [events.spaceId],

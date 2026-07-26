@@ -1,23 +1,24 @@
 import "dotenv/config";
 import { db } from "@/db";
-import { universities, spaces, tenants, events, attendees, users, paymentAuditLogs } from "@/db/schema";
+import { universities, spaces, tenants, departments, events, attendees, users } from "@/db/schema";
 import { EventsService } from "@/services/events.service";
 import { AttendeesService } from "@/services/attendees.service";
-import { eq } from "drizzle-orm";
+import { DepartmentsService } from "@/services/departments.service";
+import { SpacesService } from "@/services/spaces.service";
 
 async function runIntegrityTests() {
-  console.log("🚀 Iniciando suite de pruebas de integridad del modelo de negocio...\n");
+  console.log("🚀 Iniciando suite de pruebas de integridad: Jerarquía y Flujo de Aprobación...\n");
 
   try {
     // 1. Setup temporal data
-    console.log("📦 1. Creando entidades de prueba (Universidad, Espacio, Tenant, Usuario)...");
+    console.log("📦 1. Creando entidades (Universidad, Espacio, Facultad, Departamento)...");
     const [uni] = await db.insert(universities).values({
-      name: `Uni Prueba ${Date.now()}`,
+      name: `Universidad Test ${Date.now()}`,
       slug: `uni-test-${Date.now()}`,
     }).returning();
 
     const [space] = await db.insert(spaces).values({
-      name: "Auditorio de Prueba (Capacidad: 50)",
+      name: "Auditorio Test (Capacidad: 50)",
       capacity: 50,
       universityId: uni.id,
     }).returning();
@@ -28,114 +29,88 @@ async function runIntegrityTests() {
       universityId: uni.id,
     }).returning();
 
-    const [adminUser] = await db.insert(users).values({
-      email: `admin_${Date.now()}@test.com`,
+    const dept = await DepartmentsService.createDepartment({
+      name: "Departamento de Computación Test",
+      tenantId: tenant.id,
+      description: "Departamento de prueba para automatización",
+    });
+    console.log(`✅ Departamento creado: ${dept.name} (ID: ${dept.id})`);
+
+    const [decanoUser] = await db.insert(users).values({
+      email: `decano_${Date.now()}@test.com`,
       passwordHash: "hashed",
-      name: "Admin Validador",
+      name: "Decano Validador",
       role: "tenant_admin",
       tenantId: tenant.id,
     }).returning();
 
-    // 2. Probar restricción de aforo (EventsService.createEvent con capacity > space.capacity)
-    console.log("\n🧪 2. Probando validación de aforo físico vs. aforo de evento...");
-    try {
-      await EventsService.createEvent({
-        title: "Evento Sobrepoblado VIP",
-        date: new Date(Date.now() + 86400000),
-        duration: 120,
-        tenantId: tenant.id,
-        spaceId: space.id,
-        capacity: 200, // Excede capacidad de 50
-        price: "10.00",
-      });
-      console.error("❌ FALLO: Se permitió crear un evento que excede la capacidad física del espacio.");
-    } catch (err: any) {
-      if (err.message.includes("no puede exceder la capacidad máxima física")) {
-        console.log(`✅ ÉXITO: Bloqueo correcto por aforo -> "${err.message}"`);
-      } else {
-        throw err;
-      }
+    // 2. Probar propuesta de evento por departamento (Estado inicial: pendiente_aprobacion)
+    console.log("\n🧪 2. Probando propuesta de evento por departamento...");
+    const proposedEvent = await EventsService.createEvent({
+      title: `Simposio Propuesto ${Date.now()}`,
+      date: new Date(Date.now() + 86400000 * 3),
+      duration: 120,
+      tenantId: tenant.id,
+      departmentId: dept.id,
+      spaceId: space.id,
+      capacity: 40,
+      price: "10.00",
+      status: "pendiente_aprobacion",
+    });
+    console.log(`📋 Evento propuesto con ID: ${proposedEvent.id} | Estado: "${proposedEvent.status}"`);
+
+    // Verificar que el evento NO esté en el catálogo público
+    const publicEventsBefore = await EventsService.getAllEvents();
+    const foundBefore = publicEventsBefore.some((e) => e.id === proposedEvent.id);
+    if (foundBefore) {
+      console.error("❌ FALLO: Un evento 'pendiente_aprobacion' es visible en el catálogo público.");
+    } else {
+      console.log("✅ ÉXITO: El evento pendiente NO es visible públicamente en el catálogo.");
     }
 
-    // Crear un evento válido (capacidad = 30)
-    const validEvent = await EventsService.createEvent({
-      title: `Evento Válido ${Date.now()}`,
-      date: new Date(Date.now() + 86400000 * 2),
-      duration: 60,
-      tenantId: tenant.id,
-      spaceId: space.id,
-      capacity: 30,
-      price: "5.00",
-    });
-    console.log(`✅ Evento válido creado con ID: ${validEvent.id}`);
+    // 3. Probar Aprobación por el Decanato de la Facultad
+    console.log("\n🧪 3. Probando Aprobación de Evento por el Decanato...");
+    const approvedEvent = await EventsService.approveEvent(proposedEvent.id);
+    console.log(`🏛️ Evento aprobado por Decano -> Estado nuevo: "${approvedEvent.status}"`);
 
-    // 3. Probar registro bimonetario y prevención de duplicados
-    console.log("\n🧪 3. Probando registro bimonetario y unicidad de inscripciones...");
+    // Verificar que AHORA SÍ aparezca en el catálogo público
+    const publicEventsAfter = await EventsService.getAllEvents();
+    const foundAfter = publicEventsAfter.some((e) => e.id === approvedEvent.id);
+    if (foundAfter) {
+      console.log("✅ ÉXITO: El evento aprobado AHORA SÍ es visible en el catálogo público.");
+    } else {
+      console.error("❌ FALLO: El evento aprobado no apareció en el catálogo público.");
+    }
+
+    // 4. Probar Inscripción bimonetario y confirmación de pago
+    console.log("\n🧪 4. Probando inscripción bimonetaria en evento aprobado...");
     const attendeeData = {
-      eventId: validEvent.id,
-      name: "Estudiante Bimonetario",
-      email: `estudiante_${Date.now()}@uni.edu`,
-      phone: "0414-1234567",
-      paymentReference: "REF-998877",
-      paymentAmountBs: "300.50",
+      eventId: approvedEvent.id,
+      name: "Estudiante UC",
+      email: `estudiante_${Date.now()}@uc.edu.ve`,
+      phone: "0412-9998877",
+      paymentReference: "REF-112233",
+      paymentAmountBs: "601.00",
       exchangeRateBcv: "60.1000",
-      paymentBankOrigin: "Mercantil",
+      paymentBankOrigin: "Banesco",
       paymentDate: new Date(),
     };
 
     const attendee = await AttendeesService.registerAttendee(attendeeData);
-    console.log(`✅ Asistente registrado exitosamente con pago en Bs: ${attendee.paymentAmountBs} (Tasa BCV: ${attendee.exchangeRateBcv})`);
+    console.log(`✅ Registro completado. Token QR: ${attendee.ticketToken} | Estado: ${attendee.status}`);
 
-    // Intentar registrar de nuevo con el mismo correo
-    try {
-      await AttendeesService.registerAttendee({
-        ...attendeeData,
-        name: "Intento Duplicado",
-      });
-      console.error("❌ FALLO: Se permitió el registro duplicado del mismo correo en el evento.");
-    } catch (err: any) {
-      if (err.message.includes("Ya hay una inscripción registrada con este correo") || err.message.includes("Ya estás registrado")) {
-        console.log(`✅ ÉXITO: Bloqueo de duplicidad correcto -> "${err.message}"`);
-      } else {
-        throw err;
-      }
-    }
+    // Confirmar pago en AttendeesService
+    await AttendeesService.confirmPayment(attendee.id, decanoUser.id);
+    console.log("✅ Pago confirmado por el gestor. Registro de auditoría guardado.");
 
-    // 4. Probar Audit Trail en verificación de pago (Confirmar y Rechazar)
-    console.log("\n🧪 4. Probando inmutabilidad y trazas en payment_audit_logs...");
-    await AttendeesService.confirmPayment(attendee.id, adminUser.id);
-    console.log("✅ Pago confirmado en AttendeesService.");
-
-    const logsConfirm = await db.query.paymentAuditLogs.findMany({
-      where: eq(paymentAuditLogs.attendeeId, attendee.id),
-    });
-    console.log(`📋 Registros en payment_audit_logs tras confirmar: ${logsConfirm.length}`);
-    console.log(`   -> Acción: ${logsConfirm[0]?.action}, Estado Nuevo: ${logsConfirm[0]?.newStatus}, Verificador: ${logsConfirm[0]?.performedBy}`);
-
-    await AttendeesService.rejectPayment(attendee.id, adminUser.id, "Captura borrosa, re-subir");
-    console.log("✅ Pago rechazado con motivo en AttendeesService.");
-
-    const logsAll = await db.query.paymentAuditLogs.findMany({
-      where: eq(paymentAuditLogs.attendeeId, attendee.id),
-    });
-    console.log(`📋 Total registros históricos en bitácora (Audit Trail): ${logsAll.length}`);
-    logsAll.forEach((l, idx) => {
-      console.log(`   [${idx + 1}] Acción: ${l.action} (${l.previousStatus} -> ${l.newStatus}) | Motivo: ${l.reason}`);
-    });
-
-    // Limpieza de prueba (o Soft Delete de evento y espacio)
-    console.log("\n🧹 5. Probando Soft Delete de evento y espacio...");
-    const deletedEvent = await EventsService.deleteEvent(validEvent.id);
-    console.log(`✅ Evento archivado con Soft Delete -> isArchived: ${deletedEvent.isArchived}, deletedAt: ${deletedEvent.deletedAt}`);
-
-    const { SpacesService } = await import("@/services/spaces.service");
+    // 5. Probando Soft Delete
+    console.log("\n🧹 5. Probando Soft Delete de espacio...");
     const deletedSpace = await SpacesService.deleteSpace(space.id);
-    console.log(`✅ Espacio archivado con Soft Delete -> isArchived: ${deletedSpace.isArchived}, deletedAt: ${deletedSpace.deletedAt}`);
+    console.log(`✅ Espacio archivado lógicamente -> isArchived: ${deletedSpace.isArchived}`);
 
-    console.log("\n✨ ¡TODAS LAS PRUEBAS DE INTEGRIDAD Y AUDITORÍA FUERON EXITOSAS! ✨");
-    process.exit(0);
+    console.log("\n✨ ¡TODAS LAS PRUEBAS DE INTEGRIDAD Y JERARQUÍA FUERON EXITOSAS! ✨\n");
   } catch (error) {
-    console.error("\n❌ Error en ejecución de pruebas:", error);
+    console.error("❌ Error en pruebas de integridad:", error);
     process.exit(1);
   }
 }

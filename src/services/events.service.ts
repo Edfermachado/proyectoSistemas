@@ -23,11 +23,11 @@ export class EventsService {
   }
 
   /**
-   * Obtiene todos los eventos públicos no archivados.
+   * Obtiene todos los eventos públicos aprobados y no archivados.
    */
   static async getAllEvents() {
     return await db.query.events.findMany({
-      where: eq(events.isArchived, false),
+      where: and(eq(events.isArchived, false), eq(events.status, 'aprobado')),
       with: {
         space: true,
         tenant: {
@@ -35,8 +35,42 @@ export class EventsService {
             university: true,
           },
         },
+        department: true,
       },
       orderBy: (events, { desc }) => [desc(events.date)],
+    });
+  }
+
+  /**
+   * Obtiene eventos por departamento.
+   */
+  static async getEventsByDepartment(departmentId: string) {
+    return await db.query.events.findMany({
+      where: and(eq(events.departmentId, departmentId), eq(events.isArchived, false)),
+      with: {
+        space: true,
+        department: true,
+      },
+      orderBy: (events, { desc }) => [desc(events.createdAt)],
+    });
+  }
+
+  /**
+   * Obtiene eventos pendientes de aprobación para la facultad (Decanato).
+   */
+  static async getPendingEventsByTenant(tenantId: string) {
+    return await db.query.events.findMany({
+      where: and(
+        eq(events.tenantId, tenantId),
+        eq(events.status, 'pendiente_aprobacion'),
+        eq(events.isArchived, false)
+      ),
+      with: {
+        space: true,
+        department: true,
+        manager: true,
+      },
+      orderBy: (events, { desc }) => [desc(events.createdAt)],
     });
   }
 
@@ -48,6 +82,8 @@ export class EventsService {
       where: eq(events.id, id),
       with: {
         space: true,
+        department: true,
+        manager: true,
       },
     });
   }
@@ -91,7 +127,7 @@ export class EventsService {
   /**
    * Crea un evento validando las reglas de negocio.
    */
-  static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean; status?: string; paymentPhone?: string; paymentId?: string; paymentBank?: string; managerId?: string }) {
+  static async createEvent(data: { title: string; date: Date; duration: number; price?: string; tenantId: string; departmentId?: string; spaceId: string; description?: string; imageUrl?: string | null; capacity?: number; visibility?: "publico" | "privado"; requiresIpProtection?: boolean; status?: string; paymentPhone?: string; paymentId?: string; paymentBank?: string; managerId?: string }) {
     return await spaceMutex.runExclusive(data.spaceId, async () => {
       return await db.transaction(async (tx) => {
         const space = await tx.query.spaces.findFirst({
@@ -109,10 +145,33 @@ export class EventsService {
         }
 
         const slug = await generateUniqueSlug("events", data.title);
-        const [newEvent] = await tx.insert(events).values({ ...data, slug }).returning();
+        const eventStatus = data.status || 'pendiente_aprobacion';
+        const [newEvent] = await tx.insert(events).values({ ...data, status: eventStatus, slug }).returning();
         return newEvent;
       });
     });
+  }
+
+  /**
+   * Aprueba un evento propuesto por un departamento (Realizado por Decanato / Tenant Admin).
+   */
+  static async approveEvent(id: string) {
+    const [updatedEvent] = await db.update(events)
+      .set({ status: 'aprobado' })
+      .where(eq(events.id, id))
+      .returning();
+    return updatedEvent;
+  }
+
+  /**
+   * Rechaza un evento propuesto por un departamento.
+   */
+  static async rejectEvent(id: string) {
+    const [updatedEvent] = await db.update(events)
+      .set({ status: 'rechazado' })
+      .where(eq(events.id, id))
+      .returning();
+    return updatedEvent;
   }
 
   /**
