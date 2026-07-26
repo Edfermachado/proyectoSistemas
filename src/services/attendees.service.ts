@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { attendees, events, paymentAuditLogs } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { eventMutex } from "@/lib/mutex";
+import { isEventFree } from "@/lib/price-helpers";
 
 export class AttendeesService {
   static async registerAttendee(data: { 
@@ -59,7 +60,7 @@ export class AttendeesService {
         // Determine status based on price if not explicitly provided
         let status = data.status;
         if (!status) {
-           const isFree = event.price === 'FREE' || event.price === 'GRATIS' || event.price === '0' || !event.price;
+           const isFree = isEventFree(event.price);
            status = isFree ? "confirmado" : "pago_pendiente";
         }
 

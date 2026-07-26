@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { findTenantBySlugOrId, findCategoryBySlugOrId } from "@/lib/slug-helpers";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export const metadata: Metadata = {
   title: "Explorar Eventos — UniEvents",
@@ -153,7 +154,7 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((evt, idx) => {
               const eDate = new Date(evt.date);
-              const isFree = evt.price?.toUpperCase() === 'FREE' || evt.price?.toUpperCase() === 'GRATIS' || evt.price === '0';
+              const isFree = isEventFree(evt.price);
               
               const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
               const monthStr = months[eDate.getMonth()];
@@ -219,7 +220,7 @@ export default async function EventsExplorePage({ searchParams }: { searchParams
                           isFree ? "text-green-600" : "text-university-blue"
                         }`}
                       >
-                        {isFree ? "GRATIS" : evt.price}
+                        {formatEventPrice(evt.price)}
                       </span>
                       <Link href={`/events/${evt.slug || evt.id}`}>
                         <button className="bg-university-blue text-white px-5 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">

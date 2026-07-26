@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { EventsService } from "@/services/events.service";
 import { ApprovalButtons } from "./ApprovalButtons";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export default async function RequestsDashboardPage() {
   const session = await getSession();
@@ -98,8 +99,8 @@ export default async function RequestsDashboardPage() {
                         <p className="text-xs text-on-surface-variant">Capacidad: {evt.capacity || evt.space?.capacity} personas</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${Number(evt.price) > 0 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"}`}>
-                          {Number(evt.price) > 0 ? `$${evt.price}` : "Gratuito"}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${!isEventFree(evt.price) ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"}`}>
+                          {formatEventPrice(evt.price)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">

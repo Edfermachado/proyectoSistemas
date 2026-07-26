@@ -7,6 +7,7 @@ import { events as eventsSchema, tenants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export default async function FacultyEventsPage() {
   const session = await getSession();
@@ -81,8 +82,8 @@ export default async function FacultyEventsPage() {
                     <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-6 py-4 text-on-surface-variant">{e.space?.name}</td>
                     <td className="px-6 py-4 text-on-surface-variant">
-                      <span className={`font-bold ${ (e.price?.toUpperCase() === 'FREE' || e.price?.toUpperCase() === 'GRATIS') ? 'text-green-600' : 'text-university-blue' }`}>
-                        {e.price}
+                      <span className={`font-bold ${ isEventFree(e.price) ? 'text-green-600' : 'text-university-blue' }`}>
+                        {formatEventPrice(e.price)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-on-surface-variant">

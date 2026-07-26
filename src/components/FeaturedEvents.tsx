@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { events } from "@/db/schema";
 import Link from "next/link";
 import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export default async function FeaturedEvents() {
   const featuredEvents = await db.query.events.findMany({
@@ -53,7 +54,7 @@ export default async function FeaturedEvents() {
               const month = evt.date.toLocaleString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, month: 'short' }).toUpperCase();
               const day = evt.date.toLocaleString(VENEZUELA_LOCALE, { timeZone: CARACAS_TIMEZONE, day: '2-digit' });
               const time = formatTimeCaracas(evt.date);
-              const isFree = Number(evt.price) === 0;
+              const isFree = isEventFree(evt.price);
 
               return (
                 <article
@@ -104,7 +105,7 @@ export default async function FeaturedEvents() {
                           isFree ? "text-green-600" : "text-university-blue"
                         }`}
                       >
-                        {isFree ? "GRATIS" : `$${evt.price}`}
+                        {formatEventPrice(evt.price)}
                       </span>
                       <Link href={`/events/${evt.slug || evt.id}`}>
                         <button className="bg-university-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-innovation-purple transition-colors flex items-center gap-2">

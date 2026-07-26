@@ -7,6 +7,7 @@ import { findEventBySlugOrId } from "@/lib/slug-helpers";
 import { getSession } from "@/lib/auth";
 import type { Metadata } from "next";
 import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -32,7 +33,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
   const session = await getSession();
 
   const eDate = new Date(event.date);
-  const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
+  const isFree = isEventFree(event.price);
   
   const endFormat = new Date(eDate.getTime() + event.duration * 60000);
   const timeStr = `${formatTimeCaracas(eDate)} - ${formatTimeCaracas(endFormat)}`;
@@ -105,7 +106,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                 <div>
                   <p className="font-bold text-university-blue">Precio de Entrada</p>
                   <p className={`font-black text-xl ${isFree ? "text-green-600" : "text-university-blue"}`}>
-                    {isFree ? "GRATIS" : event.price}
+                    {formatEventPrice(event.price)}
                   </p>
                 </div>
               </div>

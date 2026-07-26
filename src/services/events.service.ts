@@ -146,7 +146,17 @@ export class EventsService {
 
         const slug = await generateUniqueSlug("events", data.title);
         const eventStatus = data.status || 'pendiente_aprobacion';
-        const [newEvent] = await tx.insert(events).values({ ...data, status: eventStatus, slug }).returning();
+
+        // Normalize price <= 0 to '0'
+        let sanitizedPrice = data.price;
+        if (sanitizedPrice !== undefined) {
+          const numPrice = Number(sanitizedPrice);
+          if (sanitizedPrice.toUpperCase() === 'FREE' || sanitizedPrice.toUpperCase() === 'GRATIS' || (!isNaN(numPrice) && numPrice <= 0)) {
+            sanitizedPrice = '0';
+          }
+        }
+
+        const [newEvent] = await tx.insert(events).values({ ...data, price: sanitizedPrice, status: eventStatus, slug }).returning();
         return newEvent;
       });
     });
@@ -208,8 +218,18 @@ export class EventsService {
         // Regenerate slug if title changed
         const slugUpdate = data.title ? { slug: await generateUniqueSlug("events", data.title, id) } : {};
 
+        let sanitizedPrice = data.price;
+        if (sanitizedPrice !== undefined) {
+          const numPrice = Number(sanitizedPrice);
+          if (sanitizedPrice.toUpperCase() === 'FREE' || sanitizedPrice.toUpperCase() === 'GRATIS' || (!isNaN(numPrice) && numPrice <= 0)) {
+            sanitizedPrice = '0';
+          }
+        }
+
+        const updateData = sanitizedPrice !== undefined ? { ...data, price: sanitizedPrice, ...slugUpdate } : { ...data, ...slugUpdate };
+
         const [updatedEvent] = await tx.update(events)
-          .set({ ...data, ...slugUpdate })
+          .set(updateData)
           .where(eq(events.id, id))
           .returning();
         return updatedEvent;

@@ -6,8 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import { ConfirmPaymentButton } from "@/components/ui/ConfirmPaymentButton";
 import { ManualRegisterForm } from "@/components/ui/ManualRegisterForm";
 import Link from "next/link";
-
 import { getSession } from "@/lib/auth";
+import { isEventFree } from "@/lib/price-helpers";
 
 export default async function EventAttendeesPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -23,7 +23,7 @@ export default async function EventAttendeesPage({ params }: { params: Promise<{
   if (!event || event.tenantId !== session.tenantId) notFound();
 
   const attendees = await AttendeesService.getAttendeesByEvent(id);
-  const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
+  const isFree = isEventFree(event.price);
   
   const confirmed = attendees.filter(a => a.status === 'confirmado').length;
   const pending = attendees.filter(a => a.status === 'pago_pendiente').length;

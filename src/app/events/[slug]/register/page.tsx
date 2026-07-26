@@ -7,6 +7,7 @@ import { registerForEvent } from "@/app/actions/attendees.actions";
 import { findEventBySlugOrId } from "@/lib/slug-helpers";
 import TicketQR from "@/components/TicketQR";
 import type { Metadata } from "next";
+import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -33,7 +34,7 @@ export default async function RegisterEventPage({ params, searchParams }: {
   const event = await findEventBySlugOrId(slug);
   if (!event) notFound();
 
-  const isFree = event.price?.toUpperCase() === 'FREE' || event.price?.toUpperCase() === 'GRATIS' || event.price === '0';
+  const isFree = isEventFree(event.price);
   const eventSlugOrId = event.slug || event.id;
 
   async function handleSubmit(formData: FormData) {
@@ -134,7 +135,7 @@ export default async function RegisterEventPage({ params, searchParams }: {
                 <div className="bg-surface-container-high p-4 rounded-xl flex items-center justify-between border border-outline-variant/50">
                   <span className="font-bold text-university-blue">Total a pagar:</span>
                   <span className={`font-black text-xl ${isFree ? 'text-green-600' : 'text-university-blue'}`}>
-                    {isFree ? 'GRATIS' : event.price}
+                    {formatEventPrice(event.price)}
                   </span>
                 </div>
 

@@ -11,6 +11,7 @@ import { logoutUser } from "@/app/actions/auth";
 import TicketQR from "@/components/TicketQR";
 import { ReportPaymentButton } from "@/components/ReportPaymentButton";
 import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
+import { isEventFree } from "@/lib/price-helpers";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ viewTicket?: string }> }) {
   const session = await getSession();
@@ -78,7 +79,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       tenantName: ev.tenant?.name || "UniEvents",
       ticketToken: reg.ticketToken,
       // Pass payment details if pending
-      needsPaymentInfo: reg.status === "pago_pendiente" && ev.price !== "GRATIS",
+      needsPaymentInfo: reg.status === "pago_pendiente" && !isEventFree(ev.price),
       paymentBank: ev.paymentBank,
       paymentPhone: ev.paymentPhone,
       paymentId: ev.paymentId,
