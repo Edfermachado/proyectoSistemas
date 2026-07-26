@@ -32,3 +32,31 @@
     scrollbar-width: none;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-report,
+  #printable-report *,
+  #printable-faculty-report,
+  #printable-faculty-report * {
+    visibility: visible !important;
+  }
+  #printable-report,
+  #printable-faculty-report {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+}
