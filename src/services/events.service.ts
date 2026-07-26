@@ -23,6 +23,24 @@ export class EventsService {
   }
 
   /**
+   * Obtiene todos los eventos públicos no archivados.
+   */
+  static async getAllEvents() {
+    return await db.query.events.findMany({
+      where: eq(events.isArchived, false),
+      with: {
+        space: true,
+        tenant: {
+          with: {
+            university: true,
+          },
+        },
+      },
+      orderBy: (events, { desc }) => [desc(events.date)],
+    });
+  }
+
+  /**
    * Obtiene un evento por su ID.
    */
   static async getEventById(id: string) {
