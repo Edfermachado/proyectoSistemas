@@ -73,20 +73,51 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
                     const { events } = await import("@/db/schema");
                     const { eq } = await import("drizzle-orm");
                     const { revalidatePath } = await import("next/cache");
-                    await db.update(events).set({ isFeatured: !e.isFeatured }).where(eq(events.id, e.id));
+                    const nextState = !e.isFeatured;
+                    await db.update(events).set({
+                      isFeatured: nextState,
+                      featuredRequested: false, // Reset request on toggle
+                    }).where(eq(events.id, e.id));
                     revalidatePath("/admin/events");
+                    revalidatePath("/faculty-admin/events");
                     revalidatePath("/");
                   }
 
                   return (
-                    <tr key={e.id} className="border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-university-blue">{e.title}</td>
-                      <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString()}</td>
+                    <tr key={e.id} className={`border-b border-outline-variant/50 hover:bg-surface-container-lowest/50 transition-colors ${e.featuredRequested && !e.isFeatured ? 'bg-amber-50/50' : ''}`}>
+                      <td className="px-6 py-4 font-medium text-university-blue">
+                        <div className="flex items-center gap-2">
+                          <span>{e.title}</span>
+                          {e.featuredRequested && !e.isFeatured && (
+                            <span className="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-300 animate-pulse">
+                              Solicitud Decanato
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-on-surface-variant">{e.date.toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                       <td className="px-6 py-4 text-on-surface-variant">{e.tenant?.name}</td>
                       <td className="px-6 py-4 text-center">
                         <form action={toggleFeature}>
-                          <button type="submit" title={e.isFeatured ? "Quitar destacado" : "Destacar evento"} className={`p-2 rounded-full transition-colors ${e.isFeatured ? 'text-academic-gold bg-academic-gold/10 hover:bg-academic-gold/20' : 'text-slate-400 hover:text-academic-gold hover:bg-surface-container'}`}>
-                            <span className={`material-symbols-outlined ${e.isFeatured ? 'icon-filled' : ''}`}>star</span>
+                          <button
+                            type="submit"
+                            title={
+                              e.isFeatured
+                                ? "Quitar de la Portada Principal"
+                                : e.featuredRequested
+                                  ? "Aprobar solicitud y Destacar en Portada"
+                                  : "Destacar en Portada Principal"
+                            }
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1 mx-auto ${
+                              e.isFeatured
+                                ? 'text-amber-900 bg-amber-100 border border-amber-300 hover:bg-amber-200'
+                                : e.featuredRequested
+                                  ? 'text-yellow-900 bg-yellow-300 border border-yellow-400 hover:bg-yellow-400 animate-bounce'
+                                  : 'text-slate-500 bg-surface-container-high hover:text-academic-gold hover:bg-surface-container border border-outline-variant'
+                            }`}
+                          >
+                            <span className={`material-symbols-outlined text-sm ${e.isFeatured || e.featuredRequested ? 'icon-filled text-academic-gold' : ''}`}>star</span>
+                            {e.isFeatured ? 'Destacado' : e.featuredRequested ? 'Aprobar Solicitud' : 'Destacar'}
                           </button>
                         </form>
                       </td>

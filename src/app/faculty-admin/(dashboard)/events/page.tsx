@@ -32,6 +32,16 @@ export default async function FacultyEventsPage() {
     revalidatePath("/faculty-admin/events");
   }
 
+  async function requestFeature(formData: FormData) {
+    "use server";
+    const eventId = formData.get("eventId") as string;
+    const eventTarget = await db.query.events.findFirst({ where: eq(eventsSchema.id, eventId) });
+    if (!eventTarget || eventTarget.status !== 'aprobado') return;
+    await db.update(eventsSchema).set({ featuredRequested: !eventTarget.featuredRequested }).where(eq(eventsSchema.id, eventId));
+    revalidatePath("/faculty-admin/events");
+    revalidatePath("/admin/events");
+  }
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -71,6 +81,7 @@ export default async function FacultyEventsPage() {
                   <th className="px-6 py-4 font-title-sm text-university-blue">Espacio</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Precio</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Estado</th>
+                  <th className="px-6 py-4 font-title-sm text-university-blue">Portada Global</th>
                   <th className="px-6 py-4 font-title-sm text-university-blue">Asistentes</th>
                   <th className="px-6 py-4 text-right font-title-sm text-university-blue">Acciones</th>
                 </tr>
@@ -87,13 +98,39 @@ export default async function FacultyEventsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-on-surface-variant">
-                      <span className={`font-bold text-xs uppercase px-2 py-1 rounded-full ${
+                      <span className={`font-bold text-xs uppercase px-2.5 py-1 rounded-full ${
                         e.status === 'aprobado' ? 'bg-green-100 text-green-800' :
                         e.status === 'rechazado' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
                         {e.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-on-surface-variant">
+                      {e.isFeatured ? (
+                        <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 text-xs px-2.5 py-1 rounded-full font-bold border border-amber-300">
+                          <span className="material-symbols-outlined text-xs text-amber-600 icon-filled">star</span>
+                          En Portada
+                        </span>
+                      ) : e.status === 'aprobado' && !isAccessControl ? (
+                        <form action={requestFeature}>
+                          <input type="hidden" name="eventId" value={e.id} />
+                          <button
+                            type="submit"
+                            className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold transition-all ${
+                              e.featuredRequested
+                                ? 'bg-yellow-50 text-yellow-800 border border-yellow-300 hover:bg-yellow-100'
+                                : 'bg-surface-container-high text-on-surface-variant border border-outline-variant hover:border-academic-gold hover:text-university-blue'
+                            }`}
+                            title={e.featuredRequested ? "Cancelar solicitud a Rectorado" : "Solicitar al Rectorado destacar en la Home principal"}
+                          >
+                            <span className={`material-symbols-outlined text-xs ${e.featuredRequested ? 'text-yellow-600 icon-filled' : ''}`}>star</span>
+                            {e.featuredRequested ? 'Solicitado (Pendiente)' : 'Solicitar Portada'}
+                          </button>
+                        </form>
+                      ) : (
+                        <span className="text-xs text-on-surface-variant italic">N/A</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       {e.status === 'aprobado' ? (

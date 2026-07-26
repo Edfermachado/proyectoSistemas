@@ -54,7 +54,7 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 50 }),
   role: varchar('role', { length: 50 }).notNull().default('user'), // roles: superadmin, tenant_admin, user
   tenantId: uuid('tenant_id').references(() => tenants.id), // Puede ser null para el superadmin global
-  departmentId: uuid('department_id').references(() => departments.id),
+  departmentId: uuid('department_id').references(() => departments.id, { onDelete: 'set null' }),
   organizerLevel: organizerLevelEnum('organizer_level').default('academico'),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -79,12 +79,13 @@ export const events = pgTable('events', {
   imageUrl: varchar('image_url', { length: 500 }),
   duration: integer('duration').notNull().default(60),
   tenantId: uuid('tenant_id').references(() => tenants.id).notNull(),
-  departmentId: uuid('department_id').references(() => departments.id),
+  departmentId: uuid('department_id').references(() => departments.id, { onDelete: 'set null' }),
   spaceId: uuid('space_id').references(() => spaces.id).notNull(),
   capacity: integer('capacity'),
   visibility: visibilityEnum('visibility').default('publico'),
   status: varchar('status', { length: 50 }).default('pendiente_aprobacion'), // roles: pendiente_aprobacion, aprobado, rechazado
   requiresIpProtection: boolean('requires_ip_protection').default(false),
+  featuredRequested: boolean('featured_requested').default(false),
   isFeatured: boolean('is_featured').default(false),
   paymentPhone: varchar('payment_phone', { length: 50 }),
   paymentId: varchar('payment_id', { length: 50 }),

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, and, gte } from "drizzle-orm";
 import { events } from "@/db/schema";
 import Link from "next/link";
 import { formatTimeCaracas, CARACAS_TIMEZONE, VENEZUELA_LOCALE } from "@/lib/date-utils";
@@ -8,7 +8,12 @@ import { isEventFree, formatEventPrice } from "@/lib/price-helpers";
 
 export default async function FeaturedEvents() {
   const featuredEvents = await db.query.events.findMany({
-    where: eq(events.isFeatured, true),
+    where: and(
+      eq(events.isFeatured, true),
+      eq(events.status, 'aprobado'),
+      eq(events.isArchived, false),
+      gte(events.date, new Date())
+    ),
     with: {
       space: true,
       tenant: {
