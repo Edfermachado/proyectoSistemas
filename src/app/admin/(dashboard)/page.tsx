@@ -20,10 +20,6 @@ export default async function AdminDashboard() {
             Bienvenido al centro de mando. Aquí puedes visualizar las métricas clave y gestionar las entidades principales de todas las facultades.
           </p>
         </div>
-        <button className="hidden md:flex items-center gap-2 bg-university-blue text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-innovation-purple hover:-translate-y-1 transition-all duration-300">
-          <span className="material-symbols-outlined">download</span>
-          Exportar Reporte
-        </button>
       </div>
 
       {/* Métricas Globales */}
@@ -81,7 +77,7 @@ export default async function AdminDashboard() {
               <span className="material-symbols-outlined text-university-blue group-hover:text-innovation-purple">arrow_forward</span>
             </div>
           </Link>
-          
+
           <Link href="/admin/events" className="event-card-hover bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant flex items-center justify-between group shadow-sm">
             <div>
               <h3 className="font-title-lg text-university-blue group-hover:text-innovation-purple transition-colors">Auditoría de Eventos</h3>
@@ -102,7 +98,7 @@ function MetricCard({ title, value, icon, color, bg }: { title: string, value: s
     <div className="event-card-hover bg-surface-white p-6 rounded-3xl border border-outline-variant shadow-sm flex items-center gap-6 relative overflow-hidden">
       {/* Decorative background circle */}
       <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full ${bg} opacity-50 blur-xl`}></div>
-      
+
       <div className={`w-16 h-16 rounded-2xl ${bg} flex items-center justify-center relative z-10 border border-white`}>
         <span className={`material-symbols-outlined text-3xl ${color}`}>{icon}</span>
       </div>
