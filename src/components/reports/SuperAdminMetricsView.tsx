@@ -32,7 +32,7 @@ export function SuperAdminMetricsView({ initialData, currentUserEmail }: Props) 
   };
 
   const handleDownloadCsv = () => {
-    window.open(`/api/admin/reports?period=${period}&export=csv`, "_blank");
+    window.location.href = `/api/admin/reports?period=${period}&export=csv`;
   };
 
   const filteredEvents = data.detailedEvents.filter(

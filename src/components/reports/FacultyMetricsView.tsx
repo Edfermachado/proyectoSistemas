@@ -32,7 +32,7 @@ export function FacultyMetricsView({ initialData, currentUserEmail }: Props) {
   };
 
   const handleDownloadCsv = () => {
-    window.open(`/api/faculty/reports?period=${period}&export=csv`, "_blank");
+    window.location.href = `/api/faculty/reports?period=${period}&export=csv`;
   };
 
   const filteredEvents = data.topEvents.filter(
