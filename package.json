@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx src/db/seed.ts",
-    "cleanup-qrs": "tsx scripts/cleanup-qrs.ts"
+    "cleanup-qrs": "tsx scripts/cleanup-qrs.ts",
+    "test": "vitest run",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.3",
@@ -37,12 +39,15 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/ui": "^4.1.10",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "tsx": "^4.23.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10"
   }
 }
