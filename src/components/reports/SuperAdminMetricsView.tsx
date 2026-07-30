@@ -400,6 +400,7 @@ export function SuperAdminMetricsView({ initialData, currentUserEmail }: Props) 
           </table>
         </div>
       </div>
+      </div>
 
       {/* PRINTABLE EXECUTIVE REPORT MODAL */}
       {showPrintModal && (

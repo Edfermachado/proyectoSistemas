@@ -351,6 +351,7 @@ export function FacultyMetricsView({ initialData, currentUserEmail }: Props) {
           </table>
         </div>
       </div>
+      </div>
 
       {/* PRINTABLE FACULTY REPORT MODAL */}
       {showPrintModal && (
