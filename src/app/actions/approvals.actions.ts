@@ -15,10 +15,10 @@ export async function approveEventAction(eventId: string) {
     throw new Error('No autorizado: Solo el Decanato o Administrador de Facultad puede aprobar eventos.');
   }
 
-  const approvedEvent = await EventsService.approveEvent(eventId);
+  await EventsService.approveEvent(eventId);
   revalidatePath('/faculty-admin/requests');
   revalidatePath('/events');
-  return { success: true, event: approvedEvent };
+  return { success: true };
 }
 
 /**
@@ -32,8 +32,8 @@ export async function rejectEventAction(eventId: string) {
     throw new Error('No autorizado: Solo el Decanato o Administrador de Facultad puede rechazar eventos.');
   }
 
-  const rejectedEvent = await EventsService.rejectEvent(eventId);
+  await EventsService.rejectEvent(eventId);
   revalidatePath('/faculty-admin/requests');
   revalidatePath('/events');
-  return { success: true, event: rejectedEvent };
+  return { success: true };
 }

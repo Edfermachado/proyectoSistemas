@@ -3,13 +3,14 @@ import { db } from "@/db";
 import { attendees } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
+import { AttendeesService } from "@/services/attendees.service";
 
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    // Any tenant_admin can verify for their tenant
-    if (!session || session.role !== "tenant_admin") {
-      return NextResponse.json({ error: "Unauthorized. Solo los administradores de facultad pueden verificar pagos." }, { status: 401 });
+    const allowedRoles = ["superadmin", "tenant_admin", "event_manager"];
+    if (!session || !session.userId || !allowedRoles.includes(session.role as string)) {
+      return NextResponse.json({ error: "Unauthorized. No tienes permisos para verificar pagos." }, { status: 401 });
     }
 
     const body = await request.json();
@@ -32,26 +33,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Attendee not found" }, { status: 404 });
     }
 
-    if (attendee.event.tenantId !== session.tenantId) {
+    // Check permissions
+    if (session.role === "tenant_admin" && attendee.event.tenantId !== session.tenantId) {
       return NextResponse.json({ error: "Forbidden. No tienes permisos para este evento." }, { status: 403 });
+    }
+    
+    if (session.role === "event_manager" && attendee.event.managerId !== session.userId) {
+      return NextResponse.json({ error: "Forbidden. Solo el gestor responsable de este evento puede verificar sus pagos." }, { status: 403 });
     }
 
     if (action === 'approve') {
-      await db.update(attendees)
-        .set({
-          status: 'confirmado',
-          paymentVerifiedBy: session.userId as string,
-          paymentVerifiedAt: new Date()
-        })
-        .where(eq(attendees.id, attendeeId));
+      await AttendeesService.confirmPayment(attendeeId, session.userId as string);
     } else if (action === 'reject') {
-      await db.update(attendees)
-        .set({
-          status: 'registrado', // Or a new status like 'pago_rechazado' if we added it, but fallback to registrado to force them to try again, or clear the reference
-          paymentReference: null,
-          paymentScreenshotUrl: null
-        })
-        .where(eq(attendees.id, attendeeId));
+      await AttendeesService.rejectPayment(attendeeId, session.userId as string);
     }
 
     return NextResponse.json({ success: true });
