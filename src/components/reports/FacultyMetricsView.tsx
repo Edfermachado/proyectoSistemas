@@ -362,8 +362,23 @@ export function FacultyMetricsView({ initialData, currentUserEmail }: Props) {
                 <span className="font-bold text-slate-800">Reporte Ejecutivo de Gestión de Facultad</span>
               </div>
               <div className="flex items-center gap-3">
+                <style type="text/css" media="print">
+                  {`
+                    @page { size: auto; margin: 10mm; }
+                    * {
+                      -webkit-print-color-adjust: exact !important;
+                      print-color-adjust: exact !important;
+                    }
+                  `}
+                </style>
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const originalTitle = document.title;
+                    const facultySlug = data.facultyInfo.name.replace(/\\s+/g, "_").substring(0, 15);
+                    document.title = `Reporte_${facultySlug}_${period}_${new Date().toISOString().split('T')[0]}`;
+                    window.print();
+                    setTimeout(() => { document.title = originalTitle; }, 500);
+                  }}
                   className="px-4 py-2 bg-university-blue text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-university-blue/90 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-sm">print</span> Imprimir / Guardar PDF
