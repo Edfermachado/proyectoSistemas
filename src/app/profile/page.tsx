@@ -75,7 +75,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       time: timeStr,
       location: ev.space?.name || "Ubicación por definir",
       image: ev.imageUrl || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600",
-      status: reg.status === "pago_pendiente" ? "Pendiente" : "Confirmado",
+      status: reg.scannedAt ? "Asistido" : (reg.status === "pago_pendiente" ? "Pendiente" : "Confirmado"),
       tenantName: ev.tenant?.name || "UniEvents",
       ticketToken: reg.ticketToken,
       // Pass payment details if pending
@@ -206,7 +206,12 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
                       </p>
                       
                       <div className="mt-auto flex flex-wrap gap-3">
-                        {event.status === "Confirmado" && event.ticketToken ? (
+                        {event.status === "Asistido" ? (
+                          <span className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 cursor-default" title="Tu entrada ya fue validada en la puerta">
+                            <span className="material-symbols-outlined text-[18px]">verified</span>
+                            Entrada Utilizada
+                          </span>
+                        ) : event.status === "Confirmado" && event.ticketToken ? (
                           <Link href={`/profile?viewTicket=${event.ticketToken}`} scroll={false} className="bg-university-blue/10 hover:bg-university-blue/20 text-university-blue px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
                             <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
                             Ver Entrada
