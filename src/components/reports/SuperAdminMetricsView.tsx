@@ -49,7 +49,8 @@ export function SuperAdminMetricsView({ initialData, currentUserEmail }: Props) 
     new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <>
+      <div className="space-y-8 animate-fade-in print:hidden">
       {/* Top Banner & Control Bar */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-surface-white p-6 rounded-3xl border border-outline-variant shadow-sm">
         <div>
@@ -402,8 +403,8 @@ export function SuperAdminMetricsView({ initialData, currentUserEmail }: Props) 
 
       {/* PRINTABLE EXECUTIVE REPORT MODAL */}
       {showPrintModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto print:p-0">
-          <div className="bg-white text-slate-900 w-full max-w-4xl rounded-3xl p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto print:max-h-none print:shadow-none print:rounded-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto print:static print:block print:bg-transparent print:p-0 print:overflow-visible">
+          <div className="bg-white text-slate-900 w-full max-w-4xl rounded-3xl p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto print:max-h-none print:shadow-none print:rounded-none print:overflow-visible print:w-full print:p-0 print:m-0">
             {/* Modal Controls Bar */}
             <div className="flex justify-between items-center pb-6 border-b border-slate-200 print:hidden">
               <div className="flex items-center gap-2">
@@ -532,6 +533,6 @@ export function SuperAdminMetricsView({ initialData, currentUserEmail }: Props) 
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
